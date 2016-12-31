@@ -1,0 +1,33 @@
+69 103 101 58 00 112 147
+45  67  65 3a 00  70  93
+
+0x21c0 - start of text strings?
+
+45 = you
+51 = are
+DB = ??
+
+45 = "you"
+FC = "'" = 33
+ED = "r" = 0xed - 0xdb (size of database)
+59 = "e "
+48 = "in "
+3a = "the "
+00 = "entrance "
+70 = "ha"
+93 = "ll"
+FB = " " = 32
+49 = "of "
+5D = "a "
+EE = "s"
+81 = "ma"
+93 = "ll"
+F9 = "," = 30
+DF = "d" = 4
+73 = "es"
+66 = "er"
+6D = "te"
+5C = "d " "eserted "
+43 = "rail"
+4B = "way"
+FB = " " = 32
