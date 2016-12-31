@@ -1,0 +1,69 @@
+0x313c - room exits
+2e90 = parsing
+
+State = wibble2
+
+Rooms: 
+0 = Entrance Hall
+1 = Short flight of stone stairs
+2 = Waiting room
+3 = Telephone Booth
+5 = Wide station corridor
+6 = Wide Sunlit corridor
+7 = Open air outside platform
+8 = Iron steps
+9 = Bridge
+
+
+d5 = room 16 - dead?
+
+Room 0: Entrance Hall
+Desc = 0, 2
+N = 2 (Waiting Room)
+W = 5 (Wide Station Corridor)
+D = 1 (Short flight of stone steps)
+
+Room 1: Short flight of stone steps
+Desc = 1,8
+U = 0 (Entrance Hall)
+D = D5 (?)
+
+Room 2: Waiting room
+S = 0 (Entrance Hall)
+
+Room 3: Telephone Booth
+I =
+O =
+
+Room 4:
+
+Exits:
+0-100 = 1st nybble =
+=> 0001 = n
+=> 0010 = s
+=> 0100 = e
+=> 1000 = w
+2nd nybble = count of exits
+100-200 = 1st nybble =
+0001 = u
+0010 = d
+0100 = i
+1000 = o
+2nd nybble = 
+0001 = se
+0010 = sw
+0100 = ne
+1000 = ne
+
+
+Rick: Loader
+
+Rick3: Dictionary
+
+Rick4:
+0x0    - 0x100  = room wesn
+0x100  - 0x200  = room others
+0x200  - 0x2dc  = room descs
+0x42e  -        = obj locs
+0x1f3c - 0x21bf = room exits 
+0x21c0 +        = phrases
