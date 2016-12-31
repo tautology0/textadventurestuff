@@ -29,20 +29,20 @@ int main(void)
    unsigned char blank=255;
 
 
-   messages=fopen("messages.txt","r");
+   messages=fopen("thesius.txt","r");
    if (messages == NULL)
    {
       fprintf(stderr,"Could not open messages file\n");
       exit(1);
    }
-   infile=fopen("$.RICK4","rb");
+   infile=fopen("$.ADCODE1","rb");
    if (infile == NULL)
    {
       fprintf(stderr,"Could not open data file\n");
       exit(1);
    }
    // Open exitsptr so we can look at the same file twice!
-   exitsptr=fopen("$.RICK4","rb");
+   exitsptr=fopen("$.ADCODE1","rb");
    if (exitsptr == NULL)
    {
       fprintf(stderr,"Could not open data file\n");

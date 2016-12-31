@@ -1,0 +1,7 @@
+$.ADCODE2:
+0000 - 2a60 = Messages
+2a61 - 2cc2 = ??
+2cc3 - 3005 = MIDGE tables
+
+$.ADCODE1
+Exits
