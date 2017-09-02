@@ -1,0 +1,78 @@
+Xaan1 - loads at 880, starts at 888
+
+.init 888:
+*FX &E1,0,0  	disable function keys
+*FX &C8,3    	disable escape and clear memory on break
+*FX &8B,1,0  	*OPT 1: no messages during file opts
+*RUN XAAN	Load Xaan
+
+XAAN - loads at 1200, starts at 225d
+.xaaninit 
+VDU 22,7 	mode 7
+VDU 15		page mode off
+*FX &8B,01,00	*OPT 1: no messages during files opts (again!)
+&0068 = 0
+&0085 = &43
+&0084 = 0	(&3100 file offset!)
+VDU 12		CLS
+Newline
+5 more newlines
+&20ac = &06
+newline
+&006b = &89
+call l20a6
+
+
+message
+
+0d = end
+>5b = token
+<20 = token + a5
+2e = . punct spc
+3f = ? punct spc
+21 = ! punct spc
+23 = # capitalise
+2c = , punct
+3b = ; punct
+3a = : punct
+24 = $ verb
+25 = % noun
+26 = & EOR &20 (?)
+3c = <
+= = Show in timed display
+
+
+YOU ARE
+ON 		23 = 7e
+A		46 = A1
+HILLTOP		48 = H 
+
+NORTH
+OF
+THE 
+KEEP
+
+
+0x4370 =
+61 = GUARD
+49 = I
+A4 = "S "
+53 = S
+c3 = LE
+04 = EP
+99 = ING
+20 = " "
+7e = ON
+a1 = A 
+48 = H
+AE = AR
+44 = D
+2C = ,
+57 = W
+E2 = OO
+BF = DE
+9E = "N "
+42 = B
+af = EN
+d3 = CH
+20 = " "

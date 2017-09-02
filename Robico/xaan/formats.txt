@@ -1,0 +1,82 @@
+XAAN2: copy protection code
+
+XAAN1: Message mangling code
+
+XAAN:
+From	To	Purpose
+-----------------------------------
+3100 	3248	Introduction text
+3249	32ff	Unknown
+3300	5c56	Messages
+5c57	6472	Unknown
+6355		Room messages
+6473	65a8	List of verbs
+65a9	66e1	List of nouns
+66e4	69fb	List of tokens
+
+Objects:
+x
+x		36 83
+alcove		36 02
+beggar		35 83
+blanket		37 00
+bracelet	38 82
+brooch		36 00
+chain		3b 01
+cloak		37 02
+coin		3b 03
+compass		38 04
+diamond		
+doll
+dresser
+food
+glasses
+
+
+1 = N (3)
+2 = W (3)
+3 = E (2) W (4)
+4 = E (3) N (5)
+ 
+Bit 1 = 
+e0 36
+83 36 02 35
+83 37 00 38
+82 36 00 3b 01 37 02 3b 03 38 04 3b 05 3b 06 37
+87 37 00 3b 01 38 02 38 03 3a 04 3b 05 3b 06 38
+
+e0 = 1110 000
+   = && 0x80 = start of exits
+   = && 0x40 = blocked exit
+   = && 0x20 = ??
+00 = N
+01 = S
+02 = E
+03 = w
+04 = NE
+05 = NW
+06 = SE
+07 = SW
+08 = U
+09 = D
+
+For some reasons rooms start at 0x34
+Descriptions are at 6354 - 646f Message + 163
+
+0x74f6 = items (absolute):
+00 = in inventory
+01 = wearing
+
+34 = alcove
+d6 = beggar
+d6 = blanket
+ea = bracelet
+00 = brooch
+FF 
+
+
+goblet - ec (room 8f) - 5d difference
+glasses - e1 (room 84) - 5d difference
+bracelet - ea (room 8d) - 5d difference
+ingot - e2 (room 85) - 5d difference
+leggings - e3 (room 86)
