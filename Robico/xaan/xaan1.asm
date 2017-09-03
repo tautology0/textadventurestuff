@@ -30,14 +30,14 @@ org     &ffb9
 ; code equates
 ;
 l0060       = &0060
-l0061       = &0061
-l0062       = &0062
+msgnumber       = &0061
+capflag     = &0062        ; if == 0; then next character is a capital
 l0063       = &0063
 l0064       = &0064
-l0066       = &0066
-l0067       = &0067
+wordbufptr  = &0066
+wordbufptrh = &0067
 l0068       = &0068
-l0069       = &0069
+lwrormask   = &0069        ; == &20 - value to lower case ASCII
 l006b       = &006b
 bufptr      = &0070
 bufptrh     = &0071
@@ -45,20 +45,21 @@ cmpbuf      = &0072
 cmpbufh     = &0073
 l0074       = &0074
 linelen     = &0080
-nounflag    = &0081
-curverb       = &0082
-curnoun       = &0083
-l0084       = &0084
-l0085       = &0085
-l0086       = &0086
-l0087       = &0087
+nounflag    = &0081        ; if != 0; then there is a noun
+curverb     = &0082
+curnoun     = &0083
+msglist     = &0084
+msglisth    = &0085
+verbv       = &0086
+verbvh      = &0087
 l0089       = &0089
 inputbuf    = &0400
 verbbuf     = &041f
 nounbuf     = &043e
+wordbuf     = &0600
 l0922       = &0922
-l7600       = &7600
-l7638       = &7638
+verbptrsl   = &7600
+verbptrsh   = &7638
 l7a20       = &7a20
 verblist    = &7673
 nounlist    = &77A9
@@ -109,122 +110,141 @@ org &0880
             rts
 }
 
-l090d:      clc
-            adc l0066
-            sta l0066
-            bcs l0915
+; addwordbufptr - adds the value in A to wordbufptr
+
+.addwordbufptr
+{
+            clc
+            adc wordbufptr
+            sta wordbufptr
+            bcs incwbhigh
             rts
-l0915:      inc l0067
+.incwbhigh  inc wordbufptrh
             rts
-l0918:      ldy #&00
-            sty l0066
-            lda #&06
-            sta l0067
+}
+
+.setwordbufptr
+{
+            ldy #<wordbuf
+            sty wordbufptr
+            lda #>wordbuf
+            sta wordbufptrh
             rts
-l0921:      lda #&86
+}
+
+; &10921
+.printmsg
+{            
+            lda #&86
             jmp oswrch        ; VDU 134 (Colour = cyan)
-l0926:      jsr l0918
-l0929:      lda l0069
-l092b:      sta l0062
-            lda (bufptr),y     ; MIDGE parsing special characters
-            cmp #&0d
-            beq l0976
-            cmp #&5b
-            bcs l0979
-            cmp #&20
+.msgnocol   jsr setwordbufptr
+.clrmsgloop lda lwrormask     ; == 20
+.msgloop    sta capflag
+            lda (bufptr),y    ; MIDGE parsing special characters
+            cmp #&0d          ; end of message
+            beq endmsg
+            cmp #&5b          ; token
+            bcs instoken         
+            cmp #&20          ; token + &a5
             bcc l0981
-            cmp #&2e
-            beq l0987
-            cmp #&3f
-            beq l0987
-            cmp #&21
-            beq l0987
-            cmp #&23
-            beq l098d
-            cmp #&2c
-            beq l09a0
-            cmp #&3b
-            beq l09a0
-            cmp #&3a
-            beq l09a0
-            cmp #&24
-            beq l09a6
-            cmp #&25
+            cmp #&2e          
+            beq punctcap
+            cmp #&3f          
+            beq punctcap
+            cmp #&21         
+            beq punctcap
+            cmp #&23          ; capitalise
+            beq capnext
+            cmp #&2c          ; ", "
+            beq punctlwr
+            cmp #&3b          ; "; "
+            beq punctlwr
+            cmp #&3a          ; ": "
+            beq punctlwr
+            cmp #&24          ; verb
+            beq l09a6 
+            cmp #&25          ; noun
             beq l09b0
-            cmp #&26
+            cmp #&26          ; ?
             beq l09ba
-            cmp #&3c
+            cmp #&3c          ; "<"
             beq l09c6
-            ora l0062
-l0969:      sta (l0066),y
+            ora capflag
+.storechar  sta (wordbufptr),y
             lda #&01
-l096d:      jsr l090d
+.incptrs    jsr addwordbufptr
             jsr incbufptr
-            jmp l0929
-l0976:      jmp l0aa3
-l0979:      jsr l0a2b
+            jmp clrmsgloop
+.endmsg     jmp l0aa3
+.instoken   jsr l0a2b
 l097c:      ldy #&00
-            jmp l096d
+            jmp incptrs
 l0981:      jsr l0a6e
             jmp l097c
-l0987:      jsr l0995
-            jsr l090d
-l098d:      jsr incbufptr
+.punctcap   jsr spaceafter
+            jsr addwordbufptr
+.capnext    jsr incbufptr
             lda #&00
-            jmp l092b
-l0995:      sta (l0066),y
+            jmp msgloop
+.spaceafter sta (wordbufptr),y
             lda #&20
             iny
-            sta (l0066),y
+            sta (wordbufptr),y
             lda #&02
             dey
             rts
-l09a0:      jsr l0995
-            jmp l096d
+.punctlwr   jsr spaceafter
+            jmp incptrs
 l09a6:      lda #&1f
             sta cmpbufh
             jsr l0a86
-            jmp l096d
+            jmp incptrs
 l09b0:      lda #&3e
             sta cmpbufh
             jsr l0a86
-            jmp l096d
+            jmp incptrs
 l09ba:      jsr incbufptr
-            lda l0069
+            lda lwrormask
             eor #&20
-            sta l0069
-            jmp l092b
+            sta lwrormask
+            jmp msgloop
 l09c6:      lda #&01
             eor l006b
             sta l006b
-            jmp l0969
-l09cf:      stx l0061
+            jmp storechar
+; l09cf
+; findmsg - finds message in X (and passes it to print routine)
+.findmsg
+{            
+            stx msgnumber
             lda #&20
-            sta l0069
-            lda l0084
+            sta lwrormask
+            lda msglist         ; 0 when I looked - blank A, X and Y?
             sta bufptr
             tay
             tax
-            lda l0085
+            lda msglisth        ; &45 - &4500 - start of messages
             sta bufptrh
-            lda l0061
-            beq l09f7
-l09e3:      lda (bufptr),y
+            lda msgnumber
+            beq foundmsg
+.searchloop lda (bufptr),y
             cmp #&0d
-            beq l09ef
-l09e9:      jsr incbufptr
-            jmp l09e3
-l09ef:      inx
-            cpx l0061
-            bne l09e9
+            beq endmsg
+.notfound   jsr incbufptr
+            jmp searchloop
+.endmsg     inx
+            cpx msgnumber
+            bne notfound
             jsr incbufptr
-l09f7:      jmp l0926
+.foundmsg   jmp msgnocol
+}
+
 l09fa:      jsr l0b28
             ldy #&00
             stx l0060
-            lda l0066
+            lda wordbufptr
             sta l0063
-            lda l0067
+            lda wordbufptrh
             sta l0064
 l0a09:      lda (l0063),y
             cmp #&20
@@ -271,11 +291,11 @@ l0a57:      iny
             cmp #&40
             beq l0a6b
             dey
-            ora l0062
-            sta (l0066),y
+            ora capflag
+            sta (wordbufptr),y
             iny
-            lda l0069
-            sta l0062
+            lda lwrormask
+            sta capflag
             jmp l0a57
 l0a6b:      dey
             tya
@@ -296,7 +316,7 @@ l0a86:      lda #&04
 l0a8a:      lda (cmpbufh),y
             cmp #&0d
             beq l0a96
-            sta (l0066),y
+            sta (wordbufptr),y
             iny
             jmp l0a8a
 l0a96:      tya
@@ -306,15 +326,15 @@ l0a9a:      lda l0068
             eor #&04
             sta l0068
             jmp l0acc
-l0aa3:      sta (l0066),y
+l0aa3:      sta (wordbufptr),y
             jsr l0b28
             ldy #&00
             cpx #&00
             bne l0ab1
             jsr l0921
-l0ab1:      jsr l0918
+l0ab1:      jsr setwordbufptr
 l0ab4:      jsr l09fa
-            lda (l0066),y
+            lda (wordbufptr),y
             cmp #&0d
             beq l0ad4
             cmp #&2b
@@ -325,7 +345,7 @@ l0ab4:      jsr l09fa
             ldx l0068
             bne l0ad5
 l0acc:      lda #&01
-            jsr l090d
+            jsr addwordbufptr
             jmp l0ab4
 l0ad4:      rts
 l0ad5:      txa
@@ -339,7 +359,7 @@ l0ad5:      txa
             jmp l0acc
 l0ae4:      jsr l0b22
 l0ae7:      iny
-            lda (l0066),y
+            lda (wordbufptr),y
             cmp #&2b
             bne l0ae7
             sty bufptr
@@ -357,8 +377,8 @@ l0ae7:      iny
             jsr oswrch     ; y co-ord - VDU 31, [&70], Y
             ldy #&00
 l0b0b:      lda #&01
-            jsr l090d
-            lda (l0066),y
+            jsr addwordbufptr
+            lda (wordbufptr),y
             cmp #&2b
             beq l0b1c
             jsr oswrch
@@ -549,17 +569,19 @@ l0b22:      jsr osnewl
 }
 
 ; &0c3e
-            jsr osnewl
+.handlecmd
+{
+            jsr osnewl           ; newline
             ldx curverb
-            cpx #&ff
-            beq l0c57
-            lda l7600,x
-            sta l0086
-            lda l7638,x
-            sta l0087
-            jsr l0c80
-            jmp (l0086)
-l0c57:      ldx #&00
+            cpx #&ff             ; no verb found
+            beq badverb   
+            lda verbptrsl,x      ; lookup table to control each verb
+            sta verbv
+            lda verbptrsh,x
+            sta verbvh
+            jsr setnouns
+            jmp (verbv)
+.badverb    ldx #&00
             jsr l09cf
             ldx #&02
             jsr l09cf
@@ -576,9 +598,15 @@ l0c75:      jsr osnewl
             lda #&86
             sta l0922
             jmp osnewl
-l0c80:      ldx curnoun
+}            
+; setnouns - quick helper to set X to current noun and A to whether there is a noun
+.setnouns
+{      
+            ldx curnoun
             lda nounflag
             rts
+}
+; c85            
             ldx #&00
             jmp l0c6d
             bne l0c91
@@ -611,7 +639,7 @@ l0cc7:      ldx #&09
             jmp l0c72
             jsr setbufnoun
             ldy #&00
-            stx l0061
+            stx msgnumber
             ldx #&00
 l0cd7:      lda (bufptr),y
             cmp #&0d
@@ -621,7 +649,7 @@ l0cd7:      lda (bufptr),y
 l0ce1:      jsr incbufptr
             jmp l0cd7
 l0ce7:      rts
-l0ce8:      cpx l0061
+l0ce8:      cpx msgnumber
             beq l0cf0
             inx
             jmp l0ce1
