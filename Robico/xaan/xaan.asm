@@ -1,162 +1,196 @@
 ;
-; User equates
+; user equates
 ;
-OSCLI       = &FFF7
-OSBYTE      = &FFF4
-OSWRCH      = &FFEE
-OSNEWL      = &FFE7
-OSRDCH      = &FFE0
+oscli       = &fff7
+osbyte      = &fff4
+oswrch      = &ffee
+osnewl      = &ffe7
+osrdch      = &ffe0
 ;
-; Code equates
+; code equates
 ;
-L000D       = &000D
-L0020       = &0020
-L0029       = &0029
-L002B       = &002B
-L003A       = &003A
-L0044       = &0044
-L0045       = &0045
-L0051       = &0051
-L0058       = &0058
-L0060       = &0060
-L0061       = &0061
-L0068       = &0068
-L006A       = &006A
-L006B       = &006B
-L006D       = &006D
-L0074       = &0074
-L007B       = &007B
-L007C       = &007C
-L007D       = &007D
-L007E       = &007E
-L007F       = &007F
-L0084       = &0084
-L0085       = &0085
-L0088       = &0088
-L0089       = &0089
-L008A       = &008A
-L008B       = &008B
-L008C       = &008C
-L008D       = &008D
-L008E       = &008E
-L0522       = &0522
-L0523       = &0523
-L0525       = &0525
-L0526       = &0526
-L0527       = &0527
-L0900       = &0900
-L0922       = &0922
-L09CF       = &09CF
-L0A00       = &0A00
-L0B00       = &0B00
-L0B22       = &0B22
-L0B28       = &0B28
-L0B3D       = &0B3D
-L0BD8       = &0BD8
-L0BE9       = &0BE9
-L0C00       = &0C00
-L0C3E       = &0C3E
-L0C72       = &0C72
-L0C80       = &0C80
-L0C85       = &0C85
-L0C91       = &0C91
-L0C96       = &0C96
-L0CCE       = &0CCE
-L1855       = &1855
-L1C03       = &1C03
-L1C16       = &1C16
-L20AC       = &20AC
+l000d       = &000d
+l0020       = &0020
+l0029       = &0029
+l002b       = &002b
+l003a       = &003a
+l0044       = &0044
+l0045       = &0045
+l0051       = &0051
+l0058       = &0058
+l0060       = &0060
+l0061       = &0061
+l0068       = &0068
+l006a       = &006a
+l006b       = &006b
+l006d       = &006d
+l0074       = &0074
+l007b       = &007b
+l007c       = &007c
+l007d       = &007d
+l007e       = &007e
+l007f       = &007f
+l0084       = &0084
+l0085       = &0085
+currentroom = &0088
+l0089       = &0089
+l008a       = &008a
+invsize       = &008b
+l008c       = &008c
+l008d       = &008d
+l008e       = &008e
+l0522       = &0522
+l0523       = &0523
+l0525       = &0525
+l0526       = &0526
+l0527       = &0527
+l0900       = &0900
+l0922       = &0922
+findmsg     = &09cf
+l0a00       = &0a00
+l0b00       = &0b00
+l0b22       = &0b22
+l0b28       = &0b28
+l0b3d       = &0b3d
+l0bd8       = &0bd8
+l0be9       = &0be9
+l0c00       = &0c00
+l0c3e       = &0c3e
+prtmsg      = &0c72
+l0c80       = &0c80
+badnoun     = &0c85
+l0c91       = &0c91
+l0c96       = &0c96
+l0cce       = &0cce
+l1855       = &1855
+l1c03       = &1c03
+l1c16       = &1c16
+l20ac       = &20ac
 ;
-; Start of code
+; start of code
 ;
             *= &1200
 ;
-            bne L1224
-            ldx #&0B
-            jsr L09CF
+            bne l1224
+            ldx #&0b
+            jsr findmsg
             ldx #&00
             lda #&01
-            jsr L158E
-            ldx #&0C
-            jsr L09CF
+            jsr l158e
+            ldx #&0c
+            jsr findmsg
             ldx #&01
             lda #&01
-            jsr L158E
+            jsr l158e
             cpy #&00
-            bne L1223
-L121E:      lda #&7F
-            jmp L15AB
-L1223:      rts
-L1224:      jmp L0C91
-L1227:      lda #&3F
-            sta L7535
-            jmp L1290
-            bne L1236
-L1231:      ldx #&0A
-            jmp L0C72
-L1236:      cpx #&FF
-            beq L1243
+            bne l1223
+l121e:      lda #&7f
+            jmp l15ab
+l1223:      rts
+l1224:      jmp l0c91
+l1227:      lda #&3f
+            sta l7535
+            jmp l1290
+            bne l1236
+            
+; neednoun - deals with case where a verb needs a noun and doesn't have one
+; e.g. "ATTACK"
+.neednoun
+{
+            ldx #&0a       ; message 10 "I can't guess what you want to verb"
+            jmp prtmsg
+}
+            
+l1236:      cpx #&ff
+            beq jbadnoun
             cpx #&28
-            bcc L1246
-L123E:      ldx #&11
-            jmp L0C72
-L1243:      jmp L0C85
-L1246:      stx L0525
-            lda L74F6,X
-            beq L1272
-            cmp L0088
-            beq L127C
+            bcc l1246
+            
+; cantdo - deals with the case where the verb and noun combo doesn't make sense
+; e.g. "ATTACK RING"
+.cantdo
+{
+            ldx #&11       ; message 17 "You can't do that"
+            jmp prtmsg
+} 
+           
+.jbadnoun   jmp badnoun
+l1246:      stx l0525
+            lda inventory,x
+            beq nothold
+            cmp currentroom
+            beq l127c
             cmp #&01
-            beq L127C
+            beq l127c
             cmp #&28
-            bcs L1268
+            bcs nothere
             tax
-            lda L74F6,X
-            beq L127C
+            lda inventory,x
+            beq l127c
             cmp #&01
-            beq L127C
-            cmp L0088
-            beq L127C
-L1268:      ldx #&0E
-L126A:      jsr L09CF
-            ldx #&12
-            jmp L0C72
-L1272:      ldx #&0F
-L1274:      jsr L09CF
-            ldx #&1A
-            jmp L126A
-L127C:      lda L008B
+            beq l127c
+            cmp currentroom
+            beq l127c
+            
+; nothere - deals with the case the object isn't present
+.nothere
+{            
+            ldx #&0e       ; message 14 "You can't see"
+}
+
+; thenoun - prints "the noun"
+.thenoun
+{           jsr findmsg
+            ldx #&12       ; message 18 "the noun"
+            jmp prtmsg
+}   
+ 
+; nothold - deals with case when object isn't in inventory 
+.nothold
+{ 
+            ldx #&0f       ; message 16 "You are not"
+}
+
+; holdnoun - prints "holding the noun"
+.holdnoun
+{
+.holdnoun   jsr findmsg
+            ldx #&1a       ; message 26 "holding"
+            jmp thenoun    ; "the noun"
+}
+
+l127c:      lda invsize
             cmp #&07
-            bcs L12AE
-            ldx L0525
-            cpx #&1A
-            beq L1227
+            bcs l12ae
+            ldx l0525
+            cpx #&1a
+            beq l1227
             cpx #&26
-            bne L1290
-            jmp L12FE
-L1290:      lda L74CC,X
-            and #&0F
-            bne L12B3
-L1297:      jsr L1854
-L129A:      inc L008B
-            ldx L0525
-            lda L74F6,X
+            bne l1290
+            jmp l12fe
+l1290:      lda l74cc,x
+            and #&0f
+            bne l12b3
+l1297:      jsr l1854
+l129a:      inc invsize
+            ldx l0525
+            lda inventory,x
             cmp #&01
-            bne L12A8
-            dec L008C
-L12A8:      lda #&00
-            sta L74F6,X
+            bne l12a8
+            dec l008c
+l12a8:      lda #&00
+            sta inventory,x
             rts
-L12AE:      ldx #&16
-            jmp L0C72
-L12B3:      cmp #&04
-            beq L1297
+l12ae:      ldx #&16
+            jmp prtmsg
+l12b3:      cmp #&04
+            beq l1297
             cmp #&05
-            beq L12D6
+            beq l12d6
             cmp #&06
-            beq L12DB
+            beq l12db
             cmp #&07
-            beq L12EF
+            beq l12ef
             tay
             txa
             pha
@@ -164,1832 +198,1849 @@ L12B3:      cmp #&04
             clc
             adc #&12
             tax
-            jsr L0C72
+            jsr prtmsg
             pla
             tax
-            dec L74CC,X
-            beq L129A
+            dec l74cc,x
+            beq l129a
             rts
-L12D6:      ldx #&1C
-            jmp L0C72
-L12DB:      lda L7514
+l12d6:      ldx #&1c
+            jmp prtmsg
+l12db:      lda l7514
             cmp #&01
-            bne L12EA
+            bne l12ea
             lda #&00
-            sta L74CC,X
-            jmp L1297
-L12EA:      ldx #&68
-            jmp L0C72
-L12EF:      lda L751C
+            sta l74cc,x
+            jmp l1297
+l12ea:      ldx #&68
+            jmp prtmsg
+l12ef:      lda l751c
             cmp #&27
-            bne L12EA
+            bne l12ea
             lda #&00
-            sta L74CC,X
-            jmp L1297
-L12FE:      ldx #&71
-            jmp L0C72
-L1303:      jmp L1243
-            bne L130B
-            jmp L1231
-L130B:      ldy L0088
-L130D:      sty L008A
-            cpx #&FF
-            beq L1303
+            sta l74cc,x
+            jmp l1297
+l12fe:      ldx #&71
+            jmp prtmsg
+l1303:      jmp jbadnoun
+            bne l130b
+            jmp neednoun
+l130b:      ldy currentroom
+l130d:      sty l008a
+            cpx #&ff
+            beq l1303
             cpx #&28
-            bcc L131A
-            jmp L123E
-L131A:      lda L008B
-            bne L132D
+            bcc l131a
+            jmp cantdo
+l131a:      lda invsize
+            bne l132d
             ldx #&10
-            jsr L09CF
-            ldx #&1A
-            jsr L09CF
+            jsr findmsg
+            ldx #&1a
+            jsr findmsg
             ldx #&18
-            jmp L0C72
-L132D:      lda L74F6,X
-            beq L1337
-L1332:      ldx #&10
-            jmp L1274
-L1337:      dec L008B
-            lda L008A
-            sta L74F6,X
-            jmp L1854
+            jmp prtmsg
+l132d:      lda inventory,x
+            beq l1337
+
+; youarenothold - deals with the case where noun is not in inventory
+.youarenothold
+{            
+            ldx #&10          ; message 16 "You are not"
+            jmp holdnoun
+}            
+l1337:      dec invsize
+            lda l008a
+            sta inventory,x
+            jmp l1854
             ldx #&19
-            jmp L0C72
-L1346:      jmp L142E
-L1349:      jmp L0C85
-            bne L1351
-            jmp L1231
-L1351:      cpx #&FF
-            beq L1349
+            jmp prtmsg
+l1346:      jmp l142e
+l1349:      jmp badnoun
+            bne l1351
+            jmp neednoun
+l1351:      cpx #&ff
+            beq l1349
             cpx #&28
-            bcc L135C
-            jmp L123E
-L135C:      lda L74CC,X
-            and #&0F
+            bcc l135c
+            jmp cantdo
+l135c:      lda l74cc,x
+            and #&0f
             cmp #&04
-            beq L1368
-            jmp L123E
-L1368:      lda L74F6,X
-            beq L1374
+            beq l1368
+            jmp cantdo
+l1368:      lda inventory,x
+            beq l1374
             cpx #&01
-            beq L139B
-            jmp L1332
-L1374:      lda L008C
+            beq l139b
+            jmp youarenothold
+l1374:      lda l008c
             cmp #&07
-            bcs L1396
+            bcs l1396
             cpx #&13
-            bne L138A
-            lda L751C
+            bne l138a
+            lda l751c
             cmp #&13
-            bne L138A
+            bne l138a
             ldx #&72
-            jmp L0C72
-L138A:      lda #&01
-            sta L74F6,X
-            inc L008C
-            dec L008B
-            jmp L1854
-L1396:      ldx #&17
-            jmp L0C72
-L139B:      ldx #&0F
-            jsr L09CF
-            ldx #&1B
-            jmp L126A
-            bne L1346
-L13A7:      ldx #&52
-            jsr L09CF
-            ldx L0088
+            jmp prtmsg
+l138a:      lda #&01
+            sta inventory,x
+            inc l008c
+            dec invsize
+            jmp l1854
+l1396:      ldx #&17
+            jmp prtmsg
+l139b:      ldx #&0f
+            jsr findmsg
+            ldx #&1b
+            jmp thenoun
+            bne l1346
+l13a7:      ldx #&52
+            jsr findmsg
+            ldx currentroom
             lda #&00
-            jsr L158E
+            jsr l158e
             cpy #&00
-            bne L13BA
-            jmp L121E
-L13BA:      rts
-L13BB:      sty L0526
+            bne l13ba
+            jmp l121e
+l13ba:      rts
+l13bb:      sty l0526
             lda #&83
-            jsr OSWRCH
+            jsr oswrch
             txa
             pha
             lda #&30
-            sta L0527
+            sta l0527
             lda #&00
-            ldx L0526
-            beq L13DF
+            ldx l0526
+            beq l13df
             sed
             clc
-L13D3:      adc #&01
-            bcc L13DB
-            inc L0527
+l13d3:      adc #&01
+            bcc l13db
+            inc l0527
             clc
-L13DB:      dex
-            bne L13D3
+l13db:      dex
+            bne l13d3
             cld
-L13DF:      tay
-            lda L0527
+l13df:      tay
+            lda l0527
             cmp #&30
-            beq L140B
-L13E7:      jsr OSWRCH
+            beq l140b
+l13e7:      jsr oswrch
             tya
-            lsr A
-            lsr A
-            lsr A
-            lsr A
+            lsr a
+            lsr a
+            lsr a
+            lsr a
             clc
             adc #&30
             cmp #&30
-            beq L1410
-L13F6:      jsr OSWRCH
+            beq l1410
+l13f6:      jsr oswrch
             tya
-            and #&0F
+            and #&0f
             adc #&30
-            jsr OSWRCH
+            jsr oswrch
             pla
             tax
-            ldy L0526
+            ldy l0526
             lda #&86
-            jmp OSWRCH
-L140B:      lda #&83
-            jmp L13E7
-L1410:      ldx L0527
+            jmp oswrch
+l140b:      lda #&83
+            jmp l13e7
+l1410:      ldx l0527
             cpx #&31
-            bcs L13F6
+            bcs l13f6
             lda #&83
-            jmp L13F6
-L141C:      ldy L008D
-            jsr L13BB
-            lda #&2F
-            jsr OSWRCH
-            ldy #&FA
-            jsr L13BB
-            jmp L15B3
-L142E:      bne L1433
-            jmp L1231
-L1433:      cpx #&FF
-            bne L143A
-L1437:      jmp L0C85
-L143A:      cpx #&28
-            bcc L1441
-            jmp L123E
-L1441:      lda L74F6,X
-            beq L1451
+            jmp l13f6
+l141c:      ldy l008d
+            jsr l13bb
+            lda #&2f
+            jsr oswrch
+            ldy #&fa
+            jsr l13bb
+            jmp l15b3
+l142e:      bne l1433
+            jmp neednoun
+l1433:      cpx #&ff
+            bne l143a
+l1437:      jmp badnoun
+l143a:      cpx #&28
+            bcc l1441
+            jmp cantdo
+l1441:      lda inventory,x
+            beq l1451
             cmp #&01
-            beq L1451
-            cmp L0088
-            beq L1451
-            jmp L1268
-L1451:      cpx #&0A
-            bne L1458
-            jmp L197B
-L1458:      lda L7520,X
-            stx L0525
+            beq l1451
+            cmp currentroom
+            beq l1451
+            jmp nothere
+l1451:      cpx #&0a
+            bne l1458
+            jmp l197b
+l1458:      lda l7520,x
+            stx l0525
             tax
-            jsr L09CF
-L1462:      ldx #&52
-            jsr L09CF
+            jsr findmsg
+l1462:      ldx #&52
+            jsr findmsg
             lda #&02
-            ldx L0525
-            jsr L158E
+            ldx l0525
+            jsr l158e
             cpy #&00
-            bne L1476
-            jmp L121E
-L1476:      rts
-L1477:      ldx #&20
-            jmp L0C72
-            bne L14C7
-            lda L750B
-            bne L1477
-            ldx L7535
-            cpx #&3F
-            beq L14C1
+            bne l1476
+            jmp l121e
+l1476:      rts
+l1477:      ldx #&20
+            jmp prtmsg
+            bne l14c7
+            lda l750b
+            bne l1477
+            ldx l7535
+            cpx #&3f
+            beq l14c1
             cpx #&40
-            beq L14B7
-            lda L008E
-            beq L14C1
-            cpx #&3D
-            beq L14A8
-            cpx #&3E
-            beq L14A8
-            lda L008E
+            beq l14b7
+            lda l008e
+            beq l14c1
+            cpx #&3d
+            beq l14a8
+            cpx #&3e
+            beq l14a8
+            lda l008e
             cmp #&28
-            bcc L14BC
-            ldx #&3D
-L14A2:      stx L7535
-            jmp L0C72
-L14A8:      lda L7420
-            beq L14B2
+            bcc l14bc
+            ldx #&3d
+l14a2:      stx l7535
+            jmp prtmsg
+l14a8:      lda l7420
+            beq l14b2
             ldx #&69
-            jsr L09CF
-L14B2:      ldx #&3C
-            jmp L14A2
-L14B7:      ldx #&40
-            jmp L14A2
-L14BC:      ldx #&3E
-            jmp L14A2
-L14C1:      jmp L14A2
-L14C4:      jmp L1231
-L14C7:      jmp L1224
-            beq L14C4
-            cpx #&FF
-            beq L150D
+            jsr findmsg
+l14b2:      ldx #&3c
+            jmp l14a2
+l14b7:      ldx #&40
+            jmp l14a2
+l14bc:      ldx #&3e
+            jmp l14a2
+l14c1:      jmp l14a2
+l14c4:      jmp neednoun
+l14c7:      jmp l1224
+            beq l14c4
+            cpx #&ff
+            beq l150d
             cpx #&15
-            beq L14E2
+            beq l14e2
             cpx #&27
-            bne L14DB
-            jmp L195D
-L14DB:      cpx #&13
-            bne L14C7
-            jmp L1938
-L14E2:      lda L750B
-            bne L1477
-            lda L7510
-            beq L14FE
+            bne l14db
+            jmp l195d
+l14db:      cpx #&13
+            bne l14c7
+            jmp l1938
+l14e2:      lda l750b
+            bne l1477
+            lda l7510
+            beq l14fe
             ldx #&10
-            jsr L09CF
-            ldx #&1A
-            jsr L09CF
-            ldx #&1A
-            jsr L0CCE
-            jmp L15B3
-L14FE:      lda #&3C
-            sta L7535
+            jsr findmsg
+            ldx #&1a
+            jsr findmsg
+            ldx #&1a
+            jsr l0cce
+            jmp l15b3
+l14fe:      lda #&3c
+            sta l7535
             lda #&15
-            sta L7510
-            dec L008B
-            jmp L0C96
-L150D:      jmp L1437
-L1510:      lda #&00
-            sta L7427
-            ldx L7535
-            cpx #&3D
-            beq L1521
-            cpx #&3E
-            beq L1521
+            sta l7510
+            dec invsize
+            jmp l0c96
+l150d:      jmp l1437
+l1510:      lda #&00
+            sta l7427
+            ldx l7535
+            cpx #&3d
+            beq l1521
+            cpx #&3e
+            beq l1521
             rts
-L1521:      lda #&01
-            sta L7427
-            lda L008E
+l1521:      lda #&01
+            sta l7427
+            lda l008e
             cmp #&01
-            beq L1535
+            beq l1535
             cmp #&27
-            bcc L1541
-            beq L1549
-            dec L008E
+            bcc l1541
+            beq l1549
+            dec l008e
             rts
-L1535:      dec L008E
-            lda #&FF
-            sta L7510
-            ldx #&3F
-            jmp L14A2
-L1541:      ldx #&3E
-            stx L7535
-            dec L008E
+l1535:      dec l008e
+            lda #&ff
+            sta l7510
+            ldx #&3f
+            jmp l14a2
+l1541:      ldx #&3e
+            stx l7535
+            dec l008e
             rts
-L1549:      dec L008E
-            jmp L14BC
-            jmp L1231
-L1551:      tya
+l1549:      dec l008e
+            jmp l14bc
+            jmp neednoun
+l1551:      tya
             pha
-            stx L0525
-            lda L74CC,X
-            and #&3F
-            lsr A
-            lsr A
-            lsr A
-            lsr A
+            stx l0525
+            lda l74cc,x
+            and #&3f
+            lsr a
+            lsr a
+            lsr a
+            lsr a
             clc
-            adc #&4B
+            adc #&4b
             tax
-            jsr L09CF
-            jsr L0B28
-            cpx #&1C
-            bcs L1588
-L156D:      ldx L0525
-            jsr L0CCE
+            jsr findmsg
+            jsr l0b28
+            cpx #&1c
+            bcs l1588
+l156d:      ldx l0525
+            jsr l0cce
             pla
             tay
             iny
-            cpy L006A
-            beq L1583
+            cpy l006a
+            beq l1583
             tya
             pha
-            ldx #&4F
-            jsr L09CF
+            ldx #&4f
+            jsr findmsg
             pla
             tay
-L1583:      dey
-            ldx L0525
+l1583:      dey
+            ldx l0525
             rts
-L1588:      jsr L0B22
-            jmp L156D
-L158E:      sta L0523
-            stx L008A
+l1588:      jsr l0b22
+            jmp l156d
+l158e:      sta l0523
+            stx l008a
             ldy #&00
-            sty L0522
-            jsr L15C1
+            sty l0522
+            jsr l15c1
             dey
-            beq L15B9
-            sty L006A
-            inc L0522
-            jsr L15C1
-L15A6:      lda #&7F
-            jsr OSWRCH
-L15AB:      jsr OSWRCH
-            lda #&2E
-            jsr OSWRCH
-L15B3:      jsr OSNEWL
-            jmp OSNEWL
-L15B9:      ldx #&0D
-            jsr L09CF
+            beq l15b9
+            sty l006a
+            inc l0522
+            jsr l15c1
+l15a6:      lda #&7f
+            jsr oswrch
+l15ab:      jsr oswrch
+            lda #&2e
+            jsr oswrch
+l15b3:      jsr osnewl
+            jmp osnewl
+l15b9:      ldx #&0d
+            jsr findmsg
             ldy #&00
             rts
-L15C1:      ldy #&01
+l15c1:      ldy #&01
             ldx #&02
-L15C5:      lda L74F6,X
-            cmp L008A
-            bne L15EB
-            lda L0523
-            beq L160D
-            lda L0522
-            beq L15E6
-            lda L0523
+l15c5:      lda inventory,x
+            cmp l008a
+            bne l15eb
+            lda l0523
+            beq l160d
+            lda l0522
+            beq l15e6
+            lda l0523
             cmp #&02
-            beq L15E3
-            jsr OSNEWL
-            jsr L13BB
-L15E3:      jsr L1551
-L15E6:      iny
-            cpy L006A
-            beq L15F1
-L15EB:      inx
+            beq l15e3
+            jsr osnewl
+            jsr l13bb
+l15e3:      jsr l1551
+l15e6:      iny
+            cpy l006a
+            beq l15f1
+l15eb:      inx
             cpx #&28
-            bne L15C5
+            bne l15c5
             rts
-L15F1:      lda L0522
-            beq L15EB
-            stx L0525
+l15f1:      lda l0522
+            beq l15eb
+            stx l0525
             tya
             pha
             lda #&20
-            jsr OSWRCH
+            jsr oswrch
             ldx #&36
-            jsr L09CF
+            jsr findmsg
             pla
             tay
-            ldx L0525
-            jmp L15EB
-L160D:      lda L7420
-            beq L1628
-            lda L74CC,X
-            bmi L1630
-            lda L750B
-            beq L1623
-            cmp L008A
-            beq L1623
-L1620:      jmp L15EB
-L1623:      lda L7427
-            beq L1620
-L1628:      lda L0522
-            beq L15E6
-            jmp L15E3
-L1630:      lda L750B
-            beq L163C
-            cmp L008A
-            beq L163C
-            jmp L1628
-L163C:      lda L7427
-            beq L1628
-            jmp L1620
-            bne L1649
-            jmp L1231
-L1649:      cpx #&FF
-            bne L1650
-            jmp L0C85
-L1650:      cpx #&28
-            bcc L1657
-L1654:      jmp L123E
-L1657:      lda L74F6,X
-            beq L165F
-            jmp L1332
-L165F:      stx L0525
+            ldx l0525
+            jmp l15eb
+l160d:      lda l7420
+            beq l1628
+            lda l74cc,x
+            bmi l1630
+            lda l750b
+            beq l1623
+            cmp l008a
+            beq l1623
+l1620:      jmp l15eb
+l1623:      lda l7427
+            beq l1620
+l1628:      lda l0522
+            beq l15e6
+            jmp l15e3
+l1630:      lda l750b
+            beq l163c
+            cmp l008a
+            beq l163c
+            jmp l1628
+l163c:      lda l7427
+            beq l1628
+            jmp l1620
+            bne l1649
+            jmp neednoun
+l1649:      cpx #&ff
+            bne l1650
+            jmp badnoun
+l1650:      cpx #&28
+            bcc l1657
+l1654:      jmp cantdo
+l1657:      lda inventory,x
+            beq l165f
+            jmp youarenothold
+l165f:      stx l0525
             ldx #&53
-            jsr L0C72
-            jsr L0B3D
-            jsr OSNEWL
-            jsr L0BD8
-            jsr L0C80
-            beq L16AC
-            cpx #&FF
-            beq L16BB
-            cpx L0525
-            beq L1654
+            jsr prtmsg
+            jsr l0b3d
+            jsr osnewl
+            jsr l0bd8
+            jsr l0c80
+            beq l16ac
+            cpx #&ff
+            beq l16bb
+            cpx l0525
+            beq l1654
             cpx #&15
-            beq L16B1
-            lda L74CC,X
+            beq l16b1
+            lda l74cc,x
             and #&40
-            beq L1654
-            lda L74F6,X
-            beq L1699
+            beq l1654
+            lda inventory,x
+            beq l1699
             cmp #&01
-            beq L1699
-            cmp L0088
-            beq L1699
-            jmp L1268
-L1699:      txa
+            beq l1699
+            cmp currentroom
+            beq l1699
+            jmp nothere
+l1699:      txa
             tay
-            ldx L0525
+            ldx l0525
             lda #&05
-            sta L1855
-            jsr L130D
+            sta l1855
+            jsr l130d
             lda #&67
-            sta L1855
+            sta l1855
             rts
-L16AC:      ldx #&54
-            jmp L0C72
-L16B1:      lda L0525
-            cmp #&1A
-            bne L1654
-            jmp L14E2
-L16BB:      jmp L1224
-L16BE:      lda #&00
-            sta L0089
-            sta L7424
-            sta L7422
-            sta L7425
-            sta L7423
-            sta L7428
-            sta L007B
+l16ac:      ldx #&54
+            jmp prtmsg
+l16b1:      lda l0525
+            cmp #&1a
+            bne l1654
+            jmp l14e2
+l16bb:      jmp l1224
+l16be:      lda #&00
+            sta l0089
+            sta l7424
+            sta l7422
+            sta l7425
+            sta l7423
+            sta l7428
+            sta l007b
             lda #&89
-            sta L006B
-            jsr L0B3D
-            jsr L0BE9
-            jsr L0BD8
-            jsr L0C3E
-            jsr L1510
-            lda L0089
+            sta l006b
+            jsr l0b3d
+            jsr l0be9
+            jsr l0bd8
+            jsr l0c3e
+            jsr l1510
+            lda l0089
             cmp #&09
-            beq L1722
-            jsr L1AD3
-            lda L007B
-            bne L1722
-            lda L7425
-            bne L1700
-            lda L7428
-            bne L1700
-            jmp L1754
-L1700:      lda L741F
-            bne L1732
-L1705:      lda L7421
-            bne L170B
+            beq l1722
+            jsr l1ad3
+            lda l007b
+            bne l1722
+            lda l7425
+            bne l1700
+            lda l7428
+            bne l1700
+            jmp l1754
+l1700:      lda l741f
+            bne l1732
+l1705:      lda l7421
+            bne l170b
             rts
-L170B:      lda L74FE
+l170b:      lda l74fe
             cmp #&01
-            beq L1722
+            beq l1722
             ldx #&24
-            jsr L0C72
-            ldy L7426
+            jsr prtmsg
+            ldy l7426
             iny
             cpy #&05
-            beq L1723
-            sty L7426
-L1722:      rts
-L1723:      ldx #&26
-L1725:      jsr L09CF
-L1728:      lda #&01
-            sta L7422
+            beq l1723
+            sty l7426
+l1722:      rts
+l1723:      ldx #&26
+l1725:      jsr findmsg
+l1728:      lda #&01
+            sta l7422
             ldx #&27
-            jmp L0C72
-L1732:      lda L7545
-            cmp #&3A
-            beq L173C
-            jmp L1705
-L173C:      lda L751B
-            beq L1748
-            cmp L0088
-            beq L174A
-            jmp L1705
-L1748:      dec L008B
-L174A:      lda #&FF
-            sta L751B
-            ldx #&4A
-            jmp L0C72
-L1754:      lda L7508
-            cmp L0088
-            bne L1700
-            lda L7532
+            jmp prtmsg
+l1732:      lda l7545
+            cmp #&3a
+            beq l173c
+            jmp l1705
+l173c:      lda l751b
+            beq l1748
+            cmp currentroom
+            beq l174a
+            jmp l1705
+l1748:      dec invsize
+l174a:      lda #&ff
+            sta l751b
+            ldx #&4a
+            jmp prtmsg
+l1754:      lda guardloc
+            cmp currentroom
+            bne l1700
+            lda l7532
             cmp #&55
-            bne L1700
-            lda L0088
+            bne l1700
+            lda currentroom
             cmp #&34
-            beq L176F
-            cmp #&3C
-            beq L176F
-            jmp L1700
-L176F:      lda L0088
+            beq l176f
+            cmp #&3c
+            beq l176f
+            jmp l1700
+l176f:      lda currentroom
             cmp #&34
-            beq L1787
-            lda L7424
-            beq L178F
+            beq l1787
+            lda l7424
+            beq l178f
             lda #&57
-            sta L7532
+            sta l7532
             ldx #&58
-            jsr L0C72
-            jmp L1700
-L1787:      lda L7423
-            beq L1794
-            jmp L1700
-L178F:      ldx #&59
-            jmp L1725
-L1794:      lda #&35
-            sta L7508
+            jsr prtmsg
+            jmp l1700
+l1787:      lda l7423
+            beq l1794
+            jmp l1700
+l178f:      ldx #&59
+            jmp l1725
+l1794:      lda #&35
+            sta guardloc
             lda #&01
-            sta L741E
-            ldx #&5A
-            jsr L0C72
-            jmp L1700
-            beq L17B5
+            sta l741e
+            ldx #&5a
+            jsr prtmsg
+            jmp l1700
+            beq l17b5
             cpx #&29
-            beq L17BA
-            cpx #&2A
-            beq L17B5
-            ldx #&5B
-            jmp L0C72
-L17B5:      ldx #&5C
-            jmp L0C72
-L17BA:      lda #&01
-            sta L7424
-            ldx #&5D
-            jmp L0C72
-            bne L17C9
-            jmp L1231
-L17C9:      cpx #&FF
-            bne L17D0
-            jmp L1243
-L17D0:      cpx #&12
-            beq L17D7
-            jmp L123E
-L17D7:      lda L7508
-            cmp L0088
-            beq L17E1
-            jmp L1268
-L17E1:      lda L74FD
-            bne L1801
-            lda #&01
-            sta L7423
+            beq l17ba
+            cpx #&2a
+            beq l17b5
+            ldx #&5b
+            jmp prtmsg
+l17b5:      ldx #&5c
+            jmp prtmsg
+l17ba:      lda #&01
+            sta l7424
+            ldx #&5d
+            jmp prtmsg
+; &17c4
+; handles the ATTACK and KILL commands.
+.attackcmd
+{
+            bne havenoun
+            jmp neednoun
+.havenoun   cpx #&ff       ; Is it a valid noun?
+            bne validnoun
+            jmp jbadnoun
+.validnoun  cpx #&12       ; GUARD
+            beq isguard
+            jmp cantdo
+.isguard    lda guardloc   ; guard location
+            cmp currentroom
+            beq guardhere
+            jmp nothere
+.guardhere  lda chainloc   ; chain location
+            bne chainnoinv
+            lda #&01       ; below removes block and guard
+            sta l7423      ; ??
             lda #&56
-            sta L7532
-            ldx #&5E
-            jsr L09CF
-            dec L008B
-            ldx #&FF
-            stx L74FD
-            ldx #&61
-            jmp L0C72
-L1801:      ldx #&5F
-            jmp L0C72
-            beq L1817
-            cpx #&FF
-            bne L180F
-            jmp L1243
-L180F:      cpx #&28
-            bcc L1837
+            sta l7532      ; ??
+            ldx #&5e       ; message 94 - kill guard
+            jsr findmsg
+            dec invsize    ; reduce size of inventory
+            ldx #&ff
+            stx chainloc   ; destroy chain
+            ldx #&61       ; message 97 - chain dissolves
+            jmp prtmsg
+.chainnoinv ldx #&5f       ; message 95 "You need a weapon."
+            jmp prtmsg
+}
+            
+            beq l1817
+            cpx #&ff
+            bne l180f
+            jmp jbadnoun
+l180f:      cpx #&28
+            bcc l1837
             cpx #&28
-            bne L1837
-L1817:      lda L741E
+            bne l1837
+l1817:      lda l741e
             cmp #&01
-            beq L1821
-            jmp L123E
-L1821:      lda L0088
+            beq l1821
+            jmp cantdo
+l1821:      lda currentroom
             cmp #&34
-            bne L1837
-            sta L7508
+            bne l1837
+            sta guardloc
             lda #&00
-            sta L741E
+            sta l741e
             ldx #&62
-            stx L7425
-            jmp L0C72
-L1837:      ldx #&1D
-            jmp L0C72
-            beq L1837
-            cpx #&FF
-            bne L1845
-            jmp L1243
-L1845:      cpx #&28
-            bcc L184C
-            jmp L123E
-L184C:      lda L74F6,X
-            beq L1837
-            jmp L1332
-L1854:      ldx #&67
-            jmp L0C72
-            bne L185E
-            jmp L1231
-L185E:      cpx #&FF
-            bne L1865
-            jmp L1243
-L1865:      cpx #&25
-            beq L1870
+            stx l7425
+            jmp prtmsg
+l1837:      ldx #&1d
+            jmp prtmsg
+            beq l1837
+            cpx #&ff
+            bne l1845
+            jmp jbadnoun
+l1845:      cpx #&28
+            bcc l184c
+            jmp cantdo
+l184c:      lda inventory,x
+            beq l1837
+            jmp youarenothold
+l1854:      ldx #&67
+            jmp prtmsg
+            bne l185e
+            jmp neednoun
+l185e:      cpx #&ff
+            bne l1865
+            jmp jbadnoun
+l1865:      cpx #&25
+            beq l1870
             cpx #&28
-            beq L1880
-            jmp L1224
-L1870:      lda L751B
-            beq L1878
-            jmp L1332
-L1878:      ldx #&3A
-            stx L7545
-            jmp L0C72
-L1880:      lda L741E
+            beq l1880
+            jmp l1224
+l1870:      lda l751b
+            beq l1878
+            jmp youarenothold
+l1878:      ldx #&3a
+            stx l7545
+            jmp prtmsg
+l1880:      lda l741e
             cmp #&02
-            bne L188A
-            jmp L1268
-L188A:      cmp #&01
-            beq L1891
-            jmp L123E
-L1891:      lda L0088
+            bne l188a
+            jmp nothere
+l188a:      cmp #&01
+            beq l1891
+            jmp cantdo
+l1891:      lda currentroom
             cmp #&34
-            bne L189C
-L1897:      ldx #&65
-            jmp L0C72
-L189C:      cmp #&99
-            beq L1897
+            bne l189c
+l1897:      ldx #&65
+            jmp prtmsg
+l189c:      cmp #&99
+            beq l1897
             lda #&00
-            sta L741E
-L18A5:      lda L741E
-            beq L18AF
+            sta l741e
+l18a5:      lda l741e
+            beq l18af
             cmp #&01
-            beq L18B4
+            beq l18b4
             rts
-L18AF:      ldx #&63
-            jmp L0C72
-L18B4:      ldx #&64
-            jmp L0C72
-            bne L18BE
-            jmp L1231
-L18BE:      cpx #&FF
-            bne L18C5
-            jmp L1243
-L18C5:      cpx #&25
-            beq L18D0
+l18af:      ldx #&63
+            jmp prtmsg
+l18b4:      ldx #&64
+            jmp prtmsg
+            bne l18be
+            jmp neednoun
+l18be:      cpx #&ff
+            bne l18c5
+            jmp jbadnoun
+l18c5:      cpx #&25
+            beq l18d0
             cpx #&28
-            beq L18E0
-            jmp L1224
-L18D0:      lda L751B
-            beq L18D8
-            jmp L1332
-L18D8:      ldx #&3B
-            stx L7545
-            jmp L0C72
-L18E0:      lda L741E
+            beq l18e0
+            jmp l1224
+l18d0:      lda l751b
+            beq l18d8
+            jmp youarenothold
+l18d8:      ldx #&3b
+            stx l7545
+            jmp prtmsg
+l18e0:      lda l741e
             cmp #&02
-            bne L18EA
-            jmp L1268
-L18EA:      cmp #&00
-            beq L18F1
-            jmp L123E
-L18F1:      lda #&01
-            sta L741E
-            jmp L18A5
-            bne L18FE
-            jmp L1231
-L18FE:      cpx #&FF
-            bne L1905
-            jmp L1243
-L1905:      cpx #&28
-            bcc L190C
-            jmp L123E
-L190C:      lda L74F6,X
-            beq L1914
-            jmp L1332
-L1914:      dec L008B
-            lda #&FF
-            sta L74F6,X
-            cpx #&0C
-            beq L1929
-            ldx #&67
-L1921:      jsr L09CF
-            ldx #&6E
-            jmp L0C72
-L1929:      ldx #&67
-            jsr L09CF
-            ldx #&9D
-            lda L0088
-            sta L74FC
-            jmp L1921
-L1938:      lda L7509
-            beq L1940
-            jmp L1477
-L1940:      lda L751C
+            bne l18ea
+            jmp nothere
+l18ea:      cmp #&00
+            beq l18f1
+            jmp cantdo
+l18f1:      lda #&01
+            sta l741e
+            jmp l18a5
+; &18f9
+; breakcmd - handles BREAK
+.breakcmd
+{            
+            bne havenoun
+            jmp neednoun
+.havenoun   cpx #&ff
+            bne validnoun
+            jmp jbadnoun
+.validnoun  cpx #&28          ; items < 40 can be carried.
+            bcc invitem
+            jmp cantdo
+.invitem    lda inventory,x   ; check inventory
+            beq haveobj
+            jmp youarenothold
+.haveobj    dec invsize
+            lda #&ff
+            sta inventory,x   ; destroy object
+            cpx #&0c          ; noun 12 - doll
+            beq isdoll
+            ldx #&67          ; message 103 "You verb the noun"
+.stampit    jsr findmsg
+            ldx #&6e          ; message 110 "Then stamp ..."
+            jmp prtmsg
+.isdoll     ldx #&67          ; message 103 "You verb the noun"
+            jsr findmsg
+            ldx #&9d          ; message 157 "An object falls to the floor"
+            lda currentroom
+            sta l74fc         ; Move brooch to current room
+            jmp stampit
+}
+            
+l1938:      lda l7509
+            beq l1940
+            jmp l1477
+l1940:      lda l751c
             cmp #&13
-            beq L1958
-            cmp L0088
-            bne L1953
+            beq l1958
+            cmp currentroom
+            bne l1953
             lda #&13
-            sta L751C
-            jmp L0C96
-L1953:      ldx #&70
-            jmp L0C72
-L1958:      ldx #&72
-            jmp L0C72
-L195D:      lda L751D
-            cmp L0088
-            beq L1967
-            jmp L1268
-L1967:      lda L751C
+            sta l751c
+            jmp l0c96
+l1953:      ldx #&70
+            jmp prtmsg
+l1958:      ldx #&72
+            jmp prtmsg
+l195d:      lda l751d
+            cmp currentroom
+            beq l1967
+            jmp nothere
+l1967:      lda l751c
             cmp #&13
-            bne L1953
-            lda L7509
-            bne L1953
+            bne l1953
+            lda l7509
+            bne l1953
             lda #&27
-            sta L751C
-            jmp L0C96
-L197B:      lda L0088
+            sta l751c
+            jmp l0c96
+l197b:      lda currentroom
             cmp #&38
-            bcc L19AB
-            cmp #&3C
-            bcs L19AB
+            bcc l19ab
+            cmp #&3c
+            bcs l19ab
             ldx #&51
-            jsr L09CF
+            jsr findmsg
             ldx #&30
-            lda L0088
+            lda currentroom
             cmp #&38
-            beq L199A
+            beq l199a
             cmp #&39
-            beq L19A3
-            cmp #&3B
-            beq L19A7
-L199A:      jsr L09CF
-            jsr L15A6
-            jmp L1462
-L19A3:      dex
-            jmp L199A
-L19A7:      dex
-            jmp L19A3
-L19AB:      jmp L1458
-            lda L0088
+            beq l19a3
+            cmp #&3b
+            beq l19a7
+l199a:      jsr findmsg
+            jsr l15a6
+            jmp l1462
+l19a3:      dex
+            jmp l199a
+l19a7:      dex
+            jmp l19a3
+l19ab:      jmp l1458
+            lda currentroom
             cmp #&99
-            beq L19B7
-            jmp L1837
-L19B7:      lda L741E
-            bne L19BF
-            jmp L1837
-L19BF:      lda #&00
-            sta L741E
-            ldx #&9F
-            jmp L0C72
+            beq l19b7
+            jmp l1837
+l19b7:      lda l741e
+            bne l19bf
+            jmp l1837
+l19bf:      lda #&00
+            sta l741e
+            ldx #&9f
+            jmp prtmsg
             ldx #&86
-            jmp L0C72
-            bne L19D3
-            jmp L1231
-L19D3:      cpx #&FF
-            bne L19DA
-            jmp L1243
-L19DA:      lda L0088
+            jmp prtmsg
+            bne l19d3
+            jmp neednoun
+l19d3:      cpx #&ff
+            bne l19da
+            jmp jbadnoun
+l19da:      lda currentroom
             cmp #&46
-            bcc L19E4
-            cmp #&6C
-            bcc L19E9
-L19E4:      ldx #&23
-            jmp L0C72
-L19E9:      cmp #&5A
-            bcc L19F9
-            cpx #&2D
-            beq L19F4
-L19F1:      jmp L123E
-L19F4:      ldx #&38
-            jmp L0C72
-L19F9:      cpx #&2E
-            beq L1A01
-            cpx #&2F
-            bne L19F1
-L1A01:      ldx #&29
-            jsr L09CF
-            jmp L1728
-            beq L1A0E
-L1A0B:      jmp L1224
-L1A0E:      lda L0088
+            bcc l19e4
+            cmp #&6c
+            bcc l19e9
+l19e4:      ldx #&23
+            jmp prtmsg
+l19e9:      cmp #&5a
+            bcc l19f9
+            cpx #&2d
+            beq l19f4
+l19f1:      jmp cantdo
+l19f4:      ldx #&38
+            jmp prtmsg
+l19f9:      cpx #&2e
+            beq l1a01
+            cpx #&2f
+            bne l19f1
+l1a01:      ldx #&29
+            jsr findmsg
+            jmp l1728
+            beq l1a0e
+l1a0b:      jmp l1224
+l1a0e:      lda currentroom
             cmp #&46
-            bcc L1A1C
+            bcc l1a1c
             cmp #&49
-            bcc L1A1F
-            cmp #&4D
-            bcc L1A27
-L1A1C:      jmp L0C96
-L1A1F:      ldx #&37
-L1A21:      jsr L09CF
-            jmp L1728
-L1A27:      ldx #&25
-            jmp L1A21
-            bne L1A0B
-            lda L7515
-            beq L1A38
+            bcc l1a1f
+            cmp #&4d
+            bcc l1a27
+l1a1c:      jmp l0c96
+l1a1f:      ldx #&37
+l1a21:      jsr findmsg
+            jmp l1728
+l1a27:      ldx #&25
+            jmp l1a21
+            bne l1a0b
+            lda l7515
+            beq l1a38
             ldx #&21
-            jmp L0C72
-L1A38:      lda L0088
+            jmp prtmsg
+l1a38:      lda currentroom
             cmp #&83
-            bcc L1A4C
+            bcc l1a4c
             cmp #&87
-            bcc L1A51
-            beq L1A4C
-            cmp #&8C
-            bcc L1A59
+            bcc l1a51
+            beq l1a4c
+            cmp #&8c
+            bcc l1a59
             cmp #&91
-            bcc L1A5E
-L1A4C:      ldx #&22
-            jmp L0C72
-L1A51:      jsr L1A66
+            bcc l1a5e
+l1a4c:      ldx #&22
+            jmp prtmsg
+l1a51:      jsr l1a66
             ldx #&82
-            jmp L0C72
-L1A59:      ldx #&83
-            jmp L0C72
-L1A5E:      jsr L1A66
+            jmp prtmsg
+l1a59:      ldx #&83
+            jmp prtmsg
+l1a5e:      jsr l1a66
             ldx #&84
-            jmp L0C72
-L1A66:      ldx #&27
-            lda L0088
+            jmp prtmsg
+l1a66:      ldx #&27
+            lda currentroom
             clc
-            adc #&5D
-            sta L0526
-L1A70:      lda L74F6,X
-            cmp L0526
-            bne L1A7D
-            lda L0088
-            sta L74F6,X
-L1A7D:      dex
-            bpl L1A70
+            adc #&5d
+            sta l0526
+l1a70:      lda inventory,x
+            cmp l0526
+            bne l1a7d
+            lda currentroom
+            sta inventory,x
+l1a7d:      dex
+            bpl l1a70
             rts
-            bne L1A86
-            jmp L1231
-L1A86:      cpx #&FF
-            bne L1A8D
-            jmp L1243
-L1A8D:      cpx #&26
-            beq L1A94
-            jmp L123E
-L1A94:      lda L751C
-            cmp L0088
-            beq L1AA2
+            bne l1a86
+            jmp neednoun
+l1a86:      cpx #&ff
+            bne l1a8d
+            jmp jbadnoun
+l1a8d:      cpx #&26
+            beq l1a94
+            jmp cantdo
+l1a94:      lda l751c
+            cmp currentroom
+            beq l1aa2
             cmp #&13
-            beq L1AA2
-            jmp L1268
-L1AA2:      lda #&FF
-            sta L751C
-            jmp L1854
-            bne L1AAF
-            jmp L1231
-L1AAF:      cpx #&FF
-            bne L1AB6
-            jmp L1243
-L1AB6:      cpx #&0E
-            beq L1ABD
-            jmp L123E
-L1ABD:      lda L7504
-            beq L1AC9
-            cmp L0088
-            beq L1ACB
-            jmp L1268
-L1AC9:      dec L008B
-L1ACB:      lda #&FF
-            sta L7504
-            jmp L1854
-L1AD3:      jsr L20D0
-            lda L0088
-            jsr L1CFF
-            lda L007C
-            beq L1AE2
-            jmp L1728
-L1AE2:      lda L0088
+            beq l1aa2
+            jmp nothere
+l1aa2:      lda #&ff
+            sta l751c
+            jmp l1854
+            bne l1aaf
+            jmp neednoun
+l1aaf:      cpx #&ff
+            bne l1ab6
+            jmp jbadnoun
+l1ab6:      cpx #&0e
+            beq l1abd
+            jmp cantdo
+l1abd:      lda l7504
+            beq l1ac9
+            cmp currentroom
+            beq l1acb
+            jmp nothere
+l1ac9:      dec invsize
+l1acb:      lda #&ff
+            sta l7504
+            jmp l1854
+l1ad3:      jsr l20d0
+            lda currentroom
+            jsr l1cff
+            lda l007c
+            beq l1ae2
+            jmp l1728
+l1ae2:      lda currentroom
             cmp #&63
-            bcc L1AF4
+            bcc l1af4
             cmp #&83
-            bcs L1AF4
+            bcs l1af4
             lda #&01
-            sta L7420
-            jmp L1AF9
-L1AF4:      lda #&00
-            sta L7420
-L1AF9:      lda L0088
+            sta l7420
+            jmp l1af9
+l1af4:      lda #&00
+            sta l7420
+l1af9:      lda currentroom
             cmp #&35
-            bcc L1B13
+            bcc l1b13
             cmp #&56
-            bcc L1B0B
+            bcc l1b0b
             cmp #&88
-            bcc L1B13
+            bcc l1b13
             cmp #&94
-            bcs L1B13
-L1B0B:      lda #&01
-            sta L7421
-            jmp L1B18
-L1B13:      lda #&00
-            sta L7421
-L1B18:      lda L0088
+            bcs l1b13
+l1b0b:      lda #&01
+            sta l7421
+            jmp l1b18
+l1b13:      lda #&00
+            sta l7421
+l1b18:      lda currentroom
             cmp #&46
-            bcc L1B32
+            bcc l1b32
             cmp #&56
-            bcc L1B2A
+            bcc l1b2a
             cmp #&88
-            bcc L1B32
+            bcc l1b32
             cmp #&94
-            bcs L1B32
-L1B2A:      lda #&01
-            sta L741F
-            jmp L1B37
-L1B32:      lda #&00
-            sta L741F
-L1B37:      lda L0088
+            bcs l1b32
+l1b2a:      lda #&01
+            sta l741f
+            jmp l1b37
+l1b32:      lda #&00
+            sta l741f
+l1b37:      lda currentroom
             cmp #&83
-            bcc L1B73
+            bcc l1b73
             cmp #&88
-            bcs L1B73
-            lda L7505
+            bcs l1b73
+            lda l7505
             cmp #&01
-            bne L1B73
-            lda #&CF
-            sta L0088
+            bne l1b73
+            lda #&cf
+            sta currentroom
             ldx #&85
-            jsr L0C72
+            jsr prtmsg
             ldx #&27
-L1B53:      lda L74F6,X
-            beq L1B68
+l1b53:      lda inventory,x
+            beq l1b68
             cmp #&01
-            beq L1B70
-L1B5C:      dex
-            bpl L1B53
+            beq l1b70
+l1b5c:      dex
+            bpl l1b53
             lda #&00
-            sta L008B
-            sta L008C
-            jmp L1C00
-L1B68:      lda #&BB
-            sta L74F6,X
-            jmp L1B5C
-L1B70:      jmp L1B68
-L1B73:      rts
-            .byte &32,&3A,&53,&54
-            eor (L0074,X)
-            adc L006D
-            bvs L1BF6
-            and L003A
+            sta invsize
+            sta l008c
+            jmp l1c00
+l1b68:      lda #&bb
+            sta inventory,x
+            jmp l1b5c
+l1b70:      jmp l1b68
+l1b73:      rts
+            .byte &32,&3a,&53,&54
+            eor (l0074,x)
+            adc l006d
+            bvs l1bf6
+            and l003a
             .byte &54
-            eor (L0058,X)
-            .byte &3A,&43
-            bvc L1BDF
+            eor (l0058,x)
+            .byte &3a,&43
+            bvc l1bdf
             .byte &23
-            bmi L1BC4
+            bmi l1bc4
             .byte &42
-            eor L0051
-            ror L736F
-            adc L0061
+            eor l0051
+            ror l736f
+            adc l0061
             .byte &72,&63
             pla
-            .byte &3A
-            jmp L5844
+            .byte &3a
+            jmp l5844
             .byte &23
-            bmi L1BA9
+            bmi l1ba9
             .byte &00
-            ldx L2E5A,Y
-            jmp L4F4F
-            bvc L1BDF
-            jmp L4144
+            ldx l2e5a,y
+            jmp l4f4f
+            bvc l1bdf
+            jmp l4144
             plp
-L1BA9:      eor L0058
-            and L0029
-            bit L3A59
+l1ba9:      eor l0058
+            and l0029
+            bit l3a59
             .byte &42
-            eor L6349
-            .byte &6B
-            ror L6D75
-            .byte &3A
-            rol L6E69
-            .byte &63,&3A
-            jmp L4144
-            .byte &23,&32,&3A
-L1BC4:      .byte &43
-            jmp L3A43
-            eor (L0044,X)
+            eor l6349
+            .byte &6b
+            ror l6d75
+            .byte &3a
+            rol l6e69
+            .byte &63,&3a
+            jmp l4144
+            .byte &23,&32,&3a
+l1bc4:      .byte &43
+            jmp l3a43
+            eor (l0044,x)
             .byte &43
-            eor L0058
-            and L003A
+            eor l0058
+            and l003a
             .byte &53,&54
-            eor (L0045,X)
+            eor (l0045,x)
             cli
-            and L003A
-            jmp L4144
+            and l003a
+            jmp l4144
             .byte &23
-            bmi L1C16
-            eor (L0044,X)
+            bmi l1c16
+            eor (l0044,x)
             .byte &43
-L1BDF:      eor L0058
-            and L002B
-            and (L003A),Y
+l1bdf:      eor l0058
+            and l002b
+            and (l003a),y
             .byte &53,&54
-            eor (L0045,X)
+            eor (l0045,x)
             cli
-            and L002B
-            and (L003A),Y
-            lsr A
-            eor L4C50
-            .byte &4F,&4F
-            bvc L1C03
-L1BF6:      .byte &00
+            and l002b
+            and (l003a),y
+            lsr a
+            eor l4c50
+            .byte &4f,&4f
+            bvc l1c03
+l1bf6:      .byte &00
             iny
-            .byte &1F
-            rol L6B63
-            ror L6D75
-            .byte &3A
-L1C00:      lda #&5C
-            sta L007E
-            lda #&6E
-            sta L007F
+            .byte &1f
+            rol l6b63
+            ror l6d75
+            .byte &3a
+l1c00:      lda #&5c
+            sta l007e
+            lda #&6e
+            sta l007f
             ldy #&00
             tya
-L1C0B:      sta L7400,Y
+l1c0b:      sta l7400,y
             iny
-            cpy #&1F
-            bne L1C0B
+            cpy #&1f
+            bne l1c0b
             lda #&02
-            sta L741E
+            sta l741e
             ldy #&00
-            lda L0088
+            lda currentroom
             sec
             sbc #&34
-            sta L007D
+            sta l007d
             tax
             cpx #&00
-            beq L1C43
+            beq l1c43
             ldx #&00
-L1C28:      lda (L007E),Y
-            bmi L1C3C
-L1C2C:      lda #&02
+l1c28:      lda (l007e),y
+            bmi l1c3c
+l1c2c:      lda #&02
             clc
-            adc L007E
-            sta L007E
+            adc l007e
+            sta l007e
             lda #&00
-            adc L007F
-            sta L007F
-            jmp L1C28
-L1C3C:      inx
-            cpx L007D
-            bne L1C2C
+            adc l007f
+            sta l007f
+            jmp l1c28
+l1c3c:      inx
+            cpx l007d
+            bne l1c2c
             iny
             iny
-L1C43:      lda (L007E),Y
-            and #&0F
+l1c43:      lda (l007e),y
+            and #&0f
             tax
-            inc L7400,X
-            lda (L007E),Y
-            and #&F0
-            sta L7414,X
+            inc l7400,x
+            lda (l007e),y
+            and #&f0
+            sta l7414,x
             iny
-            lda (L007E),Y
-            sta L740A,X
+            lda (l007e),y
+            sta l740a,x
             iny
-            lda L7414,X
+            lda l7414,x
             and #&40
-            beq L1C65
+            beq l1c65
             lda #&01
-            sta L741E
-L1C65:      lda L7414,X
-            bmi L1C6D
-            jmp L1C43
-L1C6D:      rts
-L1C6E:      lda #&7F
-            jsr OSWRCH
-            jsr OSWRCH
+            sta l741e
+l1c65:      lda l7414,x
+            bmi l1c6d
+            jmp l1c43
+l1c6d:      rts
+l1c6e:      lda #&7f
+            jsr oswrch
+            jsr oswrch
             tya
-            jmp OSWRCH
-L1C7A:      ldx #&2A
-            jmp L1C97
-L1C7F:      ldx #&00
+            jmp oswrch
+l1c7a:      ldx #&2a
+            jmp l1c97
+l1c7f:      ldx #&00
             ldy #&00
-L1C83:      lda L7400,X
-            beq L1C89
+l1c83:      lda l7400,x
+            beq l1c89
             iny
-L1C89:      inx
-            cpx #&0A
-            bne L1C83
+l1c89:      inx
+            cpx #&0a
+            bne l1c83
             dey
-            sty L006A
+            sty l006a
             cpy #&00
-            beq L1C7A
-            ldx #&2B
-L1C97:      jsr L09CF
+            beq l1c7a
+            ldx #&2b
+l1c97:      jsr findmsg
             ldy #&00
             ldx #&00
-L1C9E:      lda L7400,Y
-            beq L1CD0
-            lda L7414,Y
+l1c9e:      lda l7400,y
+            beq l1cd0
+            lda l7414,y
             and #&10
-            beq L1CAF
-            dec L006A
-            jmp L1CD0
-L1CAF:      stx L007D
+            beq l1caf
+            dec l006a
+            jmp l1cd0
+l1caf:      stx l007d
             tya
             pha
             clc
-            adc #&2C
+            adc #&2c
             tax
-            jsr L09CF
-            ldx L007D
+            jsr findmsg
+            ldx l007d
             inx
-            cpx L006A
-            bne L1CCE
+            cpx l006a
+            bne l1cce
             ldy #&20
-            jsr L1C6E
+            jsr l1c6e
             ldx #&36
-            jsr L09CF
-            ldx L007D
+            jsr findmsg
+            ldx l007d
             inx
-L1CCE:      pla
+l1cce:      pla
             tay
-L1CD0:      iny
-            cpy #&0A
-            bne L1C9E
-            ldy #&2E
-            jsr L1C6E
+l1cd0:      iny
+            cpy #&0a
+            bne l1c9e
+            ldy #&2e
+            jsr l1c6e
             lda #&20
-            jsr OSNEWL
+            jsr osnewl
             rts
-L1CE0:      lda #&3C
-            sta L7508
+l1ce0:      lda #&3c
+            sta guardloc
             lda #&55
-            sta L7532
-            jmp L1D03
-L1CED:      lda L0088
-            cmp #&DA
-            beq L1D5D
+            sta l7532
+            jmp l1d03
+l1ced:      lda currentroom
+            cmp #&da
+            beq l1d5d
             cmp #&36
-            beq L1CE0
+            beq l1ce0
             cmp #&94
-            bcc L1D03
+            bcc l1d03
             cmp #&98
-            bcc L1D21
-L1CFF:      cmp #&98
-            beq L1D08
-L1D03:      lda #&00
-            sta L007C
+            bcc l1d21
+l1cff:      cmp #&98
+            beq l1d08
+l1d03:      lda #&00
+            sta l007c
             rts
-L1D08:      lda #&00
-            sta L75B8
-            lda L751B
-            bne L1D21
-            lda L7545
-            cmp #&3B
-            beq L1D21
+l1d08:      lda #&00
+            sta l75b8
+            lda l751b
+            bne l1d21
+            lda l7545
+            cmp #&3b
+            beq l1d21
             lda #&01
-            sta L75B8
-            jmp L1D03
-L1D21:      lda #&01
-            sta L007C
+            sta l75b8
+            jmp l1d03
+l1d21:      lda #&01
+            sta l007c
             rts
-L1D26:      lda #&01
-            sta L7420
-            jsr L1FA0
-            bne L1D03
+l1d26:      lda #&01
+            sta l7420
+            jsr l1fa0
+            bne l1d03
             ldx #&28
-L1D32:      jsr L09CF
-            jmp L1D21
-L1D38:      lda #&01
-            sta L7420
-            jsr L1FA0
-            bne L1D03
+l1d32:      jsr findmsg
+            jmp l1d21
+l1d38:      lda #&01
+            sta l7420
+            jsr l1fa0
+            bne l1d03
             ldx #&74
-            jmp L1D32
-L1D47:      lda L0088
+            jmp l1d32
+l1d47:      lda currentroom
             cmp #&63
-            bcc L1D55
-            cmp #&6C
-            bcc L1D26
+            bcc l1d55
+            cmp #&6c
+            bcc l1d26
             cmp #&83
-            bcc L1D38
-L1D55:      lda #&00
-            sta L7420
-            jmp L1D03
-L1D5D:      ldx #&87
+            bcc l1d38
+l1d55:      lda #&00
+            sta l7420
+            jmp l1d03
+l1d5d:      ldx #&87
             lda #&01
-            cmp L7513
-            beq L1DA7
-            cmp L7506
-            beq L1DB7
-            cmp L74FE
-            bne L1DBF
-            cmp L7505
-            bne L1DC7
-            cmp L7509
-            bne L1DCF
-            cmp L750C
-            bne L1DD7
-            cmp L750E
-            bne L1DDF
-            cmp L7514
-            bne L1DE7
-            cmp L7517
-            bne L1DEF
+            cmp l7513
+            beq l1da7
+            cmp l7506
+            beq l1db7
+            cmp l74fe
+            bne l1dbf
+            cmp l7505
+            bne l1dc7
+            cmp l7509
+            bne l1dcf
+            cmp l750c
+            bne l1dd7
+            cmp l750e
+            bne l1ddf
+            cmp l7514
+            bne l1de7
+            cmp l7517
+            bne l1def
             lda #&00
-            cmp L750C
-            beq L1DA7
-            cmp L7506
-            beq L1DB7
+            cmp l750c
+            beq l1da7
+            cmp l7506
+            beq l1db7
             ldx #&92
-            jsr L09CF
+            jsr findmsg
             ldx #&93
-            jsr L0C72
-            jmp L1D03
-L1DA7:      jsr L09CF
+            jsr prtmsg
+            jmp l1d03
+l1da7:      jsr findmsg
             ldx #&88
-L1DAC:      jsr L09CF
+l1dac:      jsr findmsg
             ldx #&91
-            jsr L0C72
-            jmp L1D21
-L1DB7:      jsr L09CF
+            jsr prtmsg
+            jmp l1d21
+l1db7:      jsr findmsg
             ldx #&89
-            jmp L1DAC
-L1DBF:      jsr L09CF
-            ldx #&8C
-            jmp L1DAC
-L1DC7:      jsr L09CF
-            ldx #&8B
-            jmp L1DAC
-L1DCF:      jsr L09CF
-            ldx #&8A
-            jmp L1DAC
-L1DD7:      jsr L09CF
-            ldx #&8D
-            jmp L1DAC
-L1DDF:      jsr L09CF
+            jmp l1dac
+l1dbf:      jsr findmsg
+            ldx #&8c
+            jmp l1dac
+l1dc7:      jsr findmsg
+            ldx #&8b
+            jmp l1dac
+l1dcf:      jsr findmsg
+            ldx #&8a
+            jmp l1dac
+l1dd7:      jsr findmsg
+            ldx #&8d
+            jmp l1dac
+l1ddf:      jsr findmsg
             ldx #&90
-            jmp L1DAC
-L1DE7:      jsr L09CF
-            ldx #&8F
-            jmp L1DAC
-L1DEF:      jsr L09CF
-            ldx #&8E
-            jmp L1DAC
+            jmp l1dac
+l1de7:      jsr findmsg
+            ldx #&8f
+            jmp l1dac
+l1def:      jsr findmsg
+            ldx #&8e
+            jmp l1dac
             nop
             nop
-L1DF9:      beq L1DFE
-            jmp L1224
-L1DFE:      lda L7508
-            cmp L0088
-            bne L1E11
-            lda L7532
+l1df9:      beq l1dfe
+            jmp l1224
+l1dfe:      lda guardloc
+            cmp currentroom
+            bne l1e11
+            lda l7532
             cmp #&55
-            bne L1E11
+            bne l1e11
             ldx #&60
-            jmp L0C72
-L1E11:      ldx #&00
+            jmp prtmsg
+l1e11:      ldx #&00
             rts
-L1E14:      beq L1E11
-            jmp L1224
-            jsr L1DF9
-            bne L1E21
-            jmp L1E7E
-L1E21:      rts
-            jsr L1E14
-            bne L1E21
+l1e14:      beq l1e11
+            jmp l1224
+            jsr l1df9
+            bne l1e21
+            jmp l1e7e
+l1e21:      rts
+            jsr l1e14
+            bne l1e21
             inx
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             inx
             inx
-            jmp L1E7E
-L1E35:      jsr L1E14
-            bne L1E21
-            jmp L1EE1
-L1E3D:      ldx #&03
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+l1e35:      jsr l1e14
+            bne l1e21
+            jmp l1ee1
+l1e3d:      ldx #&03
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&04
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&05
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&06
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&07
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&08
-            jmp L1E7E
-            jsr L1E14
-            bne L1E21
+            jmp l1e7e
+            jsr l1e14
+            bne l1e21
             ldx #&09
-            jmp L1E7E
-L1E7E:      lda L7400,X
-            beq L1E94
-            lda L7414,X
+            jmp l1e7e
+l1e7e:      lda l7400,x
+            beq l1e94
+            lda l7414,x
             and #&40
-            beq L1EA2
-            lda L741E
-            beq L1E99
+            beq l1ea2
+            lda l741e
+            beq l1e99
             ldx #&64
-            jmp L0C72
-L1E94:      ldx #&73
-            jmp L0C72
-L1E99:      txa
+            jmp prtmsg
+l1e94:      ldx #&73
+            jmp prtmsg
+l1e99:      txa
             pha
             ldx #&66
-            jsr L09CF
+            jsr findmsg
             pla
             tax
-L1EA2:      lda L740A,X
-            sta L0088
-            inc L7428
-            jsr L1C00
-            jsr L2137
-            jsr L1D47
-            lda L007C
-            beq L1EBA
-            jmp L1728
-L1EBA:      lda L0088
-            jsr L1CFF
-            jsr L1F57
-            jsr L1CED
-            lda L007C
-            beq L1ED3
-            lda L0088
+l1ea2:      lda l740a,x
+            sta currentroom
+            inc l7428
+            jsr l1c00
+            jsr l2137
+            jsr l1d47
+            lda l007c
+            beq l1eba
+            jmp l1728
+l1eba:      lda currentroom
+            jsr l1cff
+            jsr l1f57
+            jsr l1ced
+            lda l007c
+            beq l1ed3
+            lda currentroom
             cmp #&98
-            bne L1ED0
+            bne l1ed0
             rts
-L1ED0:      jmp L1728
-L1ED3:      lda L0088
-            cmp #&DB
-            beq L1EDC
-            jmp L1F7B
-L1EDC:      lda #&01
-            sta L007B
+l1ed0:      jmp l1728
+l1ed3:      lda currentroom
+            cmp #&db
+            beq l1edc
+            jmp l1f7b
+l1edc:      lda #&01
+            sta l007b
             rts
-L1EE1:      lda L0088
-            cmp #&DA
-            beq L1EEA
-            jmp L1E3D
-L1EEA:      cmp L74FB
-            bne L1F2D
-            cmp L74FC
-            bne L1F2D
-            cmp L74FF
-            bne L1F2D
-            cmp L7501
-            bne L1F2D
-            cmp L7507
-            bne L1F2D
-            cmp L750A
-            bne L1F2D
-            cmp L750D
-            bne L1F2D
-            cmp L750F
-            bne L1F2D
-            cmp L7511
-            bne L1F2D
-            cmp L7512
-            bne L1F2D
+l1ee1:      lda currentroom
+            cmp #&da
+            beq l1eea
+            jmp l1e3d
+l1eea:      cmp l74fb
+            bne l1f2d
+            cmp l74fc
+            bne l1f2d
+            cmp l74ff
+            bne l1f2d
+            cmp l7501
+            bne l1f2d
+            cmp l7507
+            bne l1f2d
+            cmp l750a
+            bne l1f2d
+            cmp l750d
+            bne l1f2d
+            cmp l750f
+            bne l1f2d
+            cmp l7511
+            bne l1f2d
+            cmp l7512
+            bne l1f2d
             txa
             pha
             ldx #&95
-            jsr L09CF
+            jsr findmsg
             ldx #&93
-            jsr L0C72
+            jsr prtmsg
             pla
             tax
-            jmp L1E3D
-L1F2D:      ldx #&94
-            jsr L09CF
+            jmp l1e3d
+l1f2d:      ldx #&94
+            jsr findmsg
             ldx #&93
-            jmp L0C72
-            bne L1F3C
-            jmp L1231
-L1F3C:      cpx #&FF
-            bne L1F43
-            jmp L0C85
-L1F43:      cpx #&2B
-            beq L1F4B
-            jmp L1224
+            jmp prtmsg
+            bne l1f3c
+            jmp neednoun
+l1f3c:      cpx #&ff
+            bne l1f43
+            jmp badnoun
+l1f43:      cpx #&2b
+            beq l1f4b
+            jmp l1224
             nop
-L1F4B:      lda L0088
-            cmp #&DA
-            bne L1F54
-            jmp L1E35
-L1F54:      jmp L1837
-L1F57:      jsr L1FA0
-            beq L1F69
-            jsr L1F86
-            lda L741E
-            beq L1F6E
+l1f4b:      lda currentroom
+            cmp #&da
+            bne l1f54
+            jmp l1e35
+l1f54:      jmp l1837
+l1f57:      jsr l1fa0
+            beq l1f69
+            jsr l1f86
+            lda l741e
+            beq l1f6e
             cmp #&01
-            beq L1F73
+            beq l1f73
             rts
-L1F69:      ldx #&69
-            jmp L09CF
-L1F6E:      ldx #&63
-            jmp L09CF
-L1F73:      ldx #&64
-            jmp L09CF
-L1F78:      jsr L1F57
-L1F7B:      lda L7427
-            beq L1F83
-            jsr L1C7F
-L1F83:      jmp L13A7
-L1F86:      lda #&53
-            sta L0085
+l1f69:      ldx #&69
+            jmp findmsg
+l1f6e:      ldx #&63
+            jmp findmsg
+l1f73:      ldx #&64
+            jmp findmsg
+l1f78:      jsr l1f57
+l1f7b:      lda l7427
+            beq l1f83
+            jsr l1c7f
+l1f83:      jmp l13a7
+l1f86:      lda #&53
+            sta l0085
             lda #&00
-            sta L0084
-            ldx L0088
-            lda L7520,X
+            sta l0084
+            ldx currentroom
+            lda l7520,x
             tax
-            jsr L2131
+            jsr l2131
             lda #&45
-            sta L0085
+            sta l0085
             lda #&00
-            sta L0084
+            sta l0084
             rts
-L1FA0:      lda L7420
-            beq L1FB9
-            lda L7535
-            cmp #&3C
-            beq L1FBF
-            cmp #&3F
-            beq L1FBF
-            lda L750B
-            beq L1FB9
-            cmp L0088
-            bne L1FBF
-L1FB9:      lda #&01
-L1FBB:      sta L7427
+l1fa0:      lda l7420
+            beq l1fb9
+            lda l7535
+            cmp #&3c
+            beq l1fbf
+            cmp #&3f
+            beq l1fbf
+            lda l750b
+            beq l1fb9
+            cmp currentroom
+            bne l1fbf
+l1fb9:      lda #&01
+l1fbb:      sta l7427
             rts
-L1FBF:      lda #&00
-            jmp L1FBB
+l1fbf:      lda #&00
+            jmp l1fbb
             ldx #&07
-            jsr L0C72
-            jsr L200F
-            beq L1FD3
-L1FCE:      ldx #&08
-            jmp L0C72
-L1FD3:      ldx #&00
-L1FD5:      lda L0088,X
-            sta L7429,X
+            jsr prtmsg
+            jsr l200f
+            beq l1fd3
+l1fce:      ldx #&08
+            jmp prtmsg
+l1fd3:      ldx #&00
+l1fd5:      lda currentroom,x
+            sta l7429,x
             inx
             cpx #&08
-            bne L1FD5
-            ldx #&C0
+            bne l1fd5
+            ldx #&c0
             ldy #&22
-            jsr OSCLI
-            jmp L0C96
+            jsr oscli
+            jmp l0c96
             ldx #&07
-            jsr L0C72
-            jsr L200F
-            beq L1FF6
-            jmp L1FCE
-L1FF6:      ldx #&D1
+            jsr prtmsg
+            jsr l200f
+            beq l1ff6
+            jmp l1fce
+l1ff6:      ldx #&d1
             ldy #&22
-            jsr OSCLI
+            jsr oscli
             ldx #&00
-L1FFF:      lda L7429,X
-            sta L0088,X
+l1fff:      lda l7429,x
+            sta currentroom,x
             inx
             cpx #&08
-            bne L1FFF
-            jsr L0C96
-            jmp L1F78
-L200F:      jsr OSRDCH
-            cmp #&1B
-            beq L2024
+            bne l1fff
+            jsr l0c96
+            jmp l1f78
+l200f:      jsr osrdch
+            cmp #&1b
+            beq l2024
             cmp #&59
-            bne L201D
+            bne l201d
             lda #&00
             rts
-L201D:      cmp #&4E
-            bne L200F
+l201d:      cmp #&4e
+            bne l200f
             lda #&01
             rts
-L2024:      lda #&7E
-            jsr OSBYTE
-            jmp L200F
-L202C:      ldx #&00
-L202E:      lda L7400,X
-            sta L3000,X
-            lda L7500,X
-            sta L3100,X
+l2024:      lda #&7e
+            jsr osbyte
+            jmp l200f
+l202c:      ldx #&00
+l202e:      lda l7400,x
+            sta l3000,x
+            lda l7500,x
+            sta l3100,x
             dex
-            bne L202E
+            bne l202e
             rts
-L203E:      ldx #&2F
+l203e:      ldx #&2f
             lda #&00
-L2042:      sta L0060,X
+l2042:      sta l0060,x
             dex
-            bpl L2042
-            lda #&FF
-            sta L008E
+            bpl l2042
+            lda #&ff
+            sta l008e
             lda #&01
-            sta L008C
+            sta l008c
             lda #&34
-            sta L0088
+            sta currentroom
             lda #&45
-            sta L0084
+            sta l0084
             rts
-L2058:      jsr L203E
+l2058:      jsr l203e
             ldx #&00
-L205D:      lda L3000,X
-            sta L7400,X
-            lda L3100,X
-            sta L7500,X
+l205d:      lda l3000,x
+            sta l7400,x
+            lda l3100,x
+            sta l7500,x
             dex
-            bne L205D
-            jsr L223D
-            jsr L1C00
-            jmp L1F78
-L2075:      jsr L202C
-L2078:      lda #&0C
-            jsr OSWRCH
-            jsr L2058
-L2080:      jsr L16BE
-            lda L0089
+            bne l205d
+            jsr l223d
+            jsr l1c00
+            jmp l1f78
+l2075:      jsr l202c
+l2078:      lda #&0c
+            jsr oswrch
+            jsr l2058
+l2080:      jsr l16be
+            lda l0089
             cmp #&09
-            beq L20C7
-            lda L7422
-            bne L2095
-            lda L007B
-            bne L209E
-            jmp L2080
-L2095:      jsr L218C
-L2098:      jsr L20A6
-            jmp L2078
-L209E:      ldx #&A0
-            jsr L0C72
-            jmp L2098
-L20A6:      lda #&85
-            sta L0922
+            beq l20c7
+            lda l7422
+            bne l2095
+            lda l007b
+            bne l209e
+            jmp l2080
+l2095:      jsr l218c
+l2098:      jsr l20a6
+            jmp l2078
+l209e:      ldx #&a0
+            jsr prtmsg
+            jmp l2098
+l20a6:      lda #&85
+            sta l0922
             ldx #&96
-            jsr L2131
-            jsr L20CA
-L20B3:      jsr OSRDCH
-            cmp #&1B
-            beq L20BF
-            cmp #&0D
-            bne L20B3
+            jsr l2131
+            jsr l20ca
+l20b3:      jsr osrdch
+            cmp #&1b
+            beq l20bf
+            cmp #&0d
+            bne l20b3
             rts
-L20BF:      lda #&7E
-            jsr OSBYTE
-            jmp L20B3
-L20C7:      jmp L2078
-L20CA:      lda #&86
-            sta L0922
+l20bf:      lda #&7e
+            jsr osbyte
+            jmp l20b3
+l20c7:      jmp l2078
+l20ca:      lda #&86
+            sta l0922
             rts
-L20D0:      lda L0088
-            cmp #&D6
-            beq L20D7
+l20d0:      lda currentroom
+            cmp #&d6
+            beq l20d7
             rts
-L20D7:      lda L7504
-            cmp #&D6
-            beq L20F1
+l20d7:      lda l7504
+            cmp #&d6
+            beq l20f1
             cmp #&03
-            beq L20F1
+            beq l20f1
             ldx #&97
-            jsr L09CF
+            jsr findmsg
             ldx #&98
-L20E9:      jsr L09CF
-            ldx #&9B
-            jmp L0C72
-L20F1:      lda L7516
-            cmp #&D6
-            beq L2106
+l20e9:      jsr findmsg
+            ldx #&9b
+            jmp prtmsg
+l20f1:      lda l7516
+            cmp #&d6
+            beq l2106
             cmp #&03
-            beq L2106
+            beq l2106
             ldx #&97
-            jsr L09CF
+            jsr findmsg
             ldx #&99
-            jmp L20E9
-L2106:      lda L74FA
-            cmp #&D6
-            beq L211B
+            jmp l20e9
+l2106:      lda l74fa
+            cmp #&d6
+            beq l211b
             cmp #&03
-            beq L211B
+            beq l211b
             ldx #&97
-            jsr L09CF
-            ldx #&9A
-            jmp L20E9
-L211B:      lda L750E
-            cmp #&FF
-            beq L2127
-            ldx #&9C
-            jmp L0C72
-L2127:      lda #&D6
-            sta L750E
-            ldx #&9E
-            jmp L0C72
-L2131:      jsr L09CF
-            jmp OSNEWL
-L2137:      lda L0088
+            jsr findmsg
+            ldx #&9a
+            jmp l20e9
+l211b:      lda l750e
+            cmp #&ff
+            beq l2127
+            ldx #&9c
+            jmp prtmsg
+l2127:      lda #&d6
+            sta l750e
+            ldx #&9e
+            jmp prtmsg
+l2131:      jsr findmsg
+            jmp osnewl
+l2137:      lda currentroom
             cmp #&36
-            beq L214A
-            cmp #&3D
-            beq L217E
-            cmp #&6C
-            beq L2162
-            cmp #&9A
-            beq L2170
+            beq l214a
+            cmp #&3d
+            beq l217e
+            cmp #&6c
+            beq l2162
+            cmp #&9a
+            beq l2170
             rts
-L214A:      lda L7432
-            bne L2157
-            jsr L2158
+l214a:      lda l7432
+            bne l2157
+            jsr l2158
             lda #&01
-            sta L7432
-L2157:      rts
-L2158:      lda L7431
+            sta l7432
+l2157:      rts
+l2158:      lda l7431
             clc
-            adc #&0A
-            sta L7431
+            adc #&0a
+            sta l7431
             rts
-L2162:      lda L7434
-            bne L2157
-            jsr L2158
+l2162:      lda l7434
+            bne l2157
+            jsr l2158
             lda #&01
-            sta L7434
+            sta l7434
             rts
-L2170:      lda L7435
-            bne L2157
-            jsr L2158
+l2170:      lda l7435
+            bne l2157
+            jsr l2158
             lda #&01
-            sta L7435
+            sta l7435
             rts
-L217E:      lda L7433
-            bne L2157
-            jsr L2158
+l217e:      lda l7433
+            bne l2157
+            jsr l2158
             lda #&01
-            sta L7433
+            sta l7433
             rts
-L218C:      ldy #&00
-            lda #&DA
-            cmp L74FB
-            bne L2196
+l218c:      ldy #&00
+            lda #&da
+            cmp l74fb
+            bne l2196
             iny
-L2196:      cmp L74FC
-            bne L219C
+l2196:      cmp l74fc
+            bne l219c
             iny
-L219C:      cmp L74FF
-            bne L21A2
+l219c:      cmp l74ff
+            bne l21a2
             iny
-L21A2:      cmp L7501
-            bne L21A8
+l21a2:      cmp l7501
+            bne l21a8
             iny
-L21A8:      cmp L7507
-            bne L21AE
+l21a8:      cmp l7507
+            bne l21ae
             iny
-L21AE:      cmp L750A
-            bne L21B4
+l21ae:      cmp l750a
+            bne l21b4
             iny
-L21B4:      cmp L750D
-            bne L21BA
+l21b4:      cmp l750d
+            bne l21ba
             iny
-L21BA:      cmp L750F
-            bne L21C0
+l21ba:      cmp l750f
+            bne l21c0
             iny
-L21C0:      cmp L7511
-            bne L21C6
+l21c0:      cmp l7511
+            bne l21c6
             iny
-L21C6:      cmp L7512
-            bne L21CC
+l21c6:      cmp l7512
+            bne l21cc
             iny
-L21CC:      lda #&01
-            cmp L74FE
-            bne L21D4
+l21cc:      lda #&01
+            cmp l74fe
+            bne l21d4
             iny
-L21D4:      cmp L7505
-            bne L21DA
+l21d4:      cmp l7505
+            bne l21da
             iny
-L21DA:      cmp L7509
-            bne L21E0
+l21da:      cmp l7509
+            bne l21e0
             iny
-L21E0:      cmp L750C
-            bne L21E6
+l21e0:      cmp l750c
+            bne l21e6
             iny
-L21E6:      cmp L750E
-            bne L21EC
+l21e6:      cmp l750e
+            bne l21ec
             iny
-L21EC:      cmp L7514
-            bne L21F2
+l21ec:      cmp l7514
+            bne l21f2
             iny
-L21F2:      cmp L7517
-            bne L21F8
+l21f2:      cmp l7517
+            bne l21f8
             iny
-L21F8:      lda L74FA
+l21f8:      lda l74fa
             cmp #&03
-            beq L2203
-            cmp #&D6
-            bne L2204
-L2203:      iny
-L2204:      lda L7504
+            beq l2203
+            cmp #&d6
+            bne l2204
+l2203:      iny
+l2204:      lda l7504
             cmp #&03
-            beq L220F
-            cmp #&D6
-            bne L2210
-L220F:      iny
-L2210:      lda L7516
+            beq l220f
+            cmp #&d6
+            bne l2210
+l220f:      iny
+l2210:      lda l7516
             cmp #&03
-            beq L221B
-            cmp #&D6
-            bne L221C
-L221B:      iny
-L221C:      lda L751C
+            beq l221b
+            cmp #&d6
+            bne l221c
+l221b:      iny
+l221c:      lda l751c
             cmp #&27
-            bne L2224
+            bne l2224
             iny
-L2224:      lda #&00
-            sta L008D
-L2228:      lda L008D
+l2224:      lda #&00
+            sta l008d
+l2228:      lda l008d
             clc
-            adc #&0A
-            sta L008D
+            adc #&0a
+            sta l008d
             dey
-            bne L2228
-            lda L7431
+            bne l2228
+            lda l7431
             clc
-            adc L008D
-            sta L008D
-            jmp L141C
-L223D:      lda #&45
-            sta L0085
+            adc l008d
+            sta l008d
+            jmp l141c
+l223d:      lda #&45
+            sta l0085
             lda #&00
-            sta L0084
+            sta l0084
             lda #&83
-            sta L0922
+            sta l0922
             ldx #&06
-            jsr L0C72
-            lda #&0F
-            jsr OSWRCH
-            jmp L20CA
+            jsr prtmsg
+            lda #&0f
+            jsr oswrch
+            jmp l20ca
             ldx #&40
-            jmp L0C72
+            jmp prtmsg
             rts
-EXECADDR:   lda #&16
-            jsr OSWRCH
+execaddr:   lda #&16
+            jsr oswrch
             lda #&07
-            jsr OSWRCH
-            lda #&0F
-            jsr OSWRCH
-            lda #&8B
+            jsr oswrch
+            lda #&0f
+            jsr oswrch
+            lda #&8b
             ldx #&01
             ldy #&00
-            sty L0068
-            jsr OSBYTE
+            sty l0068
+            jsr osbyte
             lda #&43
-            sta L0085
+            sta l0085
             lda #&00
-            sta L0084
+            sta l0084
             tax
-            lda #&0C
-            jsr OSWRCH
-L2285:      txa
+            lda #&0c
+            jsr oswrch
+l2285:      txa
             pha
-            jsr L2131
+            jsr l2131
             pla
             tax
             inx
             cpx #&06
-            bne L2285
-            stx L20AC
-            jsr OSNEWL
+            bne l2285
+            stx l20ac
+            jsr osnewl
             lda #&89
-            sta L006B
-            jsr L20A6
+            sta l006b
+            jsr l20a6
             ldx #&96
-            stx L20AC
+            stx l20ac
             lda #&45
-            sta L0085
-            jmp L2075
+            sta l0085
+            jmp l2075
             ldx #&00
-L22AC:      lda #&10
-            sta L0B00,X
+l22ac:      lda #&10
+            sta l0b00,x
             lda #&00
-            sta L0900,X
-            sta L0A00,X
-            sta L0C00,X
+            sta l0900,x
+            sta l0a00,x
+            sta l0c00,x
             dex
-            bne L22AC
+            bne l22ac
             rts
             .byte &53
-            rol L4120
+            rol l4120
             .byte &44
-            lsr L0020,X
+            lsr l0020,x
             .byte &37,&34
-            bmi L22FB
-            jsr L3637
-            bmi L2300
-            ora L2E4C
-            jsr L4441
-            lsr L000D,X
+            bmi l22fb
+            jsr l3637
+            bmi l2300
+            ora l2e4c
+            jsr l4441
+            lsr l000d,x
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00
-L22FB:      .byte &00,&00,&00,&00,&00
-L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
+l22fb:      .byte &00,&00,&00,&00,&00
+l2300:      .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2021,7 +2072,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2053,7 +2104,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2085,7 +2136,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2117,7 +2168,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2149,7 +2200,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2181,7 +2232,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2213,7 +2264,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2245,7 +2296,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2277,7 +2328,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2309,7 +2360,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2341,7 +2392,7 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2351,9 +2402,9 @@ L2300:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00
-L2E4C:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l2e4c:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00
-L2E5A:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l2e5a:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2373,7 +2424,7 @@ L2E5A:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&FF,&00
+            .byte &00,&00,&00,&00,&00,&00,&ff,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2406,7 +2457,7 @@ L2E5A:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00
-L3000:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
+l3000:      .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2438,7 +2489,7 @@ L3000:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
+l3100:      .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2470,7 +2521,7 @@ L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2502,7 +2553,7 @@ L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2534,7 +2585,7 @@ L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2566,7 +2617,7 @@ L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2598,14 +2649,14 @@ L3100:      .byte &FF,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &FF,&00,&00,&00,&00,&00,&00,&00
+            .byte &ff,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00
-L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2630,7 +2681,7 @@ L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&FF,&00,&00,&00,&00,&00,&00
+            .byte &00,&ff,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2662,7 +2713,7 @@ L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&FF,&00,&00,&00,&00,&00,&00
+            .byte &00,&ff,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2694,7 +2745,7 @@ L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&FF,&00,&00,&00,&00,&00,&00
+            .byte &00,&ff,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2726,7 +2777,7 @@ L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&FF,&00,&00,&00,&00,&00,&00
+            .byte &00,&ff,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2735,10 +2786,10 @@ L3637:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00
-L3A43:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l3a43:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00
-L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l3a59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2758,7 +2809,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2790,7 +2841,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2822,7 +2873,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2854,7 +2905,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2886,7 +2937,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2918,7 +2969,7 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&0F,&76,&00,&00,&FF
+            .byte &00,&00,&00,&0f,&76,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2950,17 +3001,17 @@ L3A59:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00
-L4120:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l4120:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00
-L4144:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l4144:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -2983,7 +3034,7 @@ L4144:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&FF,&00,&00,&00
+            .byte &00,&00,&00,&00,&ff,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -3015,1546 +3066,1546 @@ L4144:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&22,&23,&8A,&4A
-            .byte &12,&9F,&10,&8F,&C1,&20,&5C,&20
-            .byte &A8,&A9,&4B,&20,&5C,&27,&52,&9D
-            .byte &C1,&99,&3F,&45,&48,&3F,&BE,&4D
-            .byte &9D,&B3,&21,&AC,&FC,&45,&A3,&F2
-            .byte &22,&2C,&0F,&B5,&54,&A4,&89,&23
-            .byte &4B,&99,&20,&7B,&23,&58,&41,&AC
-            .byte &2C,&AC,&E1,&E7,&59,&2E,&0D,&22
-            .byte &23,&93,&2E,&2E,&2E,&93,&22,&2C
-            .byte &5C,&20,&43,&52,&59,&2C,&46,&0B
-            .byte &DA,&59,&2C,&8A,&47,&41,&5A,&9D
-            .byte &19,&20,&8F,&89,&23,&4B,&99,&2E
-            .byte &0D,&22,&23,&53,&B1,&C7,&99,&20
-            .byte &4D,&A2,&93,&2C,&57,&AA,&9D,&5C
-            .byte &2C,&C1,&47,&21,&5C,&20,&4B,&EE
-            .byte &A6,&10,&8F,&23,&A5,&C1,&20,&76
-            .byte &A8,&49,&0C,&B7,&2C,&C1,&98,&5C
-            .byte &3F,&A5,&DD,&F1,&20,&8B,&A7,&7A
-            .byte &4D,&A2,&4B,&45,&04,&20,&C8,&A3
-            .byte &A1,&57,&BB,&C3,&22,&2C,&CB,&55
-            .byte &DE,&A4,&89,&23,&4B,&99,&2C,&0C
-            .byte &49,&D7,&59,&2E,&0D,&22,&23,&ED
-            .byte &A6,&4C,&B3,&47,&20,&A1,&57,&BB
-            .byte &C3,&3F,&49,&27,&A7,&56,&AA,&A2
-            .byte &A8,&02,&B8,&59,&22,&2C,&5C,&20
-            .byte &43,&DF,&FF,&2C,&54,&B5,&D3,&99
-            .byte &20,&5C,&A3,&43,&C0,&F1,&45,&A0
-            .byte &D4,&50,&53,&2E,&0D,&22,&23,&49
-            .byte &27,&A7,&EE,&9F,&53,&55,&AB,&22
-            .byte &2C,&AB,&50,&D4,&45,&A4,&89,&23
-            .byte &4B,&99,&2C,&22,&23,&D2,&B0,&4C
-            .byte &20,&5C,&20,&DF,&54,&2C,&D8,&4F
-            .byte &42,&41,&DA,&59,&22,&2C,&8A,&48
-            .byte &9D,&B9,&44,&AA,&A4,&C8,&A3,&5C
-            .byte &20,&76,&42,&9D,&D1,&53,&9F,&A9
-            .byte &76,&D8,&C9,&B3,&21,&0D,&23,&03
-            .byte &20,&08,&47,&7A,&5C,&A3,&7F,&A4
-            .byte &7E,&89,&23,&C9,&4C,&8A,&7B,&23
-            .byte &58,&41,&AC,&2E,&2E,&2E,&0D,&2B
-            .byte &23,&50,&AB,&53,&53,&3C,&26,&AB
-            .byte &54,&55,&52,&4E,&26
-L4441:      .byte &3C,&76,&B8,&AE,&54,&2E,&2B,&0D
-            .byte &9E,&A9,&76,&D8,&C9,&B3,&21,&0D
-            .byte &23,&03,&20,&08,&47,&7A,&5C,&A3
-            .byte &7F,&A4,&7E,&89,&23,&C9,&4C,&8A
-            .byte &7B,&23,&58,&41,&AC,&2E,&2E,&2E
-            .byte &0D,&2B,&23,&50,&AB,&53,&53,&3C
-            .byte &26,&AB,&54,&55,&52,&4E,&26,&3C
-            .byte &76,&B8,&AE,&54,&2E,&2B,&0D,&02
-            .byte &D1,&83,&CF,&02,&D2,&83,&D0,&00
-            .byte &D3,&83,&D1,&01,&D2,&84,&D4,&01
-            .byte &D3,&82,&86,&08,&92,&89,&83,&E2
-            .byte &C1,&02,&88,&85,&D8,&02,&D7,&85
-            .byte &D9,&02,&D8,&83,&DA,&02,&D9,&83
-            .byte &DB,&82,&DA,&10,&98,&01,&66,&02
+            .byte &00,&00,&00,&00,&22,&23,&8a,&4a
+            .byte &12,&9f,&10,&8f,&c1,&20,&5c,&20
+            .byte &a8,&a9,&4b,&20,&5c,&27,&52,&9d
+            .byte &c1,&99,&3f,&45,&48,&3f,&be,&4d
+            .byte &9d,&b3,&21,&ac,&fc,&45,&a3,&f2
+            .byte &22,&2c,&0f,&b5,&54,&a4,&89,&23
+            .byte &4b,&99,&20,&7b,&23,&58,&41,&ac
+            .byte &2c,&ac,&e1,&e7,&59,&2e,&0d,&22
+            .byte &23,&93,&2e,&2e,&2e,&93,&22,&2c
+            .byte &5c,&20,&43,&52,&59,&2c,&46,&0b
+            .byte &da,&59,&2c,&8a,&47,&41,&5a,&9d
+            .byte &19,&20,&8f,&89,&23,&4b,&99,&2e
+            .byte &0d,&22,&23,&53,&b1,&c7,&99,&20
+            .byte &4d,&a2,&93,&2c,&57,&aa,&9d,&5c
+            .byte &2c,&c1,&47,&21,&5c,&20,&4b,&ee
+            .byte &a6,&10,&8f,&23,&a5,&c1,&20,&76
+            .byte &a8,&49,&0c,&b7,&2c,&c1,&98,&5c
+            .byte &3f,&a5,&dd,&f1,&20,&8b,&a7,&7a
+            .byte &4d,&a2,&4b,&45,&04,&20,&c8,&a3
+            .byte &a1,&57,&bb,&c3,&22,&2c,&cb,&55
+            .byte &de,&a4,&89,&23,&4b,&99,&2c,&0c
+            .byte &49,&d7,&59,&2e,&0d,&22,&23,&ed
+            .byte &a6,&4c,&b3,&47,&20,&a1,&57,&bb
+            .byte &c3,&3f,&49,&27,&a7,&56,&aa,&a2
+            .byte &a8,&02,&b8,&59,&22,&2c,&5c,&20
+            .byte &43,&df,&ff,&2c,&54,&b5,&d3,&99
+            .byte &20,&5c,&a3,&43,&c0,&f1,&45,&a0
+            .byte &d4,&50,&53,&2e,&0d,&22,&23,&49
+            .byte &27,&a7,&ee,&9f,&53,&55,&ab,&22
+            .byte &2c,&ab,&50,&d4,&45,&a4,&89,&23
+            .byte &4b,&99,&2c,&22,&23,&d2,&b0,&4c
+            .byte &20,&5c,&20,&df,&54,&2c,&d8,&4f
+            .byte &42,&41,&da,&59,&22,&2c,&8a,&48
+            .byte &9d,&b9,&44,&aa,&a4,&c8,&a3,&5c
+            .byte &20,&76,&42,&9d,&d1,&53,&9f,&a9
+            .byte &76,&d8,&c9,&b3,&21,&0d,&23,&03
+            .byte &20,&08,&47,&7a,&5c,&a3,&7f,&a4
+            .byte &7e,&89,&23,&c9,&4c,&8a,&7b,&23
+            .byte &58,&41,&ac,&2e,&2e,&2e,&0d,&2b
+            .byte &23,&50,&ab,&53,&53,&3c,&26,&ab
+            .byte &54,&55,&52,&4e,&26
+l4441:      .byte &3c,&76,&b8,&ae,&54,&2e,&2b,&0d
+            .byte &9e,&a9,&76,&d8,&c9,&b3,&21,&0d
+            .byte &23,&03,&20,&08,&47,&7a,&5c,&a3
+            .byte &7f,&a4,&7e,&89,&23,&c9,&4c,&8a
+            .byte &7b,&23,&58,&41,&ac,&2e,&2e,&2e
+            .byte &0d,&2b,&23,&50,&ab,&53,&53,&3c
+            .byte &26,&ab,&54,&55,&52,&4e,&26,&3c
+            .byte &76,&b8,&ae,&54,&2e,&2b,&0d,&02
+            .byte &d1,&83,&cf,&02,&d2,&83,&d0,&00
+            .byte &d3,&83,&d1,&01,&d2,&84,&d4,&01
+            .byte &d3,&82,&86,&08,&92,&89,&83,&e2
+            .byte &c1,&02,&88,&85,&d8,&02,&d7,&85
+            .byte &d9,&02,&d8,&83,&da,&02,&d9,&83
+            .byte &db,&82,&da,&10,&98,&01,&66,&02
             .byte &59,&03,&58,&06,&67,&87,&65,&02
-            .byte &DE,&88,&82,&00,&8A,&02,&4F,&03
-            .byte &DD,&04,&8B,&85,&53,&08,&94,&89
-            .byte &CF,&00,&00,&00,&00,&00,&00,&00
+            .byte &de,&88,&82,&00,&8a,&02,&4f,&03
+            .byte &dd,&04,&8b,&85,&53,&08,&94,&89
+            .byte &cf,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&23
-            .byte &A5,&C1,&98,&55,&C4,&AA,&B8,&8A
-            .byte &0D,&4F,&A3,&0D,&ED,&A6,&76,&22
-            .byte &24,&22,&20,&0D,&10,&8F,&22,&25
-            .byte &22,&20,&F2,&AC,&53,&2E,&0D,&3D
-            .byte &23,&5C,&20,&1E,&12,&9D,&C8,&A3
-            .byte &A1,&57,&BB,&C3,&2E,&2E,&2E,&2E
-            .byte &3D,&0D,&23,&4F,&4B,&1F,&0D,&2B
-            .byte &23,&57,&CD,&BE,&4D,&9D,&C2,&2B
-            .byte &2B,&22,&23,&C9,&4C,&8A,&7B,&23
-            .byte &58,&41,&AC,&22,&2B,&2B,&23,&42
-            .byte &59,&3A,&23,&DF,&42,&AA,&9F,&23
-            .byte &4F,&27,&23,&C3,&AE,&59,&2B,&2B
-            .byte &23,&80,&2B,&0D,&23,&AE,&9D,&5C
-            .byte &20,&53,&55,&52,&9D,&5C,&20,&57
-            .byte &AC,&9F,&76,&24,&3F,&0D,&23,&A5
-            .byte &A8,&B5,&9A,&20,&5C,&20,&57,&AA
-            .byte &9D,&8E,&4B,&49,&44,&44,&99,&21
-            .byte &0D,&23,&42,&59,&45,&21,&0D,&23
-            .byte &A5,&D1,&98,&47,&55,&B7,&A4,&10
-            .byte &8F,&5C,&20,&57,&AC,&9F,&76,&24
-            .byte &21,&0D,&23,&A9,&56,&AF,&54,&B9
-            .byte &59,&3A,&2B,&20,&2B,&23,&5B,&43
-            .byte &AE,&52,&59,&99,&20,&0D,&8A,&05
-            .byte &AE,&99,&20,&0D,&EE,&A8,&99,&20
-            .byte &0D,&23,&5C,&20,&D1,&98,&71,&20
-            .byte &0D,&23,&5B,&C7,&AB,&FD,&A2,&0D
-            .byte &23,&5B,&EE,&9F,&0D,&23,&5C,&20
-            .byte &D1,&98,&C1,&20,&A8,&B2,&21,&0D
-            .byte &89,&25,&21,&0D,&23,&6D,&A1,&46
-            .byte &A9,&C7,&2C,&C7,&01,&9A,&A2,&54
-            .byte &55,&47,&2C,&89,&25,&20,&49,&A4
-            .byte &46,&AB,&E0,&21,&0D,&23,&49,&9F
-            .byte &B8,&AE,&54,&A4,&76,&DD,&4F,&53
-            .byte &AF,&2E,&0D,&23,&89,&25,&20,&71
-            .byte &4D,&A4,&49,&4D,&00,&56,&41,&42
-            .byte &C3,&21,&0D,&23,&5C,&A3,&48,&8C
-            .byte &A4,&AE,&9D,&46,&55,&D7,&21,&0D
-            .byte &23,&A1,&D5,&44,&A2,&D1,&9E,&8E
-            .byte &CC,&4B,&9D,&03,&20,&4D,&55,&D3
-            .byte &2C,&5C,&20,&4B,&EE,&57,&21,&0D
-            .byte &AC,&59,&A8,&99,&21,&0D,&23,&4A
-            .byte &12,&9F,&91,&20,&A1,&CF,&AB,&43
-            .byte &54,&9C,&2E,&0D,&ED,&4C,&44,&99
-            .byte &20,&0D,&05,&AE,&99,&20,&0D,&23
-            .byte &89,&25,&20,&49,&A4,&49,&4D,&00
-            .byte &56,&41,&42,&C3,&21,&0D,&23,&EE
-            .byte &A8,&99,&20,&B4,&EB,&AF,&53,&2E
-            .byte &0D,&23,&5C,&20,&D1,&9E,&71,&20
-            .byte &0D,&23,&89,&25,&20,&49,&A4,&EE
-            .byte &A8,&99,&20,&53,&EA,&43,&49,&C7
-            .byte &2E,&0D,&23,&5C,&20,&C1,&98,&DB
-            .byte &53,&53,&B7,&A4,&B6,&21,&0D,&23
-            .byte &5C,&20,&CA,&45,&A0,&A1,&53,&ED
-            .byte &BD,&4C,&20,&76,&24,&21,&0D,&23
-            .byte &89,&94,&49,&A4,&C2,&4F,&20,&48
-            .byte &AE,&A0,&76,&24,&2E,&0D,&23,&5C
-            .byte &20,&D1,&98,&24,&20,&48,&AA,&45
-            .byte &2E,&0D,&23,&89,&46,&AB,&45,&5A
-            .byte &99,&20,&BE,&4C,&A0,&43,&88,&A4
-            .byte &5C,&20,&76,&89,&42,&B3,&45,&21
-            .byte &0D,&22,&23,&49,&27,&A7,&D0,&F1
-            .byte &20,&7B,&A8,&49,&A4,&7F,&22,&2C
-            .byte &5C,&20,&53,&43,&AB,&D6,&2C,&8A
-            .byte &7A,&A1,&53,&55,&49,&43,&49,&44
-            .byte &C7,&20,&46,&AB,&4E,&5A,&59,&2C
-            .byte &24,&20,&6E,&89,&50,&A9,&E3,&43
-            .byte &C3,&2C,&76,&42,&9D,&50,&55,&4C
-            .byte &EA,&A0,&42,&A2,&89,&C0,&EC,&44
-            .byte &4C,&A2,&41,&50,&D8,&4F,&41,&D3
-            .byte &99,&20,&94,&A1,&46,&45,&A6,&4D
-            .byte &E5,&AF,&54,&A4,&4C,&B2,&AA,&21
-            .byte &0D,&23,&89,&A9,&B1,&E8,&AA,&B2
-            .byte &9D,&43,&D4,&4D,&B2,&9D,&B4,&A4
-            .byte &08,&BE,&4D,&9D,&C2,&4F,&20,&4D
-            .byte &55,&D3,&20,&C8,&A3,&5C,&A3,&05
-            .byte &AE,&A2,&D5,&44,&59,&2E,&0D,&23
-            .byte &5C,&20,&71,&A7,&76,&B4,&56,&9D
-            .byte &22,&BF,&50,&AE,&B1,&44,&22,&20
-            .byte &8A,&47,&B3,&9D,&76,&89,&47,&AB
-            .byte &B2,&2C,&42,&18,&20,&7F,&20,&7A
-            .byte &89,&53,&4B,&59,&21,&0D,&23,&5C
-            .byte &20,&57,&AA,&9D,&BF,&56,&B5,&AB
-            .byte &A0,&42,&A2,&A1,&C0,&8B,&A3,&56
-            .byte &49,&43,&49,&9B,&20,&ED,&47,&20
-            .byte &7A,&89,&74,&21,&0D,&23,&5C,&20
-            .byte &08,&47,&7A,&76,&24,&20,&89,&53
-            .byte &AD,&45,&A3,&46,&F6,&45,&2C,&53
-            .byte &D4,&50,&20,&8A,&46,&C7,&4C,&2E
-            .byte &41,&A4,&5C,&20,&14,&D9,&F2,&54
-            .byte &2C,&5C,&20,&53,&43,&AB,&D6,&21
-            .byte &8B,&9E,&8B,&52,&9D,&49,&A4,&D0
-            .byte &4C,&AF,&43,&45,&21,&0D,&23,&89
-            .byte &8E,&56,&C9,&49,&DA,&9D,&65,&20
-            .byte &49,&A4,&0D,&23,&8B,&52,&9D,&AE
-            .byte &9D,&56,&C9,&49,&DA,&9D,&65,&A4
-            .byte &0D,&5D,&2C,&0D,&5E,&2C,&0D,&5F
-            .byte &2C,&0D,&60,&2C,&0D,&5D,&5F,&2C
-            .byte &0D,&5D,&60,&2C,&0D,&5E,&5F,&2C
-            .byte &0D,&5E,&60,&2C,&0D,&19,&2C,&0D
-            .byte &67,&2C,&0D,&8A,&0D,&23,&5C,&20
-            .byte &24,&20,&8A,&14,&D2,&47,&9D,&4F
-            .byte &46,&46,&20,&89,&7C,&2E,&89,&C6
-            .byte &A1,&57,&0A,&AD,&A4,&4F,&BD,&A3
-            .byte &5C,&A3,&0F,&B2,&54,&AA,&45,&A0
-            .byte &E9,&4C,&4B,&2E,&0D,&23,&5C,&20
-            .byte &24,&20,&89,&54,&AB,&45,&2C,&C1
-            .byte &20,&5C,&A3,&46,&D6,&9B,&20,&41
-            .byte &EA,&C5,&9E,&49,&E8,&AA,&53,&B3
-            .byte &B2,&9C,&2C,&8A,&24,&20,&67,&20
-            .byte &41,&47,&41,&A9,&2E,&57,&13,&21
-            .byte &5C,&27,&52,&9D,&03,&20,&C5,&44
-            .byte &D1,&50,&21,&0D,&2B,&23,&4D,&B7
-            .byte &EF,&DC,&3A,&2B,&3D,&23,&B8,&4F
-            .byte &50,&20,&B6,&21,&4C,&BC,&56,&9D
-            .byte &4D,&9D,&C7,&B3,&45,&21,&49,&27
-            .byte &A7,&7E,&A8,&49,&A4,&50,&CB,&7A
-            .byte &08,&99,&20,&53,&55,&52,&AB,&C7
-            .byte &C9,&9F,&8F,&89,&4D,&E5,&AF,&54
-            .byte &2C,&49,&46,&20,&5C,&20,&C1,&98
-            .byte &4D,&A9,&44,&21,&3D,&0D,&23,&89
-            .byte &B8,&55,&52,&44,&A2,&25,&20,&49
-            .byte &A4,&68,&2E,&0D,&23,&89,&B8,&55
-            .byte &52,&44,&A2,&25,&20,&49,&A4,&69
-            .byte &44,&2E,&0D,&23,&89,&CB,&E8,&20
-            .byte &49,&A4,&4F,&46,&46,&2E,&0D,&23
-            .byte &89,&CB,&E8,&20,&1B,&52,&4E,&A4
-            .byte &6D,&A1,&16,&5A,&5A,&4C,&99,&20
-            .byte &A9,&54,&AF,&53,&B6,&59,&2E,&0D
-            .byte &23,&89,&CB,&E8,&20,&49,&A4,&46
-            .byte &FD,&99,&2E,&0D,&23,&89,&CB,&E8
-            .byte &20,&CA,&E0,&A4,&4F,&E7,&2E,&0D
-            .byte &23,&57,&52,&B6,&9D,&76,&23,&C7
-            .byte &49,&43,&45,&21,&0D,&23,&89,&25
-            .byte &20,&49,&A4,&C5,&44,&9D,&6E,&A1
-            .byte &D4,&9A,&2C,&50,&AB,&43,&49,&9B
-            .byte &20,&C7,&DD,&A2,&8A,&08,&AE,&A4
-            .byte &89,&E6,&42,&C3,&A7,&7B,&89,&23
-            .byte &4B,&B2,&DF,&A4,&44,&59,&E3,&B8
-            .byte &59,&2E,&0D,&23,&89,&43,&DD,&FF
-            .byte &20,&49,&A4,&57,&AE,&4D,&2C,&6D
-            .byte &4D,&AC,&A2,&DB,&F1,&45,&54,&53
-            .byte &2E,&0D,&23,&B8,&4F,&50,&20,&50
-            .byte &CB,&59,&99,&20,&6D,&5C,&A3,&25
-            .byte &21,&B6,&27,&A4,&42,&41,&A0,&4D
-            .byte &AC,&4E,&AA,&53,&21,&0D,&23,&89
-            .byte &25,&20,&49,&A4,&46,&0A,&48,&9C
-            .byte &45,&A0,&6E,&02,&B3,&2C,&B6,&A4
-            .byte &AD,&41,&56,&A2,&4C,&A9,&4B,&A4
-            .byte &AF,&43,&52,&12,&B1,&A0,&6D,&52
-            .byte &12,&9F,&6E,&41,&DC,&A4,&1E,&B8
-            .byte &2E,&0D,&23,&A8,&49,&A4,&49,&A4
-            .byte &CB,&E8,&20,&25,&2E,&0D,&23,&89
-            .byte &25,&20,&AE,&9D,&A1,&4C,&D9,&A9
-            .byte &9B,&20,&50,&A9,&4B,&20,&BE,&4C
-            .byte &B5,&52,&2C,&8A,&4B,&4E,&B6,&B1
-            .byte &A0,&B5,&9F,&7B,&A1,&48,&B9,&52
-            .byte &49,&42,&C3,&2C,&C5,&9E,&C5,&44
-            .byte &9D,&46,&49,&1C,&9D,&28,&41,&A4
-            .byte &4F,&50,&DB,&C6,&A0,&76,&50,&A9
-            .byte &45,&2C,&4F,&A3,&53,&E5,&45,&A8
-            .byte &99,&29,&2E,&0D,&23,&8B,&53,&9D
-            .byte &AE,&9D,&74,&20,&25,&2E,&0D,&23
-            .byte &89,&25,&20,&49,&A4,&A1,&47,&C0
-            .byte &56,&9D,&CF,&47,&47,&AA,&27,&53
-            .byte &2E,&0D,&23,&4D,&4D,&4D,&21,&8B
-            .byte &53,&9D,&57,&AA,&9D,&54,&AB,&C4
-            .byte &A2,&7A,&31,&39,&37,&31,&2C,&57
-            .byte &AA,&45,&98,&8B,&59,&3F,&14,&B2
-            .byte &46,&B9,&4D,&53,&2C,&8A,&C7,&4C
-            .byte &20,&A8,&B2,&3F,&0D,&23,&89,&68
-            .byte &20,&D9,&42,&AB,&D7,&A1,&43,&B2
-            .byte &43,&AD,&A4,&7A,&89,&90,&20,&8A
-            .byte &DA,&13,&A4,&87,&2E,&0D,&A1,&0D
-            .byte &41,&9E,&0D,&53,&E5,&9D,&0D,&A1
-            .byte &50,&F4,&A3,&7B,&0D,&2C,&0D,&23
-            .byte &89,&25,&20,&CA,&E0,&4C,&9D,&71
-            .byte &4D,&A4,&76,&42,&9D,&B8,&55,&F1
-            .byte &2E,&0D,&23,&89,&25,&20,&47,&DD
-            .byte &57,&A4,&6D,&A1,&62,&9D,&41,&55
-            .byte &C0,&21,&89,&CA,&E0,&4C,&9D,&DB
-            .byte &A9,&54,&A4,&0D,&23,&5C,&20,&46
-            .byte &A9,&A0,&0D,&23,&10,&AA,&45,&3F
-            .byte &0D,&23,&A5,&D1,&98,&47,&55,&B7
-            .byte &53,&21,&0D,&23,&89,&61,&49,&A4
-            .byte &AC,&E1,&A2,&8F,&08,&99,&20,&CF
-            .byte &B8,&55,&52,&42,&E0,&2E,&0D,&23
-            .byte &89,&61,&49,&A4,&44,&BC,&44,&2E
-            .byte &0D,&23,&89,&61,&49,&A4,&0A,&C3
-            .byte &04,&2E,&0D,&23,&89,&61,&AD,&AE
-            .byte &A4,&89,&25,&20,&8A,&46,&C7,&4C
-            .byte &A4,&BF,&45,&EA,&A3,&A9,&76,&BB
-            .byte &A4,&44,&AB,&D6,&53,&2E,&0D,&23
-            .byte &89,&61,&57,&FF,&B7,&2C,&71,&A4
-            .byte &5C,&20,&8A,&7A,&41,&9E,&A9,&B8
-            .byte &AC,&54,&2C,&B4,&A4,&44,&C0,&57
-            .byte &9E,&BB,&A4,&01,&9A,&A2,&FC,&B9
-            .byte &44,&2E,&6D,&A1,&53,&99,&C3,&2C
-            .byte &46,&CB,&0F,&99,&20,&DA,&13,&2C
-            .byte &89,&C0,&5A,&B9,&2D,&E0,&47,&9D
-            .byte &7B,&89,&57,&BC,&50,&7E,&53,&D4
-            .byte &43,&45,&A4,&A8,&52,&B5,&DE,&20
-            .byte &5C,&A3,&CA,&F1,&2C,&8A,&5C,&A3
-            .byte &AD,&41,&A0,&DF,&D7,&53,&2C,&D4
-            .byte &46,&45,&82,&4C,&59,&2C,&C7,&B3
-            .byte &47,&20,&89,&46,&DD,&B9,&2E,&0D
-            .byte &23,&89,&61,&0F,&B5,&54,&A4,&8F
-            .byte &5C,&20,&C8,&A3,&CF,&B8,&55,&52
-            .byte &42,&99,&20,&BB,&A7,&8A,&4C,&BC
-            .byte &56,&B7,&2C,&43,&DD,&53,&99,&20
-            .byte &89,&C1,&4F,&A3,&08,&48,&A9,&A0
-            .byte &BB,&4D,&2E,&0D,&23,&A5,&C1,&98
-            .byte &4B,&EE,&A6,&B6,&2E,&43,&B5,&4C
-            .byte &A0,&5C,&20,&E9,&A7,&49,&9F,&C8
-            .byte &A3,&F2,&3F,&0D,&23,&5C,&20,&53
-            .byte &99,&20,&89,&CB,&B1,&53,&9F,&4E
-            .byte &D9,&08,&A3,&42,&A2,&89,&46,&D6
-            .byte &9B,&20,&AD,&41,&56,&A2,&F2,&54
-            .byte &C7,&20,&E1,&B5,&50,&2C,&23,&55
-            .byte &52,&AC,&49,&55,&A7,&23,&A8,&55
-            .byte &C4,&AA,&D5,&4C,&54,&2C,&56,&AA
-            .byte &A2,&4C,&B5,&44,&4C,&59,&2E,&0D
-            .byte &23,&5C,&20,&53,&99,&20,&A1,&42
-            .byte &BC,&55,&B0,&46,&55,&4C,&20,&4C
-            .byte &55,&4C,&CB,&42,&A2,&41,&42,&B5
-            .byte &9F,&53,&4B,&49,&EB,&99,&20,&A8
-            .byte &52,&B5,&DE,&20,&A1,&4D,&BC,&C1
-            .byte &57,&2C,&47,&41,&8B,&52,&99,&20
-            .byte &46,&DD,&57,&AA,&53,&2E,&89,&57
-            .byte &B9,&4C,&A0,&71,&4D,&A4,&A1,&08
-            .byte &54,&B1,&A3,&50,&CB,&43,&45,&2E
-            .byte &0D,&23,&5C,&20,&E1,&49,&50,&20
-            .byte &89,&43,&B4,&7A,&B0,&9A,&4C,&A2
-            .byte &8A,&B8,&AE,&9F,&76,&54,&57,&C9
-            .byte &9F,&49,&9F,&AE,&B5,&4E,&A0
-L4C50:      .byte &89,&47,&55,&AE,&44,&27,&A4,&CA
-            .byte &F1,&2E,&41,&A4,&89,&CB,&53,&9F
-            .byte &42,&AB,&41,&A8,&20,&7B,&D4,&46
-            .byte &9D,&49,&A4,&53,&F0,&0B,&5A,&45
-            .byte &A0,&6E,&BB,&A4,&D5,&44,&59,&2C
-            .byte &48,&9D,&FE,&D9,&50,&A4,&76,&89
-            .byte &46,&DD,&B9,&2E,&0D,&23,&5C,&20
-            .byte &CA,&45,&A0,&A1,&57,&BC,&50,&B3
-            .byte &2E,&0D,&23,&89,&61,&DA,&4F,&F1
-            .byte &A4,&5C,&A3,&57,&1F,&2E,&0D,&23
-            .byte &89,&AC,&43,&49,&AF,&9F,&43,&B4
-            .byte &7A,&44,&C9,&03,&4C,&BD,&A4,&A9
-            .byte &76,&A1,&50,&E7,&9D,&7B,&17,&B8
-            .byte &2C,&57,&BB,&D3,&20,&4D,&99,&C3
-            .byte &A4,&6D,&89,&53,&55,&52,&52,&B5
-            .byte &C4,&99,&20,&CF,&52,&9F,&8A,&49
-            .byte &A4,&DD,&53,&9F,&C8,&AB,&56,&AA
-            .byte &21,&0D,&23,&A1,&61,&68,&A4,&89
-            .byte &C1,&4F,&A3,&8A,&AF,&54,&AA,&A4
-            .byte &89,&6A,&2E,&0D,&23,&89,&C1,&4F
-            .byte &A3,&49,&A4,&68,&2E,&0D,&23,&89
-            .byte &C1,&4F,&A3,&49,&A4,&69,&44,&2E
-            .byte &0D,&23,&89,&C1,&4F,&A3,&49,&A4
-            .byte &6B,&2E,&0D,&23,&89,&C1,&4F,&A3
-            .byte &53,&CB,&4D,&A4,&53,&E9,&9F,&08
-            .byte &48,&A9,&A0,&5C,&21,&0D,&23,&5C
-            .byte &20,&24,&20,&89,&25,&2E,&0D,&23
-            .byte &89,&25,&20,&49,&A4,&B5,&9F,&7B
-            .byte &AB,&41,&D3,&21,&0D,&23,&49,&9F
-            .byte &49,&A4,&50,&B6,&D3,&20,&74,&2E
-            .byte &0D,&23,&89,&25,&20,&AE,&9D,&E6
-            .byte &42,&DF,&49,&44,&AA,&45,&A0,&6D
-            .byte &89,&AE,&4D,&A4,&7B,&23,&4B,&B2
-            .byte &DF,&53,&2E,&0D,&23,&89,&25,&20
-            .byte &57,&41,&A4,&C5,&44,&9D,&7A,&23
-            .byte &B1,&58,&0A,&21,&0D,&23,&4A,&12
-            .byte &9F,&5C,&A3,&D0,&5A,&45,&21,&0D
-            .byte &23,&89,&25,&20,&49,&A4,&52,&B5
-            .byte &DE,&2C,&C0,&47,&DC,&A0,&8A,&46
-            .byte &E7,&A8,&A2,&6D,&D8,&C9,&7E,&CF
-            .byte &52,&54,&2E,&0D,&23,&8B,&9E,&5C
-            .byte &20,&B8,&D6,&50,&20,&89,&BF,&1C
-            .byte &49,&A4,&B5,&9F,&7B,&F9,&49,&B8
-            .byte &AF,&43,&45,&21,&0D,&23,&89,&25
-            .byte &20,&49,&A4,&53,&C5,&D7,&2E,&41
-            .byte &9E,&A9,&53,&43,&52,&49,&50,&B0
-            .byte &7E,&AB,&FD,&53,&3A,&22,&23,&A8
-            .byte &49,&A4,&25,&20,&B4,&A4,&A1,&C5
-            .byte &58,&49,&4D,&55,&A7,&93,&20,&D1
-            .byte &50,&F6,&B6,&A2,&7B,&34,&35,&2E
-            .byte &34,&36,&20,&4C,&B6,&AB,&53,&22
-            .byte &2E,&0D,&23,&5C,&20,&CA,&45,&A0
-            .byte &93,&2E,&0D,&23,&46,&49,&D7,&20
-            .byte &A1,&43,&B3,&CC,&A9,&AA,&2E,&0D
-            .byte &23,&89,&48,&8F,&49,&A4,&46,&55
-            .byte &D7,&21,&0D,&23,&5C,&20,&D1,&98
-            .byte &F5,&20,&24,&2E,&0D,&23,&B5,&D3
-            .byte &21,&5C,&20,&57,&C7,&4B,&45,&A0
-            .byte &A9,&76,&A1,&DB,&A9,&B1,&A0,&B8
-            .byte &C7,&F6,&B0,&54,&9D,&7A,&89,&74
-            .byte &21,&0D,&27,&23,&AA,&45,&2C,&B8
-            .byte &4F,&50,&20,&DB,&4B,&99,&20,&F2
-            .byte &2C,&5C,&20,&43,&AD,&45,&4B,&A2
-            .byte &25,&21,&0D,&23,&B6,&27,&A4,&A1
-            .byte &1A,&9F,&00,&A8,&2D,&45,&B2,&AF
-            .byte &21,&0D,&23,&89,&25,&20,&49,&A4
-            .byte &AF,&43,&52,&12,&B1,&A0,&6D,&17
-            .byte &1A,&B7,&21,&0D,&23,&89,&25,&20
-            .byte &49,&A4,&43,&C0,&46,&B1,&A0,&6E
-            .byte &DB,&4C,&C9,&AD,&A0,&D0,&4C,&56
-            .byte &AA,&21,&0D,&23,&A8,&49,&A4,&25
-            .byte &20,&DD,&4F,&4B,&A4,&D4,&4B,&9D
-            .byte &54,&AB,&0A,&55,&AB,&21,&0D,&23
-            .byte &89,&25,&20,&52,&B2,&54,&C3,&A4
-            .byte &57,&AD,&9E,&5C,&20,&53,&B4,&4B
-            .byte &9D,&B6,&2E,&0D,&23,&89,&25,&20
-            .byte &49,&A4,&46,&0A,&48,&9C,&45,&A0
-            .byte &6E,&43,&4C,&BC,&A3,&43,&52,&59
-            .byte &B8,&C7,&21,&0D,&23,&89,&25,&20
-            .byte &49,&A4,&C5,&44,&9D,&7B,&32,&32
-            .byte &20,&43,&AE,&8F,&F5,&4C,&44,&21
-            .byte &0D,&23,&8B,&A2,&AE,&9D,&C0,&47
-            .byte &DC,&44,&2C,&1B,&9F,&43,&C3,&AC
-            .byte &2E,&0D,&23,&89,&25,&20,&49,&A4
-            .byte &B8,&52,&D2,&47,&20,&6D,&0F,&A9
-            .byte &99,&20,&EA,&AE,&4C,&53,&21,&0D
-            .byte &23,&89,&25,&20,&B4,&A4,&A1,&4C
-            .byte &AE,&47,&9D,&EF,&EB,&BB,&AB,&21
-            .byte &0D,&23,&B6,&27,&A4,&A1,&23,&50
-            .byte &AA,&D0,&41,&9E,&25,&21,&0D,&23
-            .byte &4D,&4D,&4D,&21,&C1,&98,&5C,&20
-            .byte &4A,&12,&9F,&DD,&56,&9D,&81,&46
-            .byte &AB,&0F,&2C,&43,&AE,&D5,&D4,&43
-            .byte &20,&AE,&4F,&C5,&3F,&0D,&23,&5C
-            .byte &20,&24,&20,&4C,&B3,&47,&20,&8A
-            .byte &BF,&04,&2C,&8A,&55,&CA,&AE
-L4F4F:      .byte &A8,&20,&A1,&57,&49,&8B,&AB,&A0
-            .byte &43,&B9,&50,&C6,&2C,&57,&BB,&D3
-            .byte &20,&44,&C9,&03,&4C,&BD,&A4,&A9
-            .byte &76,&A1,&50,&E7,&9D,&7B,&44,&12
-            .byte &9F,&8A,&49,&A4,&53,&43,&B2,&54
-            .byte &AA,&45,&A0,&42,&A2,&89,&46,&B5
-            .byte &A3,&90,&53,&21,&0D,&23,&89,&53
-            .byte &8A,&49,&A4,&0E,&A2,&8A,&89,&ED
-            .byte &4C,&9D,&F0,&49,&F1,&4C,&A2,&46
-            .byte &49,&D7,&A4,&A9,&2E,&0D,&23,&89
-            .byte &44,&D6,&50,&20,&53,&8A,&49,&A4
-            .byte &46,&02,&A7,&8A,&5C,&20,&24,&20
-            .byte &A1,&4C,&AE,&47,&9D,&50,&B6,&2E
-            .byte &0D,&23,&6D,&89,&74,&20,&47,&CB
-            .byte &53,&C6,&A4,&B3,&2C,&89,&4D,&C9
-            .byte &9F,&C2,&54,&C7,&4C,&A2,&4F,&42
-            .byte &53,&43,&55,&AB,&A4,&5C,&A3,&56
-            .byte &C9,&9C,&2E,&5C,&20,&07,&49,&50
-            .byte &20,&8A,&AE,&9D,&43,&B3,&43,&12
-            .byte &C6,&A0,&41,&A4,&5C,&20,&BB,&9F
-            .byte &89,&46,&DD,&B9,&2E,&57,&AD,&9E
-            .byte &5C,&20,&57,&FF,&45,&2C,&5C,&20
-            .byte &46,&A9,&A0,&5C,&52,&C6,&4C,&46
-            .byte &20,&8F,&89,&C8,&4F,&9F,&7B,&89
-            .byte &88,&2C,&5C,&A3,&DB,&53,&53,&B7
-            .byte &53,&9C,&A4,&47,&B3,&45,&21,&0D
-            .byte &23,&F5,&A0,&AD,&4C,&50,&A4,&A8
-            .byte &4F,&53,&9D,&57,&ED,&20,&AD,&4C
-            .byte &50,&20,&8B,&4D,&C6,&4C,&56,&B7
-            .byte &21,&0D,&22,&23,&A5,&AB,&BE,&47
-            .byte &4E,&C9,&9D,&0D,&81,&EF,&F1,&99
-            .byte &21,&0D,&A8,&4F,&53,&9D,&47,&DD
-            .byte &56,&B7,&2E,&8B,&59,&27,&52,&9D
-            .byte &89,&23,&4B,&99,&27,&53,&21,&0D
-            .byte &81,&B4,&02,&21,&0D,&A8,&4F,&53
-            .byte &9D,&46,&55,&52,&B0,&56,&9D,&45
-            .byte &59,&B7,&21,&0D,&81,&54,&B9,&03
-            .byte &21,&0D,&A8,&4F,&53,&9D,&42,&8C
-            .byte &A2,&C3,&47,&53,&21,&0D,&A8,&4F
-            .byte &53,&9D,&AC,&4B,&4C,&B7,&21,&0D
-            .byte &A8,&4F,&53,&9D,&46,&0B,&54,&21
-            .byte &0D,&A8,&4F,&53,&9D,&48,&8C,&53
-            .byte &21,&0D,&23,&5C,&20,&42,&9D,&89
-            .byte &44,&B7,&50,&AA,&B2,&9D,&43,&52
-            .byte &49,&4D,&A9,&C7,&20,&6E,&89,&6C
-            .byte &53,&2C,&59,&B3,&44,&AA,&21,&5C
-            .byte &27,&D7,&20,&EE,&9F,&BE,&4D,&9D
-            .byte &41,&D5,&AE,&A0,&4D,&A2,&95,&22
-            .byte &2C,&0F,&B5,&54,&A4,&89,&23,&D1
-            .byte &50,&CC,&A9,&2C,&8A,&B0,&45,&A4
-            .byte &5C,&A3,&CA,&F1,&20,&A9,&76,&56
-            .byte &AE,&49,&9B,&20,&EF,&E7,&B9,&27
-            .byte &A4,&4B,&EE,&54,&53,&21,&0D,&22
-            .byte &23,&AD,&D7,&4F,&20,&8B,&AB,&2C
-            .byte &62,&AA,&21,&5C,&27,&D7,&20,&42
-            .byte &9D,&57,&AC,&54,&A9,&27,&20,&50
-            .byte &0A,&EF,&47,&9D,&7E,&4D,&A2,&56
-            .byte &B7,&C6,&4C,&2C,&57,&49,&D7,&20
-            .byte &27,&45,&3F,&44,&DF,&50,&20,&5C
-            .byte &A3,&79,&67,&20,&8B,&AB,&2C,&C8
-            .byte &A3,&1E,&59,&4D,&AF,&54,&2C,&D4
-            .byte &4B,&45,&22,&2C,&0D,&EF,&59,&A4
-            .byte &89,&23,&D1,&50,&CC,&A9,&2E,&0D
-            .byte &22,&23,&19,&20,&5C,&A3,&DB,&4F
-            .byte &50,&20,&BF,&F1,&2C,&C5,&B1,&59
-            .byte &21,&A5,&57,&AC,&9F,&4D,&B9,&9D
-            .byte &54,&AB,&0A,&55,&AB,&22,&2C,&0D
-            .byte &22,&23,&53,&BB,&BD,&A3,&4D,&9D
-            .byte &B0,&4D,&42,&AA,&53,&21,&A8,&B2
-            .byte &27,&D7,&20,&C1,&20,&4E,&49,&43
-            .byte &CD,&59,&2C,&D0,&52,&22,&2C,&0D
-            .byte &23,&50,&AB,&53,&53,&3C,&26,&AB
-            .byte &54,&55,&52,&4E,&26,&3C,&C8,&A3
-            .byte &AC,&4F,&8B,&A3,&47,&D6,&45,&2E
-            .byte &0D,&22,&23,&AD,&D7,&4F,&21,&C7
-            .byte &A8,&B5,&DE,&20,&23,&49,&27,&A7
-            .byte &A1,&08,&47,&47,&AE,&2C,&23,&49
-            .byte &27,&A7,&41,&A4,&D3,&E2,&53,&A2
-            .byte &41,&A4,&0C,&AA,&59,&B3,&9D,&CD
-            .byte &C6,&2C,&4F,&4B,&1F,&3F,&03,&20
-            .byte &4A,&12,&9F,&44,&DF,&50,&20,&0D
-            .byte &53,&E5,&9D,&C8,&4F,&A0,&0D,&A1
-            .byte &42,&41,&A3,&7B,&03,&41,&50,&20
-            .byte &0D,&A1,&DA,&AC,&4B,&45,&9F,&0D
-            .byte &67,&20,&8B,&52,&9D,&C8,&A3,&F2
-            .byte &22,&2C,&EF,&59,&A4,&89,&08,&47
-            .byte &47,&AE,&2E,&0D,&22,&23,&BB,&21
-            .byte &49,&27,&56,&9D,&B4,&A0,&A1,&57
-            .byte &0A,&48,&22,&2C,&EF,&59,&A4,&89
-            .byte &08,&47,&47,&AE,&2C,&57,&41,&56
-            .byte &99,&20,&89,&03,&41,&50,&2E,&0D
-            .byte &23,&41,&9E,&4F,&42,&4A,&45,&43
-            .byte &9F,&46,&C7,&4C,&A4,&76,&89,&46
-            .byte &DD,&B9,&21,&0D,&22,&23,&08,&D1
-            .byte &12,&9D,&5C,&27,&56,&9D,&08,&45
-            .byte &9E,&03,&20,&4E,&49,&43,&9D,&76
-            .byte &F2,&2C,&B4,&56,&9D,&8B,&53,&9D
-            .byte &4D,&B6,&54,&AF,&53,&22,&2C,&EF
-            .byte &59,&A4,&89,&08,&47,&47,&AE,&2C
-            .byte &47,&AF,&AA,&9B,&4C,&59,&2E,&0D
-            .byte &23,&89,&1B,&E7,&44,&99,&20,&AB
-            .byte &53,&B5,&C4,&A4,&6D,&A1,&DD,&A6
-            .byte &50,&B6,&43,&AD,&A0,&E9,&A7,&41
-            .byte &A4,&89,&C5,&53,&D0,&56,&9D,&C1
-            .byte &4F,&A3,&53,&DD,&57,&4C,&A2,&68
-            .byte &53,&2C,&AB,&56,&BC,&4C,&99,&2C
-            .byte &41,&A4,&49,&9F,&C1,&45,&A4,&03
-            .byte &2C,&89,&CF,&4D,&4C,&A2,&D4,&9F
-            .byte &A9,&54,&AA,&49,&4F,&A3,&7B,&89
-            .byte &97,&21,&0D,&23,&57,&CD,&4C,&20
-            .byte &44,&B3,&45,&21,&5C,&20,&B4,&56
-            .byte &9D,&BE,&E8,&C3,&B1,&A0,&22,&23
-            .byte &C9,&4C,&8A,&7B,&23,&58,&41,&AC
-            .byte &22,&20,&8A,&B4,&56,&9D,&A1,&C5
-            .byte &58,&49,&4D,&55,&A7,&53,&43,&B9
-            .byte &9D,&7B,&32,&35,&30,&20,&DB,&A9
-            .byte &54,&53,&21,&0D,&53,&21,&0D,&22
-            .byte &23,&AD,&D7,&4F,&20,&8B,&AB,&2C
-            .byte &62,&23,&89,&54,&AB,&4D,&AF,&44
-            .byte &9B,&20,&DB,&05,&A3,&7B,&89,&93
-            .byte &46,&C7,&4C,&20,&46,&B9,&43,&45
-            .byte &A4,&5C,&20,&76,&5C,&A3,&4B,&CA
-            .byte &45,&A4,&8A,&5C,&20,&BE,&4C,&CB
-            .byte &50,&C6,&2C,&42,&AB,&41,&A8,&82
-            .byte &4C,&59,&2C,&76,&89,&46,&DD,&B9
-            .byte &21,&5C,&20,&47,&4C,&AC,&43,&9D
-            .byte &5D,&57,&AE,&44,&A4,&8A,&C5,&4B
-            .byte &9D,&B5,&9F,&89,&B4,&5A,&A2,&53
-            .byte &B4,&50,&9D,&7B,&A1,&77,&20,&AF
-            .byte &07,&AC,&43,&9D,&08,&59,&B3,&44
-            .byte &2E,&8B,&9E,&0C,&AA,&59,&A8,&99
-            .byte &20,&F5,&45,&A4,&42,&CB,&F1,&2E
-            .byte &0D,&23,&5B,&D2,&BF,&A3,&89,&43
-            .byte &C0,&0F,&99,&20,&93,&46,&C7,&4C
-            .byte &2C,&89,&68,&20,&D9,&42,&AB,&D7
-            .byte &A1,&AD,&4C,&A0,&EF,&46,&CD,&A2
-            .byte &6F,&5C,&2E,&89,&10,&B6,&9D,&93
-            .byte &20,&52,&12,&AD,&A4,&1E,&B8,&2C
-            .byte &B6,&A4,&53,&50,&C0,&A2,&03,&FF
-            .byte &99,&20,&5C,&20,&76,&89,&53,&4B
-            .byte &A9,&2E,&A8,&52,&B5,&DE,&20,&89
-            .byte &05,&9F,&B4,&5A,&45,&2C,&76,&89
-            .byte &5D,&2C,&5C,&20,&71,&20,&89,&AF
-            .byte &07,&AC,&43,&9D,&76,&A1,&74,&20
-            .byte &77,&2E,&0D,&23,&5B,&7A,&A1,&53
-            .byte &C5,&D7,&2C,&CF,&4D,&4C,&A2,&D4
-            .byte &9F,&6C,&2C,&46,&E7,&C3,&A0,&6D
-            .byte &89,&B8,&AF,&D3,&20,&7B,&44,&BC
-            .byte &A8,&20,&8A,&BF,&D1,&59,&2E,&89
-            .byte &E4,&E2,&A8,&2C,&E1,&AC,&B6,&9D
-            .byte &64,&A4,&71,&A7,&76,&69,&20,&7A
-            .byte &7E,&5C,&2C,&66,&82,&20,&8A,&4D
-            .byte &AF,&F6,&99,&21,&76,&89,&5D,&20
-            .byte &DD,&E5,&A4,&A1,&E9,&DC,&2C,&02
-            .byte &7E,&C1,&B9,&2E,&0D,&23,&5B,&8F
-            .byte &A1,&44,&BC,&A0,&AF,&A0,&7A,&89
-            .byte &43,&B9,&8D,&B9,&2E,&89,&6C,&A4
-            .byte &5E,&20,&7B,&5C,&20,&06,&56,&9D
-            .byte &57,&41,&A2,&76,&52,&B5,&DE,&2C
-            .byte &1C,&49,&F1,&20,&64,&53,&2C,&8A
-            .byte &89,&43,&45,&E7,&99,&20,&49,&A4
-            .byte &03,&20,&DD,&57,&2C,&81,&5B,&46
-            .byte &B9,&43,&45,&A0,&76,&B8,&E2,&50
-            .byte &2E,&0D,&23,&5B,&7A,&A1,&4C,&B3
-            .byte &47,&2C,&5F,&2D,&60,&20,&43,&B9
-            .byte &8D,&B9,&2E,&F8,&8B,&A3,&78,&20
-            .byte &7B,&5C,&2C,&6B,&20,&6C,&A4,&B8
-            .byte &AB,&54,&D3,&20,&A9,&76,&89,&47
-            .byte &DD,&E5,&2E,&0D,&23,&5B,&8F,&89
-            .byte &60,&AA,&9E,&AF,&A0,&7B,&89,&4C
-            .byte &B3,&47,&20,&43,&B9,&8D,&B9,&2E
-            .byte &5E,&20,&7B,&5B,&89,&CB,&53,&9F
-            .byte &7B,&89,&6B,&20,&6C,&53,&2E,&A1
-            .byte &4E,&AE,&DF,&A6,&AE,&D3,&57,&41
-            .byte &A2,&49,&A4,&4A,&12,&9F,&56,&C9
-            .byte &49,&DA,&9D,&D6,&B3,&47,&53,&9F
-            .byte &89,&53,&B4,&C1,&57,&A4,&7B,&89
-            .byte &5D,&20,&64,&2E,&0D,&23,&5B,&7A
-            .byte &A1,&54,&57,&49,&B8,&99,&20,&7D
-            .byte &20,&7B,&45,&D3,&4F,&99,&20,&43
-            .byte &B9,&8D,&B9,&53,&2E,&BC,&D3,&20
-            .byte &53,&B5,&4E,&A0,&5C,&20,&C5,&4B
-            .byte &9D,&71,&4D,&A4,&D6,&50,&D4,&46
-            .byte &49,&45,&A0,&41,&A4,&49,&9F,&42
-            .byte &B5,&4E,&43,&45,&A4,&08,&54,&05
-            .byte &45,&9E,&89,&BE,&4C,&44,&2C,&DF
-            .byte &F1,&20,&64,&53,&21,&0D,&23,&5B
-            .byte &7A,&89,&61,&6A,&20,&7B,&89,&4B
-            .byte &45,&04,&2E,&D4,&9A,&20,&B8,&AB
-            .byte &D6,&A4,&7A,&6E,&41,&9E,&68,&20
-            .byte &C1,&B9,&57,&41,&A2,&76,&89,&5D
-            .byte &2C,&AB,&41,&D3,&99,&20,&0C,&AA
-            .byte &A2,&43,&B9,&4E,&AA,&2C,&53,&ED
-            .byte &57,&99,&20,&89,&46,&E7,&A8,&20
-            .byte &8A,&53,&F0,&C7,&4F,&A3,&81,&41
-            .byte &42,&B5,&C4,&53,&21,&A1,&53,&43
-            .byte &17,&46,&46,&A2,&61,&49,&A4,&53
-            .byte &C3,&04,&99,&20,&7E,&A1,&48,&AE
-            .byte &44,&2C,&57,&E2,&BF,&9E,&42,&AF
-            .byte &D3,&20,&C6,&9F,&A9,&76,&89,&5D
-            .byte &20,&64,&2E,&0D,&23,&5B,&7E,&A1
-            .byte &88,&C2,&50,&20,&5D,&20,&7B,&89
-            .byte &4B,&45,&04,&2C,&DD,&4F,&4B,&99
-            .byte &20,&67,&20,&A1,&44,&AC,&47,&AA
-            .byte &9B,&20,&53,&43,&AB,&9D,&53,&DD
-            .byte &50,&9D,&76,&A1,&74,&20,&73,&08
-            .byte &59,&B3,&44,&2E,&0D,&23,&5B,&7E
-            .byte &89,&88,&C2,&50,&20,&5D,&60,&20
-            .byte &7B,&89,&4B,&45,&04,&2E,&76,&89
-            .byte &5D,&2C,&67,&20,&89,&88,&2C,&89
-            .byte &74,&20,&73,&53,&50,&AB,&FD,&A4
-            .byte &F6,&DF,&53,&A4,&A1,&56,&C7,&C3
-            .byte &59,&2E,&0D,&23,&5B,&7E,&89,&88
-            .byte &C2,&50,&20,&5D,&5F,&20,&7B,&89
-            .byte &4B,&45,&04,&2E,&5D,&2C,&67,&20
-            .byte &89,&88,&2C,&49,&A4,&89,&C8,&AB
-            .byte &B8,&2E,&0D,&23,&5B,&7E,&A1,&BE
-            .byte &42,&42,&C3,&A0,&75,&57,&41,&A2
-            .byte &4C,&BC,&44,&99,&20,&5E,&60,&20
-            .byte &76,&5D,&5F,&20,&67,&20,&89,&88
-            .byte &2E,&0D,&23,&5B,&7E,&A1,&BE,&42
-            .byte &42,&C3,&A0,&75,&57,&41,&A2,&57
-            .byte &BB,&D3,&20,&4C,&BC,&44,&A4,&5E
-            .byte &5F,&20,&76,&5D,&60,&20,&67,&20
-            .byte &89,&88,&2E,&0D,&23,&5B,&7A,&A1
-            .byte &84,&20,&60,&20,&7B,&89,&4B,&45
-            .byte &04,&2E,&BB,&DE,&20,&64,&A4,&97
-            .byte &20,&F8,&8B,&A3,&78,&20,&7B,&5C
-            .byte &2C,&0F,&52,&B5,&44,&99,&20,&5C
-            .byte &20,&7A,&A1,&BF,&04,&2C,&BE,&4C
-            .byte &A0,&53,&B4,&C1,&57,&2E,&0D,&23
-            .byte &5B,&7A,&A1,&BB,&DE,&20,&64,&45
-            .byte &A0,&83,&5F,&20,&7B,&89,&4B,&45
-            .byte &04,&2E,&89,&64,&A4,&B4,&56,&9D
-            .byte &08,&45,&9E,&57,&B9,&9E,&E4,&E2
-            .byte &A8,&20,&4F,&BD,&A3,&89,&47,&AF
-            .byte &AA,&B2,&9C,&A4,&8A,&AE,&9D,&D2
-            .byte &53,&55,&52,&4D,&B5,&BA,&41,&42
-            .byte &C3,&2E,&0D,&23,&5B,&7A,&A1,&64
-            .byte &45,&A0,&84,&20,&60,&20,&7B,&89
-            .byte &4B,&45,&04,&2E,&A1,&43,&88,&20
-            .byte &42,&AB,&45,&5A,&9D,&AB,&44,&44
-            .byte &AF,&A4,&5C,&A3,&46,&F6,&45,&2E
-            .byte &0D,&23,&5B,&7A,&A1,&64,&45,&A0
-            .byte &83,&5F,&20,&7B,&89,&4B,&45,&04
-            .byte &2E,&A1,&0F,&AE,&50,&20,&42,&AB
-            .byte &45,&5A,&9D,&57,&BB,&B8,&C3,&A4
-            .byte &19,&20,&89,&83,&6E,&89,&5E,&2E
-            .byte &0D,&23,&5B,&7E,&A1,&7C,&C2,&50
-            .byte &20,&5E,&60,&20,&7B,&89,&4B,&45
-            .byte &04,&2E,&89,&B8,&52,&B3,&47,&20
-            .byte &90,&20,&CB,&53,&AD,&A4,&89,&C6
-            .byte &A1,&A9,&76,&A1,&54,&55,&52,&00
-            .byte &E7,&2C,&53,&AF,&44,&99,&20,&53
-            .byte &55,&52,&46,&20,&19,&20,&89,&4A
-            .byte &41,&47,&DC,&A0,&7C,&2D,&46,&F6
-            .byte &45,&2E,&0D,&23,&5B,&7E,&A1,&4E
-            .byte &AE,&DF,&A6,&C3,&44,&47,&9D,&5E
-            .byte &20,&7B,&89,&4B,&45,&04,&2C,&BB
-            .byte &DE,&20,&6F,&89,&C0,&47,&99,&20
-            .byte &53,&BC,&2E,&89,&90,&20,&DA,&13
-            .byte &A4,&48,&AE,&A0,&8A,&46,&B9,&43
-            .byte &45,&A4,&5C,&20,&92,&41,&47,&41
-            .byte &A9,&53,&9F,&89,&4B,&45,&04,&20
-            .byte &64,&2C,&87,&20,&6E,&89,&BF,&1C
-            .byte &49,&A4,&A8,&DF,&57,&9E,&19,&20
-            .byte &42,&A2,&89,&57,&0A,&48,&20,&41
-            .byte &A4,&49,&9F,&43,&C0,&53,&AD,&A4
-            .byte &A9,&76,&89,&53,&AD,&45,&A3,&7C
-            .byte &2E,&0D,&23,&5B,&5E,&5F,&20,&7B
-            .byte &89,&4B,&45,&04,&2C,&7E,&A1,&50
-            .byte &A9,&E3,&43,&4C,&9D,&4F,&56,&AA
-            .byte &DD,&4F,&4B,&99,&20,&89,&53,&BC
-            .byte &2E,&89,&FC,&02,&4C,&99,&20,&90
-            .byte &20,&ED,&57,&4C,&A4,&AE,&B5,&4E
-            .byte &A0,&5C,&2C,&42,&B6,&99,&20,&5C
-            .byte &A3,&11,&B7,&48,&20,&8A,&46,&AB
-            .byte &45,&5A,&99,&20,&5C,&A3,&42,&AB
-            .byte &41,&A8,&21,&0D,&23,&5B,&7E,&A1
-            .byte &50,&CB,&7A,&4F,&56,&AA,&DD,&4F
-            .byte &4B,&99,&20,&A1,&C0,&4D,&53,&B4
-            .byte &F1,&4C,&9D,&47,&C0,&BD,&59,&AE
-            .byte &44,&2E,&89,&90,&20,&EC,&F1,&A4
-            .byte &19,&20,&46,&A9,&9D,&44,&12,&9F
-            .byte &57,&BB,&D3,&20,&BE,&56,&AA,&A4
-            .byte &5C,&20,&6E,&AD,&41,&A0,&76,&C2
-            .byte &45,&2C,&8A,&C5,&4B
-L5844:      .byte &45,&A4,&5C,&20,&71,&A7,&DE,&4F
-            .byte &B8,&4C,&A2,&57,&BB,&B1,&2E,&0D
-            .byte &23,&5B,&BB,&DE,&20,&6F,&A1,&90
-            .byte &FC,&04,&9F,&50,&CB,&A9,&2C,&DD
-            .byte &4F,&4B,&99,&20,&67,&20,&6E,&A1
-            .byte &DF,&F1,&A2,&50,&AB,&43,&49,&EC
-            .byte &43,&45,&2E,&89,&B8,&52,&B3,&47
-            .byte &20,&90,&20,&52,&12,&AD,&A4,&50
-            .byte &0A,&9F,&5C,&2C,&A8,&52,&B5,&DE
-            .byte &20,&A1,&DD,&A6,&AE,&D3,&57,&41
-            .byte &A2,&76,&89,&5D,&2C,&8A,&A9,&76
-            .byte &89,&4D,&55,&B8,&A2,&77,&53,&2E
-            .byte &0D,&23,&5B,&7E,&A1,&50,&AB,&43
-            .byte &49,&EC,&43,&9D,&46,&41,&A3,&6F
-            .byte &A1,&EA,&42,&DA,&9D,&42,&BC,&D3
-            .byte &2E,&89,&DA,&55,&B8,&AA,&A2,&90
-            .byte &20,&FC,&02,&4C,&A4,&AE,&B5,&4E
-            .byte &A0,&5C,&2C,&D1,&12,&99,&20,&5C
-            .byte &20,&76,&B1,&45,&B1,&A3,&50,&AB
-            .byte &43,&AE,&49,&9B,&4C,&A2,&7E,&89
-            .byte &E0,&DC,&21,&0D,&23,&5B,&7E,&A1
-            .byte &47,&55,&B8,&A2,&7C,&C2,&50,&20
-            .byte &DD,&4F,&4B,&99,&20,&B5,&9F,&F6
-            .byte &DF,&53,&A4,&89,&53,&BC,&2E,&46
-            .byte &41,&A3,&70,&5C,&20,&49,&A4,&A1
-            .byte &57,&E2,&BF,&9E,&4A,&45,&54,&F3
-            .byte &2C,&60,&20,&7B,&57,&BB,&D3,&20
-            .byte &49,&A4,&4D,&E2,&AB,&A0,&A1,&EF
-            .byte &E7,&99,&20,&95,&2E,&0D,&23,&5B
-            .byte &7E,&A1,&EA,&42,&DA,&9D,&85,&8F
-            .byte &89,&C8,&4F,&9F,&7B,&A1,&53,&B1
-            .byte &04,&20,&7C,&2E,&A1,&53,&C7,&54
-            .byte &A2,&42,&AB,&45,&5A,&9D,&DA,&13
-            .byte &A4,&7A,&6E,&89,&53,&BC,&2E,&0D
-            .byte &23,&5B,&7E,&A1,&EA,&42,&DA,&9D
-            .byte &42,&BC,&D3,&2C,&D2,&BF,&A3,&A1
-            .byte &BB,&DE,&20,&7C,&2C,&CA,&58,&9F
-            .byte &76,&89,&52,&B5,&DE,&20,&53,&BC
-            .byte &2E,&89,&90,&20,&49,&A4,&B8,&52
-            .byte &B3,&47,&2E,&0D,&23,&5B,&7E,&A1
-            .byte &54,&AB,&45,&82,&20,&75,&20,&8F
-            .byte &89,&C8,&4F,&9F,&7B,&A1,&BB,&DE
-            .byte &20,&4D,&B5,&BA,&41,&A9,&2E,&B8
-            .byte &AE,&99,&20,&19,&2C,&B6,&A4,&53
-            .byte &B1,&04,&20,&64,&A4,&71,&A7,&76
-            .byte &44,&C9,&41,&EB,&BC,&A3,&A9,&76
-            .byte &89,&43,&4C,&B5,&44,&A2,&53,&4B
-            .byte &59,&2E,&0D,&23,&5C,&20,&8F,&89
-            .byte &D5,&54,&C2,&A7,&7B,&A1,&54,&C7
-            .byte &4C,&2C,&B8,&AE,&4B,&20,&4D,&B5
-            .byte &BA,&41,&A9,&2E,&76,&89,&5D,&2C
-            .byte &8B,&52,&9D,&49,&A4,&A1,&43,&AB
-            .byte &56,&49,&43,&9D,&7A,&89,&78,&20
-            .byte &7B,&89,&4D,&B5,&BA,&41,&A9,&2C
-            .byte &4C,&AE,&47,&9D,&AF,&B5,&DE,&20
-            .byte &76,&AF,&54,&AA,&2E,&0D,&23,&5B
-            .byte &8F,&89,&AF,&07,&AC,&43,&9D,&76
-            .byte &A1,&C5,&53,&D0,&56,&9D,&C8,&AB
-            .byte &B8,&2E,&5F,&20,&8A,&60,&20,&7B
-            .byte &5C,&20,&47,&DF,&57,&A4,&A1,&A8
-            .byte &B9,&4E,&A2,&AD,&44,&47,&AA,&13
-            .byte &2C,&57,&BB,&D3,&20,&46,&B9,&4D
-            .byte &A4,&A1,&75,&20,&A9,&76,&89,&73
-            .byte &8A,&8B,&9E,&BD,&AA,&A4,&52,&49
-            .byte &9A,&20,&8A,&C3,&46,&54,&2C,&43
-            .byte &DD,&53,&99,&20,&7A,&89,&54,&AB
-            .byte &B7,&2E,&49,&9F,&49,&A4,&D4,&9A
-            .byte &20,&48,&AA,&45,&2C,&1B,&9F,&EA
-            .byte &AA,&99,&20,&A9,&2C,&C7,&4C,&20
-            .byte &49,&A4,&41,&9E,&45,&AA,&49,&9D
-            .byte &42,&CB,&F1,&4E,&B7,&53,&21,&0D
-            .byte &23,&5B,&8F,&89,&E0,&47,&9D,&7B
-            .byte &89,&C8,&AB,&B8,&2C,&5C,&A3,&57
-            .byte &41,&A2,&B5,&9F,&42,&6B,&20,&42
-            .byte &A2,&A1,&A8,&49,&F1,&20,&AD,&44
-            .byte &DC,&2E,&0D,&23,&5B,&8F,&89,&C8
-            .byte &AB,&B8,&27,&A4,&E0,&DC,&2E,&7A
-            .byte &89,&AD,&44,&47,&AA,&4F,&A6,&46
-            .byte &B9,&4D,&99,&20,&89,&5F,&AA,&9E
-            .byte &42,&B5,&C4,&AE,&A2,&49,&A4,&A1
-            .byte &ED,&C3,&2C,&4A,&12,&9F,&57,&49
-            .byte &44,&9D,&AF,&B5,&DE,&20,&C8,&A3
-            .byte &5C,&20,&76,&53,&F0,&0B,&5A,&9D
-            .byte &A8,&52,&B5,&DE,&2E,&0D,&23,&5B
-            .byte &BF,&04,&20,&7A,&89,&C8,&AB,&B8
-            .byte &2E,&54,&C7,&4C,&20,&54,&AB,&45
-            .byte &A4,&AB,&41,&A3,&19,&20,&C7,&4C
-            .byte &20,&AE,&B5,&C4,&2C,&8B,&49,&A3
-            .byte &1C,&AC,&43,&AD,&A4,&A9,&54,&AA
-            .byte &54,&57,&A9,&99,&20,&76,&43,&55
-            .byte &9F,&B5,&9F,&C7,&4C,&20,&16,&59
-            .byte &D4,&9A,&2E,&5C,&A3,&CB,&E8,&20
-            .byte &D1,&B8,&A4,&A1,&59,&CD,&DD,&A6
-            .byte &B4,&DD,&20,&4F,&BD,&A3,&5C,&2C
-            .byte &57,&BB,&D3,&20,&53,&D1,&AB,&A4
-            .byte &89,&73,&43,&AB,&B2,&55,&AB,&A4
-            .byte &8A,&ED,&4C,&44,&A4,&8B,&A7,&8F
-            .byte &42,&1F,&2E,&0D,&23,&5B,&7A,&89
-            .byte &AF,&07,&AC,&43,&9D,&43,&B4,&4D
-            .byte &08,&A3,&7B,&A1,&4C,&AE,&47,&9D
-            .byte &D1,&56,&9D,&53,&59,&53,&B1,&4D
-            .byte &2E,&5E,&20,&7B,&5C,&2C,&89,&D1
-            .byte &53,&D1,&44,&99,&20,&93,&46,&C7
-            .byte &4C,&20,&4F,&42,&53,&43,&55,&AB
-            .byte &A4,&5C,&A3,&56,&49,&45,&A6,&7B
-            .byte &89,&C8,&AB,&B8,&2E,&0D,&23,&5B
-            .byte &8F,&A1,&44,&BC,&A0,&AF,&A0,&7A
-            .byte &89,&77,&20,&50,&0A,&EF,&47,&B7
-            .byte &2E,&5C,&20,&CB,&E8,&20,&D1,&B8
-            .byte &A4,&62,&45,&2C,&AC,&49,&C5,&B1
-            .byte &A0,&53,&B4,&C1,&57,&A4,&7E,&89
-            .byte &55,&CA,&BD,&9E,&64,&53,&2E,&0D
-            .byte &23,&5B,&7A,&A1,&7D,&20,&7B,&4E
-            .byte &AE,&DF,&A6,&77,&20,&50,&0A,&EF
-            .byte &47,&B7,&2C,&4D,&A9,&44,&46,&55
-            .byte &4C,&20,&7B,&89,&DF,&F1,&A2,&B5
-            .byte &54,&43,&DF,&50,&A4,&8A,&DB,&A9
-            .byte &B1,&A0,&B8,&C7,&F6,&B0,&B1,&A4
-            .byte &57,&BB,&D3,&20,&48,&AC,&47,&20
-            .byte &44,&AC,&47,&AA,&9B,&4C,&A2,&6E
-            .byte &89,&43,&45,&E7,&99,&2E,&0D,&23
-            .byte &5B,&7A,&A1,&4C,&AE,&47,&9D,&43
-            .byte &B4,&4D,&42,&AA,&2C,&41,&57,&AE
-            .byte &9D,&7B,&89,&BE,&4C,&A0,&44,&C0
-            .byte &55,&9A,&20,&57,&BB,&D3,&20,&54
-            .byte &B5,&43,&AD,&A4,&5C,&A3,&46,&F6
-            .byte &9D,&6E,&89,&5D,&2E,&0D,&23,&5B
-            .byte &7A,&A1,&DA,&55,&B8,&AA,&A2,&77
-            .byte &20,&50,&0A,&EF,&DC,&2E,&A1,&42
-            .byte &AB,&45,&5A,&9D,&DA,&13,&A4,&7A
-            .byte &6E,&89,&5E,&2E,&0D,&23,&5B,&7A
-            .byte &A1,&C5,&53,&D0,&56,&9D,&B4,&D7
-            .byte &20,&7A,&89,&77,&53,&2E,&89,&53
-            .byte &B5,&4E,&A0,&7B,&0E,&49,&EB,&99
-            .byte &20,&93,&20,&45,&D3,&4F,&45,&A4
-            .byte &6E,&53,&E5,&45,&10,&AA,&9D,&CF
-            .byte &B8,&AC,&9F,&8A,&E6,&AA,&47,&99
-            .byte &20,&6E,&89,&53,&B4,&C1,&57,&A4
-            .byte &7B,&89,&43,&45,&E7,&99,&20,&5C
-            .byte &20,&71,&20,&E9,&DC,&2C,&43,&B3
-            .byte &49,&43,&C7,&20,&B8,&C7,&F6,&B0
-            .byte &B1,&53,&2C,&D4,&4D,&9D,&10,&B6
-            .byte &9D,&7A,&89,&47,&4C,&AE,&9D,&7B
-            .byte &5C,&A3,&CB,&E8,&2E,&0D,&23,&5B
-            .byte &8F,&89,&C2,&50,&20,&7B,&A1,&90
-            .byte &99,&20,&B8,&F4,&52,&D1,&C6,&2C
-            .byte &AD,&57,&9E,&6E,&89,&77,&20,&DF
-            .byte &F1,&2E,&0D,&23,&5B,&7E,&A1,&90
-            .byte &99,&20,&B8,&F4,&52,&D1,&C6,&2C
-            .byte &43,&AE,&BD,&A0,&6E,&89,&77,&20
-            .byte &DF,&F1,&2E,&0D,&23,&5B,&7A,&A1
-            .byte &CF,&4D,&4C,&A2,&D4,&9F,&47,&C0
-            .byte &BD,&59,&AE,&44,&2E,&FC,&02,&4C
-            .byte &99,&20,&01,&B8,&A4,&43,&DD,&FF
-            .byte &20,&89,&AD,&FD,&B8,&B3,&B7,&2C
-            .byte &C5,&4B,&99,&20,&8B,&A7,&53,&BB
-            .byte &4D,&F2,&A3,&6D,&41,&9E,&D2,&4E
-            .byte &B2,&55,&C0,&4C,&20,&D4,&9A,&2E
-            .byte &0D,&23,&5B,&7E,&A1,&01,&B8,&A2
-            .byte &46,&D4,&9A,&20,&7B,&53,&B1,&50
-            .byte &A4,&57,&BB,&D3,&20,&43,&B3,&CA
-            .byte &43,&54,&A4,&19,&EA,&A3,&8A,&DD
-            .byte &05,&A3,&C3,&BD,&4C,&A4,&7B,&89
-            .byte &47,&C0,&BD,&59,&AE,&44,&2E,&0D
-            .byte &23,&5B,&7E,&0E,&59,&2C,&53,&8C
-            .byte &A2,&42,&BC,&D3,&2E,&7A,&89,&CF
-            .byte &B8,&AC,&43,&9D,&76,&89,&5D,&2C
-            .byte &89,&52,&B5,&DE,&20,&C6,&A1,&43
-            .byte &C0,&53,&AD,&A4,&76,&89,&53,&ED
-            .byte &AB,&2E,&A1,&4C,&B6,&54,&4C,&9D
-            .byte &57,&41,&A2,&5E,&2C,&89,&47,&AB
-            .byte &A2,&7C,&A4,&64,&20,&7A,&89,&42
-            .byte &BC,&D3,&2E,&0D,&23,&5B,&7E,&A1
-            .byte &53,&8C,&A2,&85,&42,&A2,&89,&52
-            .byte &B5,&DE,&20,&53,&BC,&2E,&89,&53
-            .byte &8A,&49,&A4,&44,&D6,&50,&20,&8A
-            .byte &5C,&20,&4C,&BC,&56,&9D,&BF,&04
-            .byte &20,&C8,&4F,&54,&D8,&A9,&54,&53
-            .byte &2E,&0D,&23,&5B,&7E,&A1,&57,&49
-            .byte &BF,&2C,&11,&8F,&50,&CB,&A9,&2E
-            .byte &89,&90,&20,&DA,&13,&A4,&B8,&52
-            .byte &B3,&47,&4C,&59,&2C,&4B,&49,&F1
-            .byte &99,&20,&19,&20,&89,&44,&12,&9F
-            .byte &A9,&76,&D3,&4F,&4B,&99,&20,&43
-            .byte &4C,&B5,&44,&53,&2E,&0D,&23,&5B
-            .byte &7E,&89,&C2,&50,&20,&7B,&A1,&44
-            .byte &AC,&47,&AA,&9B,&20,&53,&43,&AB
-            .byte &9D,&53,&DD,&50,&9D,&4F,&56,&AA
-            .byte &DD,&4F,&4B,&99,&20,&89,&C8,&AB
-            .byte &B8,&2E,&5C,&20,&47,&41,&5A,&9D
-            .byte &67,&20,&89,&88,&2C,&76,&89,&D5
-            .byte &54,&C2,&A7,&7B,&89,&53,&DD,&50
-            .byte &9D,&10,&AA,&9D,&89,&E1,&B5,&4E
-            .byte &A0,&71,&4D,&A4,&46,&02,&4D,&AA
-            .byte &2E,&8F,&81,&4D,&E5,&AF,&54,&2C
-            .byte &A1,&B8,&B3,&9D,&00,&BD,&A4,&6E
-            .byte &D2,&BF,&A3,&5C,&2C,&8A,&5C,&20
-            .byte &53,&50,&C0,&57,&4C,&20,&F6,&DF
-            .byte &53,&A4,&89,&4A,&41,&47,&DC,&A0
-            .byte &B8,&B3,&B7,&2E,&0D,&23,&5C,&20
-            .byte &AF,&B1,&A3,&89,&CF,&CB,&EC,&16
-            .byte &B1,&A0,&48,&9B,&9D,&8A,&EA,&45
-            .byte &A3,&52,&B5,&C4,&2C,&D1,&55,&B0
-            .byte &9B,&4C,&59,&2E,&5C,&20,&AD,&41
-            .byte &A3,&A1,&4C,&B5,&A0,&53,&43,&C0
-            .byte &50,&99,&20,&8A,&8B,&9E,&BE,&4C
-            .byte &CB,&50,&53,&9D,&76,&89,&46,&DD
-            .byte &B9,&2C,&41,&A4,&89,&DF,&7B,&D1
-            .byte &BD,&A4,&7A,&8A,&43,&52,&12,&AD
-            .byte &A4,&5C,&2E,&0D,&23,&5C,&20,&AF
-            .byte &B1,&A3,&89,&6A,&20,&8A,&46,&A9
-            .byte &A0,&5C,&52,&C6,&4C,&46,&20,&7A
-            .byte &A1,&B8,&55,&44,&59,&2E,&A1,&4C
-            .byte &BC,&8B,&A3,&FC,&49,&BD,&4C,&20
-            .byte &43,&B4,&49,&A3,&46,&F6,&45,&A4
-            .byte &87,&20,&6E,&5C,&2E,&53,&55,&44
-            .byte &44,&AF,&4C,&59,&2C,&89,&43,&B4
-            .byte &49,&A3,&AB,&56,&4F,&4C,&BD,&A4
-            .byte &8A,&5C,&20,&46,&F6,&9D,&89,&23
-            .byte &4B,&99,&2E,&22,&23,&A5,&C1,&98
-            .byte &57,&AC,&9F,&76,&42,&9D,&CF,&B8
-            .byte &55,&52,&42,&E0,&22,&2C,&48,&9D
-            .byte &0F,&B5,&54,&53,&2C,&8A,&47,&C0
-            .byte &42,&42,&99,&20,&A1,&D0,&4C,&BD
-            .byte &A3,&C3,&54,&B1,&A3,&68,&AA,&2C
-            .byte &B8,&41,&42,&A4,&5C,&21,&0D,&23
-            .byte &5C,&20,&14,&D2,&47,&9D,&A9,&76
-            .byte &89,&46,&AB,&45,&5A,&99,&20,&53
-            .byte &BC,&2E,&A1,&06,&47,&AC,&B0,&43
-            .byte &20,&57,&41,&56,&9D,&46,&DD,&4F
-            .byte &44,&A4,&4F,&BD,&A3,&5C,&2C,&50
-            .byte &55,&D7,&99,&20,&5C,&20,&55,&C4
-            .byte &AA,&2E,&89,&CB,&53,&9F,&A8,&99
-            .byte &20,&5C,&20,&46,&45,&CD,&20,&49
-            .byte &A4,&89,&B8,&99,&20,&7B,&53,&C7
-            .byte &9F,&93,&20,&7A,&5C,&A3,&45,&59
-            .byte &B7,&2E,&0D,&23,&5B,&B5,&54,&78
-            .byte &20,&89,&23,&97,&20,&7B,&23,&58
-            .byte &41,&AC,&2E,&B6,&A4,&43,&55,&52
-            .byte &BD,&A0,&64,&A4,&AE,&9D,&E4,&E2
-            .byte &A8,&20,&8A,&BB,&DE,&2C,&8A,&DD
-            .byte &E5,&2C,&49,&4D,&DB,&53,&99,&4C
-            .byte &59,&2C,&4F,&BD,&A3,&89,&C9,&4C
-            .byte &8C,&2E,&89,&60,&20,&64,&20,&49
-            .byte &A4,&CC,&4B,&45,&9E,&19,&20,&42
-            .byte &A2,&41,&9E,&AE,&43,&AD,&44,&2C
-            .byte &57,&E2,&BF,&9E,&C1,&B9,&2C,&57
-            .byte &BB,&D3,&20,&49,&A4,&B8,&55,&44
-            .byte &BF,&A0,&6D,&42,&CB,&F1,&20,&02
-            .byte &7E,&8A,&1E,&A9,&B1,&A0,&6D,&89
-            .byte &23,&4B,&99,&27,&A4,&BE,&8F,&7B
-            .byte &AE,&4D,&53,&2E,&0D,&23,&5B,&7A
-            .byte &89,&C5,&7A,&B4,&D7,&20,&7B,&89
-            .byte &97,&2E,&CC,&50,&B7,&07,&49,&45
-            .byte &A4,&BF,&EC,&43,&54,&99,&20,&89
-            .byte &23,&4B,&99,&20,&7B,&23,&58,&41
-            .byte &AC,&27,&A4,&0C,&E7,&20,&AB,&18
-            .byte &4E,&2C,&48,&AC,&47,&20,&6E,&89
-            .byte &47,&AB,&59,&2C,&B8,&B3,&9D,&64
-            .byte &53,&2E,&76,&89,&5F,&20,&49,&A4
-            .byte &89,&AE,&43,&AD,&A0,&C1,&4F,&A3
-            .byte &4C,&BC,&44,&99,&20,&B5,&54,&2E
-            .byte &0D,&23,&5B,&7A,&A1,&57,&49,&44
-            .byte &9D,&63,&7A,&89,&97,&2E,&A1,&53
-            .byte &C5,&D7,&20,&C1,&4F,&A3,&D4,&45
-            .byte &A4,&50,&AE,&B0,&C7,&4C,&A2,&BB
-            .byte &44,&BF,&9E,&8F,&89,&D5,&54,&C2
-            .byte &A7,&7B,&53,&E5,&9D,&53,&B1,&50
-            .byte &53,&2E,&0D,&23,&5B,&7A,&89,&57
-            .byte &49,&44,&9D,&43,&B9,&8D,&B9,&2C
-            .byte &1C,&49,&9A,&4C,&A2,&D4,&9F,&6E
-            .byte &6F,&42,&A2,&A1,&62,&9D,&D4,&9A
-            .byte &2D,&53,&B5,&52,&43,&9D,&5C,&20
-            .byte &43,&AC,&EE,&9F,&55,&C4,&AA,&B8
-            .byte &8C,&2E,&0D,&23,&5B,&8F,&89,&AF
-            .byte &A0,&7B,&89,&57,&49,&44,&9D,&43
-            .byte &B9,&8D,&B9,&2E,&A1,&46,&D4,&9A
-            .byte &20,&7B,&B8,&F4,&52,&A4,&4C,&BC
-            .byte &44,&A4,&76,&89,&94,&41,&D5,&BD
-            .byte &2C,&8A,&A1,&53,&C5,&D7,&20,&C1
-            .byte &4F,&A3,&49,&A4,&C6,&9F,&7A,&89
-            .byte &5D,&20,&64,&2E,&0D,&23,&5B,&7A
-            .byte &A1,&57,&CD,&4C,&20,&46,&55,&52
-            .byte &4E,&C9,&AD,&A0,&53,&B6,&54,&99
-            .byte &20,&6A,&2C,&44,&B5,&DA,&9D,&47
-            .byte &CB,&5A,&E0,&2C,&6D,&46,&0A,&48
-            .byte &9C,&41,&DA,&9D,&42,&D6,&D5,&4F
-            .byte &20,&43,&B4,&02,&A4,&8A,&41,&9E
-            .byte &45,&C3,&43,&07,&49,&43,&20,&46
-            .byte &02,&9D,&6D,&50,&CB,&53,&B0,&43
-            .byte &20,&BE,&C7,&2E,&0D,&23,&5B,&7A
-            .byte &A1,&4C,&AE,&DC,&2C,&1C,&49,&9A
-            .byte &20,&4B,&B6,&43,&AD,&4E,&2E,&57
-            .byte &BB,&B1,&2C,&AF,&D6,&CD,&20,&B0
-            .byte &C3,&A4,&BE,&BD,&A3,&89,&64,&A4
-            .byte &8A,&43,&B3,&43,&AB,&54,&9D,&53
-            .byte &B1,&50,&A4,&4C,&BC,&A0,&19,&20
-            .byte &76,&A1,&53,&C5,&D7,&2C,&1E,&A9
-            .byte &B1,&A0,&C1,&B9,&2E,&0D,&23,&5B
-            .byte &7A,&A1,&55,&B0,&4C,&B6,&A2,&6A
-            .byte &2E,&56,&AE,&49,&9B,&20,&BE,&E8
-            .byte &C3,&58,&20,&C5,&D3,&A9,&B7,&2C
-            .byte &6D,&4E,&D6,&45,&A4,&81,&C7,&4C
-            .byte &20,&AF,&A0,&7A,&22,&4F,&C5,&B0
-            .byte &43,&22,&2C,&1B,&5A,&5A,&2C,&43
-            .byte &4C,&AC,&4B,&20,&8A,&E9,&A7,&49
-            .byte &E8,&AB,&53,&D0,&BD,&4C,&59,&2E
-            .byte &F7,&B1,&A3,&47,&41,&5A,&99,&20
-            .byte &8F,&89,&22,&23,&CF,&47,&B6,&C7
-            .byte &20,&57,&0A,&ED,&C5,&B0,&43,&20
-            .byte &B8,&AA,&45,&4F,&20,&C0,&CF,&4F
-            .byte &20,&0E,&A9,&4B,&A4,&C5,&D3,&A9
-            .byte &45,&22,&2C,&5C,&20,&BF,&43,&49
-            .byte &44,&9D,&49,&9F,&B4,&A4,&EE,&20
-            .byte &7F,&20,&D0,&47,&4E,&49,&46,&49
-            .byte &43,&AC,&43,&45,&2E,&0D,&23,&5B
-            .byte &7A,&A1,&53,&50,&F6,&49,&9B,&20
-            .byte &50,&AC,&07,&A2,&6D,&57,&E2,&44
-            .byte &2D,&50,&AC,&CD,&C3,&A0,&64,&53
-            .byte &2E,&A1,&56,&AE,&4E,&C9,&AD,&44
-            .byte &2C,&50,&A9,&9D,&CC,&DA,&9D,&49
-            .byte &A4,&DD,&D1,&B1,&A0,&7A,&89,&43
-            .byte &AF,&07,&9D,&7B,&89,&6A,&20,&8A
-            .byte &4F,&43,&43,&55,&EC,&45,&A4,&4D
-            .byte &55,&D3,&20,&7B,&89,&94,&41,&AB
-            .byte &41,&2E,&0D,&23,&5B,&7E,&89,&DD
-            .byte &05,&A3,&4C,&8C,&99,&2E,&B8,&F4
-            .byte &52,&A4,&4C,&BC,&A0,&76,&89,&46
-            .byte &DD,&B9,&A4,&6F,&8A,&42,&CD,&13
-            .byte &2E,&0D,&23,&5B,&7A,&A1,&50,&0A
-            .byte &EF,&DC,&57,&41,&A2,&7E,&89,&46
-            .byte &02,&53,&9F,&46,&DD,&B9,&2E,&89
-            .byte &5E,&20,&64,&20,&B4,&A4,&65,&A4
-            .byte &76,&56,&AE,&49,&9B,&20,&6A,&53
-            .byte &2E,&0D,&23,&5B,&8F,&89,&AF,&A0
-            .byte &7B,&89,&50,&0A,&EF,&DC,&57,&41
-            .byte &A2,&7E,&89,&46,&02,&53,&9F,&46
-            .byte &DD,&B9,&2E,&0D,&23,&5B,&7E,&89
-            .byte &19,&EA,&A3,&4C,&8C,&99,&2E,&53
-            .byte &B1,&50,&A4,&4C,&BC,&A0,&67,&20
-            .byte &76,&89,&94,&42,&CD,&13,&2E,&46
-            .byte &55,&52,&8B,&A3,&C7,&B3,&47,&20
-            .byte &89,&4C,&8C,&99,&20,&76,&89,&5F
-            .byte &2C,&5C,&20,&C5,&4B,&9D,&B5,&9F
-            .byte &89,&53,&B4,&50,&9D,&7B,&A1,&53
-            .byte &C5,&D7,&20,&C1,&B9,&2E,&0D,&23
-            .byte &5B,&8F,&89,&46,&41,&A3,&AF,&A0
-            .byte &7B,&89,&19,&EA,&A3,&4C,&8C,&99
-            .byte &20,&B5,&54,&78,&20,&A1,&53,&C5
-            .byte &D7,&2C,&57,&E2,&BF,&9E,&C1,&B9
-            .byte &2E,&A1,&4D,&B7,&EF,&47,&9D,&7E
-            .byte &89,&C1,&4F,&A3,&AB,&FD,&A4,&22
-            .byte &26,&D8,&49,&56,&B2
-L6349:      .byte &9D,&4B,&45,&04,&20,&B5,&54,&26
-            .byte &22,&2E,&0D,&23,&5B,&7A,&A1,&44
-            .byte &C9,&55,&C6,&A0,&42,&E0,&6A,&2C
-            .byte &15,&B8,&A2,&8A,&42,&41,&AB,&2E
-            .byte &5C,&A3,&C8,&4F,&54,&53,&B1,&50
-            .byte &A4,&AB,&53,&B3,&B2,&9D,&7E,&89
-            .byte &46,&DD,&B9,&D5,&AE,&44,&53,&2E
-            .byte &76,&89,&5E,&20,&8B,&52,&9D,&49
-            .byte &A4,&A1,&43,&19,&D5,&AE,&A0,&C1
-            .byte &B9,&2E,&0D,&23,&5B,&7A,&A1,&43
-            .byte &BB,&4C,&44,&27,&A4,&42,&E0,&6A
-            .byte &2E,&89,&64,&A4,&AE,&9D,&1C,&49
-            .byte &9A,&4C,&A2,&BF,&43,&B9,&41,&B1
-            .byte &A0,&6D,&EC,&43,&54,&55,&AB,&A4
-            .byte &7B,&B1,&44,&44,&A2,&08,&AE,&A4
-            .byte &8A,&A1,&53,&C5,&D7,&20,&08,&A0
-            .byte &49,&A4,&50,&12,&AD,&A0,&41,&47
-            .byte &41,&A9,&53,&9F,&89,&5F,&20,&64
-            .byte &2E,&A1,&AB,&A0,&47,&DD,&53,&53
-            .byte &A2,&C1,&4F,&A3,&4D,&AE,&4B,&45
-            .byte &A0,&22,&23,&C2,&A2,&23,&43,&19
-            .byte &D5,&AE,&44,&22,&20,&CC,&4B,&45
-            .byte &A4,&19,&20,&89,&5E,&20,&64,&2E
-            .byte &0D,&23,&5B,&7A,&89,&C5,&53,&B1
-            .byte &A3,&42,&E0,&6A,&2E,&49,&9F,&49
-            .byte &A4,&53,&50,&F6,&49,&9B,&20,&8A
-            .byte &57,&CD,&4C,&20,&4C,&B6,&2E,&41
-            .byte &9E,&45,&C3,&47,&AC,&9F,&46,&B5
-            .byte &A3,&DB,&53,&B1,&A3,&08,&A0,&49
-            .byte &A4,&DB,&53,&B6,&9C,&45,&A0,&CA
-            .byte &58,&9F,&76,&A1,&C1,&4F,&A3,&7A
-            .byte &89,&5E,&20,&64,&2E,&0D,&23,&5B
-            .byte &7A,&A1,&4C,&AE,&DC,&2C,&CF,&4D
-            .byte &4C,&A2,&4C,&B6,&2C,&57,&C7,&4B
-            .byte &2D,&7A,&4C,&A9,&45,&9E,&43,&19
-            .byte &D5,&AE,&44,&2E,&A1,&E1,&49,&4D
-            .byte &A2,&C1,&4F,&A3,&4F,&43,&43,&55
-            .byte &EC,&45,&A4,&89,&5D,&20,&64,&2E
-            .byte &0D,&23,&5B,&7A,&A1,&53,&C5,&D7
-            .byte &20,&C2,&A2,&43,&19,&D5,&AE,&44
-            .byte &2C,&CF,&4D,&4C,&A2,&49,&D7,&D9
-            .byte &A9,&41,&B1,&A0,&42,&A2,&89,&D4
-            .byte &9A,&20,&57,&BB,&D3,&20,&43,&AB
-            .byte &04,&A4,&7A,&A8,&52,&B5,&DE,&20
-            .byte &47,&41,&50,&A4,&D2,&BF,&A3,&89
-            .byte &C1,&4F,&A3,&76,&89,&5D,&2E,&0D
-            .byte &23,&5B,&7A,&A1,&00,&44,&AA,&9E
-            .byte &42,&41,&A8,&6A,&2E,&89,&53,&55
-            .byte &B6,&9D,&49,&A4,&41,&9E,&F9,&43
-            .byte &4C,&55,&D0,&56,&9D,&D3,&4F,&BE
-            .byte &4C,&B2,&9D,&BE,&4C,&B5,&52,&2C
-            .byte &53,&D2,&4B,&20,&A9,&76,&89,&46
-            .byte &DD,&B9,&2C,&6D,&AF,&47,&C0,&BD
-            .byte &A0,&CC,&50,&53,&2C,&A1,&8B,&52
-            .byte &C5,&4C,&20,&C2,&57,&CD,&20,&C0
-            .byte &E7,&20,&8A,&53,&E5,&9D,&C0,&8B
-            .byte &A3,&F9,&50,&AF,&D0,&56,&9D,&23
-            .byte &50,&C6,&55,&C1,&2D,&23,&56,&49
-            .byte &43,&54,&B9,&49,&41,&9E,&03,&41
-            .byte &50,&20,&44,&C9,&AD,&53,&21,&0D
-            .byte &23,&5B,&8F,&89,&C2,&50,&20,&7B
-            .byte &A1,&46,&D4,&9A,&20,&7B,&53,&B1
-            .byte &50,&53,&2C,&43,&AE,&BD,&A0,&B5
-            .byte &9F,&7B,&89,&4D,&B5,&BA,&41,&A9
-            .byte &2E,&8B,&52,&9D,&49,&A4,&A1,&46
-            .byte &AB,&0F,&20,&42,&AB,&45,&5A,&9D
-            .byte &57,&BB,&D3,&20,&71,&4D,&A4,&76
-            .byte &AF,&D4,&BD,&9E,&5C,&21,&0D,&23
-            .byte &5B,&7E,&A1,&46,&D4,&9A,&20,&7B
-            .byte &45,&AE,&A8,&A2,&53,&B1,&50,&53
-            .byte &2C,&43,&AE,&BD,&A0,&B5,&9F,&7B
-            .byte &89,&4D,&B5,&BA,&41,&A9,&2E,&0D
-            .byte &23,&5B,&8F,&89,&D5,&54,&C2,&A7
-            .byte &7B,&A1,&46,&D4,&9A,&20,&7B,&53
-            .byte &B1,&50,&53,&2C,&F9,&D1,&56,&41
-            .byte &B1,&A0,&6E,&89,&4D,&B5,&BA,&41
-            .byte &A9,&78,&2E,&0D,&23,&5B,&7E,&A1
-            .byte &53,&EC,&C0,&4C,&20,&75,&57,&41
-            .byte &A2,&7E,&89,&78,&20,&7B,&89,&4D
-            .byte &B5,&BA,&41,&A9,&2E,&0D,&23,&5B
-            .byte &8F,&A1,&50,&CB,&B1,&41,&55,&20
-            .byte &B4,&4C,&46,&20,&57,&41,&A2,&19
-            .byte &20,&89,&4D,&B5,&BA,&41,&A9,&2E
-            .byte &A1,&EA,&43,&55,&D4,&AE,&2C,&DA
-            .byte &55,&9D,&D4,&9A,&20,&50,&55,&4C
-            .byte &C6,&A4,&76,&89,&60,&2E,&0D,&23
-            .byte &5B,&8F,&89,&5F,&AA,&9E,&E0,&47
-            .byte &9D,&7B,&89,&50,&CB,&B1,&41,&55
-            .byte &2E,&BB,&DE,&20,&42,&AC,&4B,&A4
-            .byte &7B,&45,&AE,&A8,&20,&B8,&4F,&50
-            .byte &20,&AC,&A2,&46,&55,&52,&8B,&A3
-            .byte &D8,&FB,&AB,&53,&53,&2E,&46,&41
-            .byte &A3,&76,&89,&60,&20,&5C,&20,&71
-            .byte &20,&A1,&50,&55,&4C,&53,&99,&2C
-            .byte &DA,&55,&9D,&D4,&9A,&2E,&0D,&23
-            .byte &5B,&8F,&A1,&53,&C5,&D7,&20,&47
-            .byte &DF,&54,&C2,&2C,&43,&55,&9F,&A9
-            .byte &76,&89,&4D,&B5,&BA,&41,&A9,&2E
-            .byte &A1,&DA,&55,&45,&2C,&CA,&7E,&D0
-            .byte &47,&9E,&AB,&FD,&99,&3A,&22,&3C
-            .byte &23,&C5,&4B,&9D,&23,&5C,&A3,&23
-            .byte &57,&C9,&48,&20,&23,&48,&AA,&45
-            .byte &3C,&22,&2C,&DB,&A9,&54,&A4,&76
-            .byte &A1,&53,&C5,&D7,&20,&57,&CD,&4C
-            .byte &2C,&43,&B3,&B8,&17,&43,&B1,&A0
-            .byte &7B,&1C,&49,&F1,&2C,&6D,&A1,&42
-            .byte &C0,&53,&A4,&14,&B2,&9D,&C6,&9F
-            .byte &A9,&76,&89,&64,&2E,&0D,&23,&5B
-            .byte &7A,&A1,&42,&AE,&AB,&9E,&72,&50
-            .byte &0A,&53,&2C,&53,&F0,&0B,&5A,&45
-            .byte &A0,&08,&54,&05,&45,&9E,&54,&57
-            .byte &4F,&20,&42,&AC,&4B,&A4,&7B,&45
-            .byte &AE,&A8,&20,&8A,&DF,&F1,&2E,&89
-            .byte &E1,&B5,&4E,&A0,&49,&A4,&48,&AE
-            .byte &A0,&8A,&55,&CA,&56,&AF,&2E,&0D
-            .byte &23,&5B,&7E,&A1,&47,&C0,&53,&53
-            .byte &A2,&53,&DD,&50,&9D,&4C,&BC,&44
-            .byte &99,&20,&67,&20,&89,&4D,&B5,&BA
-            .byte &41,&A9,&2E,&89,&BD,&DC,&CC,&B0
-            .byte &7E,&49,&A4,&52,&49,&D3,&20,&8A
-            .byte &47,&AB,&AF,&2E,&0D,&23,&5B,&7E
-            .byte &A1,&47,&C0,&53,&53,&A2,&50,&CB
-            .byte &B1,&41,&55,&20,&4F,&56,&AA,&53
-            .byte &B4,&C1,&05,&A0,&42,&A2,&89,&01
-            .byte &9A,&A2,&23,&97,&20,&7B,&23,&58
-            .byte &41,&AC,&2E,&8B,&52,&9D,&AE,&9D
-            .byte &D0,&47,&4E,&A4,&81,&4F,&8B,&52
-            .byte &A4,&B4,&56,&9D,&08,&45,&9E,&48
-            .byte &AA,&9D,&08,&46,&B9,&9D,&5C,&21
-            .byte &0D,&23,&5B,&8F,&89,&D5,&54,&C2
-            .byte &A7,&7B,&A1,&47,&C0,&53,&53,&A2
-            .byte &53,&DD,&EA,&2E,&89,&47,&C0,&53
-            .byte &A4,&48,&AA,&9D,&49,&A4,&57,&BC
-            .byte &4B,&2C,&59,&CD,&DD,&A6,&8A,&A9
-            .byte &54,&AA,&4D,&99,&C3,&A0,&6D,&42
-            .byte &AE,&9D,&50,&B2,&43,&AD,&53,&2E
-            .byte &0D,&23,&5B,&7E,&89,&11,&8F,&4C
-            .byte &8C,&A4,&42,&AF,&BC,&A8,&20,&89
-            .byte &23,&97,&20,&7B,&23,&58,&41,&AC
-            .byte &2E,&89,&4C,&8C,&A4,&AE,&9D,&53
-            .byte &50,&AE,&C6,&4C,&A2,&BD,&DC,&CC
-            .byte &B1,&A0,&8A,&B8,&B3,&59,&2E,&0D
-            .byte &23,&5B,&7A,&89,&01,&44,&53,&9F
-            .byte &7B,&89,&11,&8F,&4C,&8C,&A4,&42
-            .byte &AF,&BC,&A8,&20,&89,&23,&97,&20
-            .byte &7B,&23,&58,&41,&AC,&2E,&89,&E1
-            .byte &B5,&4E,&A0,&49,&A4,&48,&AE,&A0
-            .byte &8A,&DF,&F1,&59,&2C,&8A,&EE,&20
-            .byte &BD,&DC,&CC,&B0,&7E,&47,&DF,&57
-            .byte &53,&2E,&0D,&23,&5B,&7A,&A1,&B8
-            .byte &A9,&4B,&99,&20,&44,&B6,&D3,&2E
-            .byte &89,&48,&AE,&A0,&94,&49,&A4,&BE
-            .byte &56,&AA,&45,&A0,&6D,&DB,&4F,&4C
-            .byte &A4,&7B,&B8,&41,&47,&4E,&AC,&9F
-            .byte &D4,&F0,&49,&A0,&8A,&B8,&AF,&D3
-            .byte &99,&20,&53,&D4,&F2,&2E,&89,&D0
-            .byte &F1,&AF,&99,&20,&E4,&CD,&4C,&20
-            .byte &4C,&99,&AA,&53,&2C,&44,&C9,&47
-            .byte &55,&B8,&99,&4C,&59,&2C,&7A,&5C
-            .byte &A3,&EE,&B8,&52,&E7,&53,&2E,&A8
-            .byte &49,&A4,&C9,&98,&A1,&47,&E2,&A0
-            .byte &50,&CB,&43,&9D,&76,&EC,&43,&4E
-            .byte &49,&43,&21,&0D,&23,&5B,&8F,&89
-            .byte &AF,&A0,&7B,&A1,&15,&B8,&A2,&DF
-            .byte &FD,&2C,&42,&B5,&4E,&BF,&A0,&42
-            .byte &A2,&44,&C0,&A9,&41,&47,&9D,&44
-            .byte &B6,&43,&AD,&53,&2E,&76,&89,&5D
-            .byte &20,&D4,&9D,&89,&11,&8F,&4C,&8C
-            .byte &A4,&42,&AF,&BC,&A8,&20,&89,&23
-            .byte &97,&20,&7B,&23,&58,&41,&AC,&2E
-            .byte &0D,&23,&5B,&7E,&A1,&4C,&B3,&47
-            .byte &2C,&15,&B8,&A2,&DF,&FD,&2E,&4F
-            .byte &56,&AA,&47,&DF,&57,&9E,&75,&A4
-            .byte &4C,&BC,&A0,&5D,&2C,&76,&A1,&DF
-            .byte &A6,&7B,&43,&B3,&BF,&4D,&CA,&A0
-            .byte &48,&9B,&B7,&2E,&8B,&49,&A3,&57
-            .byte &E2,&44,&57,&B9,&4B,&20,&49,&A4
-            .byte &DF,&54,&54,&99,&2C,&8B,&49,&A3
-            .byte &1E,&A9,&54,&57,&B9,&4B,&20,&43
-            .byte &BB,&50,&EA,&A0,&8A,&46,&CB,&4B
-            .byte &99,&2C,&8A,&8B,&49,&A3,&66,&A4
-            .byte &53,&C5,&53,&AD,&A0,&4F,&A3,&D5
-            .byte &AE,&BF,&44,&2E,&0D,&23,&5B,&8F
-            .byte &89,&B8,&AE,&9F,&7B,&A1,&4C,&B3
-            .byte &47,&2C,&B8,&C0,&49,&9A,&20,&DF
-            .byte &FD,&2C,&53,&55,&52,&46,&F6,&45
-            .byte &A0,&6D,&AB,&A0,&15,&B8,&2E,&89
-            .byte &DF,&41,&A0,&49,&A4,&42,&B5,&4E
-            .byte &BF,&A0,&42,&A2,&0F,&B5,&4C,&44
-            .byte &AA,&2D,&BB,&DE,&20,&44,&B6,&43
-            .byte &AD,&53,&2C,&43,&55,&9F,&C8,&A3
-            .byte &44,&C0,&A9,&41,&47,&9D,&50,&55
-            .byte &52,&DB,&53,&B7,&2E,&0D,&23,&5B
-            .byte &8F,&89,&D5,&54,&C2,&A7,&7B,&89
-            .byte &88,&2E,&BB,&DE,&20,&6F,&8A,&5E
-            .byte &2C,&89,&4B,&45,&04,&20,&97,&A4
-            .byte &4F,&BD,&A3,&5C,&2C,&71,&4D,&99
-            .byte &20,&76,&57,&B2,&D3,&20,&5C,&A3
-            .byte &0C,&AA,&A2,&00,&BD,&21,&89,&74
-            .byte &20,&73,&49,&A4,&76,&89,&5D,&2C
-            .byte &57,&BB,&4C,&9D,&DF,&FD,&A4,&B8
-            .byte &AB,&54,&D3,&20,&5F,&20,&8A,&60
-            .byte &2E,&0D,&23,&5B,&7A,&A1,&4E,&AE
-            .byte &DF,&57,&2C,&53,&B4,&44,&A2,&4C
-            .byte &AC,&45,&2E,&57,&E7,&A0,&46,&DD
-            .byte &57,&AA,&A4,&8A,&47,&C0,&53,&C6
-            .byte &A4,&11,&B5,&52,&C9,&48,&20,&08
-            .byte &54,&05,&45,&9E,&42,&AE,&9D,&43
-            .byte &AE,&54,&2D,&54,&C0,&F1,&53,&2E
-            .byte &0D,&23,&5B,&8F,&89,&AF,&A0,&7B
-            .byte &89,&53,&B4,&44,&A2,&4C,&AC,&45
-            .byte &2E,&89,&46,&DD,&57,&AA,&A4,&8A
-            .byte &47,&C0,&53,&C6,&A4,&47,&DF,&A6
-            .byte &54,&C7,&4C,&2C,&48,&AA,&45,&2E
-            .byte &A1,&44,&C9,&55,&C6,&A0,&54,&C0
-            .byte &F1,&20,&49,&A4,&56,&C9,&49,&DA
-            .byte &9D,&76,&89,&5D,&2E,&0D,&23,&5B
-            .byte &7E,&A1,&44,&C9,&55,&C6,&A0,&54
-            .byte &C0,&F1,&2E,&89,&55,&C4,&AA,&47
-            .byte &DF,&57,&A8,&20,&49,&A4,&A8,&49
-            .byte &F1,&20,&8A,&46,&55,&D7,&20,&7B
-            .byte &A8,&B9,&4E,&A2,&14,&AC,&54,&A4
-            .byte &8A,&CA,&54,&54,&4C,&B7,&2C,&47
-            .byte &55,&AE,&AC,&B1,&45,&A0,&76,&52
-            .byte &49,&50,&20,&8A,&B8,&99,&2E,&0D
-            .byte &23,&5B,&7E,&A1,&4E,&AE,&DF,&A6
-            .byte &B8,&F4,&52,&57,&41,&A2,&57,&BB
-            .byte &D3,&20,&4C,&BC,&44,&A4,&19,&20
-            .byte &76,&89,&90,&A2,&50,&CB,&A9,&2C
-            .byte &8A,&67,&20,&76,&89,&01,&B8,&A2
-            .byte &47,&C0,&BD,&59,&AE,&44,&2E,&0D
-            .byte &23,&5B,&7A,&A1,&08,&47,&47,&AE
-            .byte &27,&A4,&ED,&BD,&4C,&3A,&A1,&54
-            .byte &A9,&A2,&57,&E2,&BF,&9E,&53,&B4
-            .byte &F1,&2C,&6D,&DF,&54,&54,&99,&20
-            .byte &46,&DD,&B9,&D5,&AE,&44,&A4,&8A
-            .byte &44,&D6,&50,&20,&64,&53,&2E,&A1
-            .byte &08,&47,&47,&41,&A3,&53,&B6,&A4
-            .byte &7A,&89,&43,&B9,&4E,&AA,&2C,&43
-            .byte &DF,&53,&53,&C3,&47,&DC,&44,&2C
-            .byte &8A,&48,&D9,&4D,&99,&20,&54,&55
-            .byte &CA,&82,&4C,&59,&2E,&0D,&23,&5B
-            .byte &7E,&A1,&57,&E2,&BF,&9E,&47,&AC
-            .byte &47,&14,&AC,&4B,&20,&76,&89,&95
-            .byte &2E,&A1,&AB,&44,&2D,&EE,&C6,&A0
-            .byte &23,&D1,&50,&CC,&A9,&2C,&6D,&A1
-            .byte &46,&C7,&53,&9D,&C3,&47,&20,&8A
-            .byte &A1,&B8,&55,&46,&46,&45,&A0,&50
-            .byte &AE,&DF,&9F,&E3,&49,&C3,&A0,&76
-            .byte &BB,&A4,&14,&59,&57,&E2,&A0,&0F
-            .byte &B5,&4C,&44,&AA,&2C,&FC,&18,&A4
-            .byte &A1,&D5,&54,&54,&4C,&9D,&7B,&52
-            .byte &D9,&2C,&8A,&EA,&AA,&A4,&8F,&5C
-            .byte &2E,&0D,&23,&5C,&20,&D5,&AE,&A0
-            .byte &89,&56,&0A,&9F,&EF,&E7,&99,&20
-            .byte &95,&2C,&C8,&D7,&4F,&05,&A0,&42
-            .byte &A2,&89,&23,&D1,&50,&CC,&A9,&2E
-            .byte &89,&AC,&D3,&4F,&A3,&49,&A4,&D4
-            .byte &46,&B1,&44,&2C,&89,&90,&20,&43
-            .byte &B2,&43
-L6B63:      .byte &AD,&A4,&7A,&89,&EF,&E7,&A4,&8A
-            .byte &8B,&A2,&1A,&D7,&4F,&A6,&B5,&54
-            .byte &2E,&53,&DD,&57,&4C,&59,&2C,&89
-            .byte &95,&20,&4C,&BC,&BD,&A4,&89,&23
-            .byte &C9,&4C,&8A,&7B,&23,&58,&41,&AC
-            .byte &21,&5C,&20,&B4,&56,&9D,&B7,&D1
-            .byte &50,&E0,&21,&5B,&46,&AB,&9D,&8F
-            .byte &CB,&B8,&21,&0D,&23,&5B,&8F,&A1
-            .byte &43,&C3,&AE,&99,&20,&7A,&89,&C8
-            .byte &AB,&B8,&2E,&A1,&93,&46,&C7,&4C
-            .byte &20,&D1,&53,&D1,&BF,&A4,&67,&20
-            .byte &89,&53,&B1,&04,&20,&72,&64,&2C
-            .byte &DF,&AE,&99,&20,&6D,&DB,&57,&AA
-            .byte &21,&A1,&C0,&A9,&D5,&A6,&AE,&43
-            .byte &A4,&A8,&52,&B5,&DE,&20,&89,&53
-            .byte &50,&C0,&A2,&41,&D5,&BD,&2E,&89
-            .byte &93,&A4,&44,&C9,&41,&EB,&BC,&A3
-            .byte &A9,&76,&A1,&43,&AB,&56,&49,&43
-            .byte &45,&2C,&46,&B9,&4D,&99,&20,&55
-            .byte &C4,&AA,&E1,&B5,&4E,&A0,&52,&49
-            .byte &56,&AA,&A4,&8A,&B8,&AB,&D6,&53
-            .byte &2E,&0D,&23,&5B,&8F,&89,&D5,&54
-            .byte &C2,&A7,&7B,&A1,&90,&99,&20,&B8
-            .byte &F4,&52,&D1,&53,&9D,&DD,&4F,&4B
-            .byte &99,&20,&B5,&9F,&B3,&76,&A1,&EA
-            .byte &42,&DA,&9D,&42,&BC,&D3,&2E,&0D
-            .byte &23,&5B,&7E,&A1,&EA,&42,&DA,&9D
-            .byte &85,&8F,&89,&AF,&07,&AC,&43,&9D
-            .byte &76,&A1,&53,&59,&53,&B1,&A7,&7B
-            .byte &D1,&56,&B7,&2E,&7A,&89,&CF,&A7
-            .byte &D4,&9A,&20,&7B,&89,&A9,&54,&AA
-            .byte &49,&B9,&2C,&53,&B1,&50,&A4,&AE
-            .byte &9D,&56,&C9,&49,&42,&C3,&2C,&43
-            .byte &D4,&4D,&42,&99,&20,&19,&20,&89
-            .byte &A9,&CA,&A3,&DF,&F1,&20,&64,&53
-            .byte &2E,&0D,&23,&5B,&7E,&A1,&B8,&B3
-            .byte &A2,&53,&43,&AB,&9D,&53,&DD,&EA
-            .byte &2E,&89,&E1,&B5,&4E,&A0,&49,&A4
-            .byte &46,&02,&A7,&8A,&EF,&46,&9D,&48
-            .byte &AA,&45,&2C,&1B,&9F,&46,&55,&52
-            .byte &8B,&A3,&19,&20,&89,&88,&20,&8B
-            .byte &52,&9D,&AE,&9D,&DD,&4F,&53,&9D
-            .byte &DF,&F1,&A4,&8A,&BB,&44,&BF,&9E
-            .byte &50,&B6,&46,&C7,&4C,&53,&2E,&70
-            .byte &5C,&2C,&89,&74,&20,&73,&BE,&56
-            .byte &AA,&A4,&89,&56,&C7,&C3,&59,&2E
-            .byte &0D,&23,&5B,&7E,&A1,&4C,&B3,&47
-            .byte &20,&57,&E2,&BF,&9E,&4A,&45,&54
-            .byte &F3,&2C,&F8,&8B,&A3,&78,&20,&7B
-            .byte &57,&BB,&D3,&2C,&AE,&9D,&57,&BB
-            .byte &B1,&2C,&53,&B1,&CD,&20,&C0,&E7
-            .byte &99,&53,&2E,&89,&4A,&45,&54,&54
-            .byte &A2,&B8,&AB,&54,&43,&AD,&A4,&B5
-            .byte &9F,&4F,&BD,&A3,&89,&53,&BC,&2E
-            .byte &0D,&23,&5B,&7A,&89,&53,&50,&AE
-            .byte &C6,&4C,&A2,&BD,&DC,&CC,&B1,&A0
-            .byte &11,&8F,&4C,&8C,&53,&2E,&76,&89
-            .byte &5D,&2C,&89,&23,&97,&20,&7B,&23
-            .byte &58,&41,&41,&9E,&AB,&F6,&AD,&A4
-            .byte &A9,&76,&89,&53,&4B,&59,&2E,&60
-            .byte &20,&7B,&5C,&20,&49,&A4,&A1,&53
-            .byte &C5,&D7,&2C,&57,&E2,&BF,&9E,&53
-            .byte &B4,&F1,&2C,&B6,&A4,&DF,&7B,&42
-            .byte &DF,&4B,&45,&9E,&8A,&B6,&A4,&C1
-            .byte &4F,&A3,&48,&AC,&47,&99,&20,&DD
-            .byte &4F,&C6,&4C,&A2,&6E,&17,&B8,&A2
+            .byte &a5,&c1,&98,&55,&c4,&aa,&b8,&8a
+            .byte &0d,&4f,&a3,&0d,&ed,&a6,&76,&22
+            .byte &24,&22,&20,&0d,&10,&8f,&22,&25
+            .byte &22,&20,&f2,&ac,&53,&2e,&0d,&3d
+            .byte &23,&5c,&20,&1e,&12,&9d,&c8,&a3
+            .byte &a1,&57,&bb,&c3,&2e,&2e,&2e,&2e
+            .byte &3d,&0d,&23,&4f,&4b,&1f,&0d,&2b
+            .byte &23,&57,&cd,&be,&4d,&9d,&c2,&2b
+            .byte &2b,&22,&23,&c9,&4c,&8a,&7b,&23
+            .byte &58,&41,&ac,&22,&2b,&2b,&23,&42
+            .byte &59,&3a,&23,&df,&42,&aa,&9f,&23
+            .byte &4f,&27,&23,&c3,&ae,&59,&2b,&2b
+            .byte &23,&80,&2b,&0d,&23,&ae,&9d,&5c
+            .byte &20,&53,&55,&52,&9d,&5c,&20,&57
+            .byte &ac,&9f,&76,&24,&3f,&0d,&23,&a5
+            .byte &a8,&b5,&9a,&20,&5c,&20,&57,&aa
+            .byte &9d,&8e,&4b,&49,&44,&44,&99,&21
+            .byte &0d,&23,&42,&59,&45,&21,&0d,&23
+            .byte &a5,&d1,&98,&47,&55,&b7,&a4,&10
+            .byte &8f,&5c,&20,&57,&ac,&9f,&76,&24
+            .byte &21,&0d,&23,&a9,&56,&af,&54,&b9
+            .byte &59,&3a,&2b,&20,&2b,&23,&5b,&43
+            .byte &ae,&52,&59,&99,&20,&0d,&8a,&05
+            .byte &ae,&99,&20,&0d,&ee,&a8,&99,&20
+            .byte &0d,&23,&5c,&20,&d1,&98,&71,&20
+            .byte &0d,&23,&5b,&c7,&ab,&fd,&a2,&0d
+            .byte &23,&5b,&ee,&9f,&0d,&23,&5c,&20
+            .byte &d1,&98,&c1,&20,&a8,&b2,&21,&0d
+            .byte &89,&25,&21,&0d,&23,&6d,&a1,&46
+            .byte &a9,&c7,&2c,&c7,&01,&9a,&a2,&54
+            .byte &55,&47,&2c,&89,&25,&20,&49,&a4
+            .byte &46,&ab,&e0,&21,&0d,&23,&49,&9f
+            .byte &b8,&ae,&54,&a4,&76,&dd,&4f,&53
+            .byte &af,&2e,&0d,&23,&89,&25,&20,&71
+            .byte &4d,&a4,&49,&4d,&00,&56,&41,&42
+            .byte &c3,&21,&0d,&23,&5c,&a3,&48,&8c
+            .byte &a4,&ae,&9d,&46,&55,&d7,&21,&0d
+            .byte &23,&a1,&d5,&44,&a2,&d1,&9e,&8e
+            .byte &cc,&4b,&9d,&03,&20,&4d,&55,&d3
+            .byte &2c,&5c,&20,&4b,&ee,&57,&21,&0d
+            .byte &ac,&59,&a8,&99,&21,&0d,&23,&4a
+            .byte &12,&9f,&91,&20,&a1,&cf,&ab,&43
+            .byte &54,&9c,&2e,&0d,&ed,&4c,&44,&99
+            .byte &20,&0d,&05,&ae,&99,&20,&0d,&23
+            .byte &89,&25,&20,&49,&a4,&49,&4d,&00
+            .byte &56,&41,&42,&c3,&21,&0d,&23,&ee
+            .byte &a8,&99,&20,&b4,&eb,&af,&53,&2e
+            .byte &0d,&23,&5c,&20,&d1,&9e,&71,&20
+            .byte &0d,&23,&89,&25,&20,&49,&a4,&ee
+            .byte &a8,&99,&20,&53,&ea,&43,&49,&c7
+            .byte &2e,&0d,&23,&5c,&20,&c1,&98,&db
+            .byte &53,&53,&b7,&a4,&b6,&21,&0d,&23
+            .byte &5c,&20,&ca,&45,&a0,&a1,&53,&ed
+            .byte &bd,&4c,&20,&76,&24,&21,&0d,&23
+            .byte &89,&94,&49,&a4,&c2,&4f,&20,&48
+            .byte &ae,&a0,&76,&24,&2e,&0d,&23,&5c
+            .byte &20,&d1,&98,&24,&20,&48,&aa,&45
+            .byte &2e,&0d,&23,&89,&46,&ab,&45,&5a
+            .byte &99,&20,&be,&4c,&a0,&43,&88,&a4
+            .byte &5c,&20,&76,&89,&42,&b3,&45,&21
+            .byte &0d,&22,&23,&49,&27,&a7,&d0,&f1
+            .byte &20,&7b,&a8,&49,&a4,&7f,&22,&2c
+            .byte &5c,&20,&53,&43,&ab,&d6,&2c,&8a
+            .byte &7a,&a1,&53,&55,&49,&43,&49,&44
+            .byte &c7,&20,&46,&ab,&4e,&5a,&59,&2c
+            .byte &24,&20,&6e,&89,&50,&a9,&e3,&43
+            .byte &c3,&2c,&76,&42,&9d,&50,&55,&4c
+            .byte &ea,&a0,&42,&a2,&89,&c0,&ec,&44
+            .byte &4c,&a2,&41,&50,&d8,&4f,&41,&d3
+            .byte &99,&20,&94,&a1,&46,&45,&a6,&4d
+            .byte &e5,&af,&54,&a4,&4c,&b2,&aa,&21
+            .byte &0d,&23,&89,&a9,&b1,&e8,&aa,&b2
+            .byte &9d,&43,&d4,&4d,&b2,&9d,&b4,&a4
+            .byte &08,&be,&4d,&9d,&c2,&4f,&20,&4d
+            .byte &55,&d3,&20,&c8,&a3,&5c,&a3,&05
+            .byte &ae,&a2,&d5,&44,&59,&2e,&0d,&23
+            .byte &5c,&20,&71,&a7,&76,&b4,&56,&9d
+            .byte &22,&bf,&50,&ae,&b1,&44,&22,&20
+            .byte &8a,&47,&b3,&9d,&76,&89,&47,&ab
+            .byte &b2,&2c,&42,&18,&20,&7f,&20,&7a
+            .byte &89,&53,&4b,&59,&21,&0d,&23,&5c
+            .byte &20,&57,&aa,&9d,&bf,&56,&b5,&ab
+            .byte &a0,&42,&a2,&a1,&c0,&8b,&a3,&56
+            .byte &49,&43,&49,&9b,&20,&ed,&47,&20
+            .byte &7a,&89,&74,&21,&0d,&23,&5c,&20
+            .byte &08,&47,&7a,&76,&24,&20,&89,&53
+            .byte &ad,&45,&a3,&46,&f6,&45,&2c,&53
+            .byte &d4,&50,&20,&8a,&46,&c7,&4c,&2e
+            .byte &41,&a4,&5c,&20,&14,&d9,&f2,&54
+            .byte &2c,&5c,&20,&53,&43,&ab,&d6,&21
+            .byte &8b,&9e,&8b,&52,&9d,&49,&a4,&d0
+            .byte &4c,&af,&43,&45,&21,&0d,&23,&89
+            .byte &8e,&56,&c9,&49,&da,&9d,&65,&20
+            .byte &49,&a4,&0d,&23,&8b,&52,&9d,&ae
+            .byte &9d,&56,&c9,&49,&da,&9d,&65,&a4
+            .byte &0d,&5d,&2c,&0d,&5e,&2c,&0d,&5f
+            .byte &2c,&0d,&60,&2c,&0d,&5d,&5f,&2c
+            .byte &0d,&5d,&60,&2c,&0d,&5e,&5f,&2c
+            .byte &0d,&5e,&60,&2c,&0d,&19,&2c,&0d
+            .byte &67,&2c,&0d,&8a,&0d,&23,&5c,&20
+            .byte &24,&20,&8a,&14,&d2,&47,&9d,&4f
+            .byte &46,&46,&20,&89,&7c,&2e,&89,&c6
+            .byte &a1,&57,&0a,&ad,&a4,&4f,&bd,&a3
+            .byte &5c,&a3,&0f,&b2,&54,&aa,&45,&a0
+            .byte &e9,&4c,&4b,&2e,&0d,&23,&5c,&20
+            .byte &24,&20,&89,&54,&ab,&45,&2c,&c1
+            .byte &20,&5c,&a3,&46,&d6,&9b,&20,&41
+            .byte &ea,&c5,&9e,&49,&e8,&aa,&53,&b3
+            .byte &b2,&9c,&2c,&8a,&24,&20,&67,&20
+            .byte &41,&47,&41,&a9,&2e,&57,&13,&21
+            .byte &5c,&27,&52,&9d,&03,&20,&c5,&44
+            .byte &d1,&50,&21,&0d,&2b,&23,&4d,&b7
+            .byte &ef,&dc,&3a,&2b,&3d,&23,&b8,&4f
+            .byte &50,&20,&b6,&21,&4c,&bc,&56,&9d
+            .byte &4d,&9d,&c7,&b3,&45,&21,&49,&27
+            .byte &a7,&7e,&a8,&49,&a4,&50,&cb,&7a
+            .byte &08,&99,&20,&53,&55,&52,&ab,&c7
+            .byte &c9,&9f,&8f,&89,&4d,&e5,&af,&54
+            .byte &2c,&49,&46,&20,&5c,&20,&c1,&98
+            .byte &4d,&a9,&44,&21,&3d,&0d,&23,&89
+            .byte &b8,&55,&52,&44,&a2,&25,&20,&49
+            .byte &a4,&68,&2e,&0d,&23,&89,&b8,&55
+            .byte &52,&44,&a2,&25,&20,&49,&a4,&69
+            .byte &44,&2e,&0d,&23,&89,&cb,&e8,&20
+            .byte &49,&a4,&4f,&46,&46,&2e,&0d,&23
+            .byte &89,&cb,&e8,&20,&1b,&52,&4e,&a4
+            .byte &6d,&a1,&16,&5a,&5a,&4c,&99,&20
+            .byte &a9,&54,&af,&53,&b6,&59,&2e,&0d
+            .byte &23,&89,&cb,&e8,&20,&49,&a4,&46
+            .byte &fd,&99,&2e,&0d,&23,&89,&cb,&e8
+            .byte &20,&ca,&e0,&a4,&4f,&e7,&2e,&0d
+            .byte &23,&57,&52,&b6,&9d,&76,&23,&c7
+            .byte &49,&43,&45,&21,&0d,&23,&89,&25
+            .byte &20,&49,&a4,&c5,&44,&9d,&6e,&a1
+            .byte &d4,&9a,&2c,&50,&ab,&43,&49,&9b
+            .byte &20,&c7,&dd,&a2,&8a,&08,&ae,&a4
+            .byte &89,&e6,&42,&c3,&a7,&7b,&89,&23
+            .byte &4b,&b2,&df,&a4,&44,&59,&e3,&b8
+            .byte &59,&2e,&0d,&23,&89,&43,&dd,&ff
+            .byte &20,&49,&a4,&57,&ae,&4d,&2c,&6d
+            .byte &4d,&ac,&a2,&db,&f1,&45,&54,&53
+            .byte &2e,&0d,&23,&b8,&4f,&50,&20,&50
+            .byte &cb,&59,&99,&20,&6d,&5c,&a3,&25
+            .byte &21,&b6,&27,&a4,&42,&41,&a0,&4d
+            .byte &ac,&4e,&aa,&53,&21,&0d,&23,&89
+            .byte &25,&20,&49,&a4,&46,&0a,&48,&9c
+            .byte &45,&a0,&6e,&02,&b3,&2c,&b6,&a4
+            .byte &ad,&41,&56,&a2,&4c,&a9,&4b,&a4
+            .byte &af,&43,&52,&12,&b1,&a0,&6d,&52
+            .byte &12,&9f,&6e,&41,&dc,&a4,&1e,&b8
+            .byte &2e,&0d,&23,&a8,&49,&a4,&49,&a4
+            .byte &cb,&e8,&20,&25,&2e,&0d,&23,&89
+            .byte &25,&20,&ae,&9d,&a1,&4c,&d9,&a9
+            .byte &9b,&20,&50,&a9,&4b,&20,&be,&4c
+            .byte &b5,&52,&2c,&8a,&4b,&4e,&b6,&b1
+            .byte &a0,&b5,&9f,&7b,&a1,&48,&b9,&52
+            .byte &49,&42,&c3,&2c,&c5,&9e,&c5,&44
+            .byte &9d,&46,&49,&1c,&9d,&28,&41,&a4
+            .byte &4f,&50,&db,&c6,&a0,&76,&50,&a9
+            .byte &45,&2c,&4f,&a3,&53,&e5,&45,&a8
+            .byte &99,&29,&2e,&0d,&23,&8b,&53,&9d
+            .byte &ae,&9d,&74,&20,&25,&2e,&0d,&23
+            .byte &89,&25,&20,&49,&a4,&a1,&47,&c0
+            .byte &56,&9d,&cf,&47,&47,&aa,&27,&53
+            .byte &2e,&0d,&23,&4d,&4d,&4d,&21,&8b
+            .byte &53,&9d,&57,&aa,&9d,&54,&ab,&c4
+            .byte &a2,&7a,&31,&39,&37,&31,&2c,&57
+            .byte &aa,&45,&98,&8b,&59,&3f,&14,&b2
+            .byte &46,&b9,&4d,&53,&2c,&8a,&c7,&4c
+            .byte &20,&a8,&b2,&3f,&0d,&23,&89,&68
+            .byte &20,&d9,&42,&ab,&d7,&a1,&43,&b2
+            .byte &43,&ad,&a4,&7a,&89,&90,&20,&8a
+            .byte &da,&13,&a4,&87,&2e,&0d,&a1,&0d
+            .byte &41,&9e,&0d,&53,&e5,&9d,&0d,&a1
+            .byte &50,&f4,&a3,&7b,&0d,&2c,&0d,&23
+            .byte &89,&25,&20,&ca,&e0,&4c,&9d,&71
+            .byte &4d,&a4,&76,&42,&9d,&b8,&55,&f1
+            .byte &2e,&0d,&23,&89,&25,&20,&47,&dd
+            .byte &57,&a4,&6d,&a1,&62,&9d,&41,&55
+            .byte &c0,&21,&89,&ca,&e0,&4c,&9d,&db
+            .byte &a9,&54,&a4,&0d,&23,&5c,&20,&46
+            .byte &a9,&a0,&0d,&23,&10,&aa,&45,&3f
+            .byte &0d,&23,&a5,&d1,&98,&47,&55,&b7
+            .byte &53,&21,&0d,&23,&89,&61,&49,&a4
+            .byte &ac,&e1,&a2,&8f,&08,&99,&20,&cf
+            .byte &b8,&55,&52,&42,&e0,&2e,&0d,&23
+            .byte &89,&61,&49,&a4,&44,&bc,&44,&2e
+            .byte &0d,&23,&89,&61,&49,&a4,&0a,&c3
+            .byte &04,&2e,&0d,&23,&89,&61,&ad,&ae
+            .byte &a4,&89,&25,&20,&8a,&46,&c7,&4c
+            .byte &a4,&bf,&45,&ea,&a3,&a9,&76,&bb
+            .byte &a4,&44,&ab,&d6,&53,&2e,&0d,&23
+            .byte &89,&61,&57,&ff,&b7,&2c,&71,&a4
+            .byte &5c,&20,&8a,&7a,&41,&9e,&a9,&b8
+            .byte &ac,&54,&2c,&b4,&a4,&44,&c0,&57
+            .byte &9e,&bb,&a4,&01,&9a,&a2,&fc,&b9
+            .byte &44,&2e,&6d,&a1,&53,&99,&c3,&2c
+            .byte &46,&cb,&0f,&99,&20,&da,&13,&2c
+            .byte &89,&c0,&5a,&b9,&2d,&e0,&47,&9d
+            .byte &7b,&89,&57,&bc,&50,&7e,&53,&d4
+            .byte &43,&45,&a4,&a8,&52,&b5,&de,&20
+            .byte &5c,&a3,&ca,&f1,&2c,&8a,&5c,&a3
+            .byte &ad,&41,&a0,&df,&d7,&53,&2c,&d4
+            .byte &46,&45,&82,&4c,&59,&2c,&c7,&b3
+            .byte &47,&20,&89,&46,&dd,&b9,&2e,&0d
+            .byte &23,&89,&61,&0f,&b5,&54,&a4,&8f
+            .byte &5c,&20,&c8,&a3,&cf,&b8,&55,&52
+            .byte &42,&99,&20,&bb,&a7,&8a,&4c,&bc
+            .byte &56,&b7,&2c,&43,&dd,&53,&99,&20
+            .byte &89,&c1,&4f,&a3,&08,&48,&a9,&a0
+            .byte &bb,&4d,&2e,&0d,&23,&a5,&c1,&98
+            .byte &4b,&ee,&a6,&b6,&2e,&43,&b5,&4c
+            .byte &a0,&5c,&20,&e9,&a7,&49,&9f,&c8
+            .byte &a3,&f2,&3f,&0d,&23,&5c,&20,&53
+            .byte &99,&20,&89,&cb,&b1,&53,&9f,&4e
+            .byte &d9,&08,&a3,&42,&a2,&89,&46,&d6
+            .byte &9b,&20,&ad,&41,&56,&a2,&f2,&54
+            .byte &c7,&20,&e1,&b5,&50,&2c,&23,&55
+            .byte &52,&ac,&49,&55,&a7,&23,&a8,&55
+            .byte &c4,&aa,&d5,&4c,&54,&2c,&56,&aa
+            .byte &a2,&4c,&b5,&44,&4c,&59,&2e,&0d
+            .byte &23,&5c,&20,&53,&99,&20,&a1,&42
+            .byte &bc,&55,&b0,&46,&55,&4c,&20,&4c
+            .byte &55,&4c,&cb,&42,&a2,&41,&42,&b5
+            .byte &9f,&53,&4b,&49,&eb,&99,&20,&a8
+            .byte &52,&b5,&de,&20,&a1,&4d,&bc,&c1
+            .byte &57,&2c,&47,&41,&8b,&52,&99,&20
+            .byte &46,&dd,&57,&aa,&53,&2e,&89,&57
+            .byte &b9,&4c,&a0,&71,&4d,&a4,&a1,&08
+            .byte &54,&b1,&a3,&50,&cb,&43,&45,&2e
+            .byte &0d,&23,&5c,&20,&e1,&49,&50,&20
+            .byte &89,&43,&b4,&7a,&b0,&9a,&4c,&a2
+            .byte &8a,&b8,&ae,&9f,&76,&54,&57,&c9
+            .byte &9f,&49,&9f,&ae,&b5,&4e,&a0
+l4c50:      .byte &89,&47,&55,&ae,&44,&27,&a4,&ca
+            .byte &f1,&2e,&41,&a4,&89,&cb,&53,&9f
+            .byte &42,&ab,&41,&a8,&20,&7b,&d4,&46
+            .byte &9d,&49,&a4,&53,&f0,&0b,&5a,&45
+            .byte &a0,&6e,&bb,&a4,&d5,&44,&59,&2c
+            .byte &48,&9d,&fe,&d9,&50,&a4,&76,&89
+            .byte &46,&dd,&b9,&2e,&0d,&23,&5c,&20
+            .byte &ca,&45,&a0,&a1,&57,&bc,&50,&b3
+            .byte &2e,&0d,&23,&89,&61,&da,&4f,&f1
+            .byte &a4,&5c,&a3,&57,&1f,&2e,&0d,&23
+            .byte &89,&ac,&43,&49,&af,&9f,&43,&b4
+            .byte &7a,&44,&c9,&03,&4c,&bd,&a4,&a9
+            .byte &76,&a1,&50,&e7,&9d,&7b,&17,&b8
+            .byte &2c,&57,&bb,&d3,&20,&4d,&99,&c3
+            .byte &a4,&6d,&89,&53,&55,&52,&52,&b5
+            .byte &c4,&99,&20,&cf,&52,&9f,&8a,&49
+            .byte &a4,&dd,&53,&9f,&c8,&ab,&56,&aa
+            .byte &21,&0d,&23,&a1,&61,&68,&a4,&89
+            .byte &c1,&4f,&a3,&8a,&af,&54,&aa,&a4
+            .byte &89,&6a,&2e,&0d,&23,&89,&c1,&4f
+            .byte &a3,&49,&a4,&68,&2e,&0d,&23,&89
+            .byte &c1,&4f,&a3,&49,&a4,&69,&44,&2e
+            .byte &0d,&23,&89,&c1,&4f,&a3,&49,&a4
+            .byte &6b,&2e,&0d,&23,&89,&c1,&4f,&a3
+            .byte &53,&cb,&4d,&a4,&53,&e9,&9f,&08
+            .byte &48,&a9,&a0,&5c,&21,&0d,&23,&5c
+            .byte &20,&24,&20,&89,&25,&2e,&0d,&23
+            .byte &89,&25,&20,&49,&a4,&b5,&9f,&7b
+            .byte &ab,&41,&d3,&21,&0d,&23,&49,&9f
+            .byte &49,&a4,&50,&b6,&d3,&20,&74,&2e
+            .byte &0d,&23,&89,&25,&20,&ae,&9d,&e6
+            .byte &42,&df,&49,&44,&aa,&45,&a0,&6d
+            .byte &89,&ae,&4d,&a4,&7b,&23,&4b,&b2
+            .byte &df,&53,&2e,&0d,&23,&89,&25,&20
+            .byte &57,&41,&a4,&c5,&44,&9d,&7a,&23
+            .byte &b1,&58,&0a,&21,&0d,&23,&4a,&12
+            .byte &9f,&5c,&a3,&d0,&5a,&45,&21,&0d
+            .byte &23,&89,&25,&20,&49,&a4,&52,&b5
+            .byte &de,&2c,&c0,&47,&dc,&a0,&8a,&46
+            .byte &e7,&a8,&a2,&6d,&d8,&c9,&7e,&cf
+            .byte &52,&54,&2e,&0d,&23,&8b,&9e,&5c
+            .byte &20,&b8,&d6,&50,&20,&89,&bf,&1c
+            .byte &49,&a4,&b5,&9f,&7b,&f9,&49,&b8
+            .byte &af,&43,&45,&21,&0d,&23,&89,&25
+            .byte &20,&49,&a4,&53,&c5,&d7,&2e,&41
+            .byte &9e,&a9,&53,&43,&52,&49,&50,&b0
+            .byte &7e,&ab,&fd,&53,&3a,&22,&23,&a8
+            .byte &49,&a4,&25,&20,&b4,&a4,&a1,&c5
+            .byte &58,&49,&4d,&55,&a7,&93,&20,&d1
+            .byte &50,&f6,&b6,&a2,&7b,&34,&35,&2e
+            .byte &34,&36,&20,&4c,&b6,&ab,&53,&22
+            .byte &2e,&0d,&23,&5c,&20,&ca,&45,&a0
+            .byte &93,&2e,&0d,&23,&46,&49,&d7,&20
+            .byte &a1,&43,&b3,&cc,&a9,&aa,&2e,&0d
+            .byte &23,&89,&48,&8f,&49,&a4,&46,&55
+            .byte &d7,&21,&0d,&23,&5c,&20,&d1,&98
+            .byte &f5,&20,&24,&2e,&0d,&23,&b5,&d3
+            .byte &21,&5c,&20,&57,&c7,&4b,&45,&a0
+            .byte &a9,&76,&a1,&db,&a9,&b1,&a0,&b8
+            .byte &c7,&f6,&b0,&54,&9d,&7a,&89,&74
+            .byte &21,&0d,&27,&23,&aa,&45,&2c,&b8
+            .byte &4f,&50,&20,&db,&4b,&99,&20,&f2
+            .byte &2c,&5c,&20,&43,&ad,&45,&4b,&a2
+            .byte &25,&21,&0d,&23,&b6,&27,&a4,&a1
+            .byte &1a,&9f,&00,&a8,&2d,&45,&b2,&af
+            .byte &21,&0d,&23,&89,&25,&20,&49,&a4
+            .byte &af,&43,&52,&12,&b1,&a0,&6d,&17
+            .byte &1a,&b7,&21,&0d,&23,&89,&25,&20
+            .byte &49,&a4,&43,&c0,&46,&b1,&a0,&6e
+            .byte &db,&4c,&c9,&ad,&a0,&d0,&4c,&56
+            .byte &aa,&21,&0d,&23,&a8,&49,&a4,&25
+            .byte &20,&dd,&4f,&4b,&a4,&d4,&4b,&9d
+            .byte &54,&ab,&0a,&55,&ab,&21,&0d,&23
+            .byte &89,&25,&20,&52,&b2,&54,&c3,&a4
+            .byte &57,&ad,&9e,&5c,&20,&53,&b4,&4b
+            .byte &9d,&b6,&2e,&0d,&23,&89,&25,&20
+            .byte &49,&a4,&46,&0a,&48,&9c,&45,&a0
+            .byte &6e,&43,&4c,&bc,&a3,&43,&52,&59
+            .byte &b8,&c7,&21,&0d,&23,&89,&25,&20
+            .byte &49,&a4,&c5,&44,&9d,&7b,&32,&32
+            .byte &20,&43,&ae,&8f,&f5,&4c,&44,&21
+            .byte &0d,&23,&8b,&a2,&ae,&9d,&c0,&47
+            .byte &dc,&44,&2c,&1b,&9f,&43,&c3,&ac
+            .byte &2e,&0d,&23,&89,&25,&20,&49,&a4
+            .byte &b8,&52,&d2,&47,&20,&6d,&0f,&a9
+            .byte &99,&20,&ea,&ae,&4c,&53,&21,&0d
+            .byte &23,&89,&25,&20,&b4,&a4,&a1,&4c
+            .byte &ae,&47,&9d,&ef,&eb,&bb,&ab,&21
+            .byte &0d,&23,&b6,&27,&a4,&a1,&23,&50
+            .byte &aa,&d0,&41,&9e,&25,&21,&0d,&23
+            .byte &4d,&4d,&4d,&21,&c1,&98,&5c,&20
+            .byte &4a,&12,&9f,&dd,&56,&9d,&81,&46
+            .byte &ab,&0f,&2c,&43,&ae,&d5,&d4,&43
+            .byte &20,&ae,&4f,&c5,&3f,&0d,&23,&5c
+            .byte &20,&24,&20,&4c,&b3,&47,&20,&8a
+            .byte &bf,&04,&2c,&8a,&55,&ca,&ae
+l4f4f:      .byte &a8,&20,&a1,&57,&49,&8b,&ab,&a0
+            .byte &43,&b9,&50,&c6,&2c,&57,&bb,&d3
+            .byte &20,&44,&c9,&03,&4c,&bd,&a4,&a9
+            .byte &76,&a1,&50,&e7,&9d,&7b,&44,&12
+            .byte &9f,&8a,&49,&a4,&53,&43,&b2,&54
+            .byte &aa,&45,&a0,&42,&a2,&89,&46,&b5
+            .byte &a3,&90,&53,&21,&0d,&23,&89,&53
+            .byte &8a,&49,&a4,&0e,&a2,&8a,&89,&ed
+            .byte &4c,&9d,&f0,&49,&f1,&4c,&a2,&46
+            .byte &49,&d7,&a4,&a9,&2e,&0d,&23,&89
+            .byte &44,&d6,&50,&20,&53,&8a,&49,&a4
+            .byte &46,&02,&a7,&8a,&5c,&20,&24,&20
+            .byte &a1,&4c,&ae,&47,&9d,&50,&b6,&2e
+            .byte &0d,&23,&6d,&89,&74,&20,&47,&cb
+            .byte &53,&c6,&a4,&b3,&2c,&89,&4d,&c9
+            .byte &9f,&c2,&54,&c7,&4c,&a2,&4f,&42
+            .byte &53,&43,&55,&ab,&a4,&5c,&a3,&56
+            .byte &c9,&9c,&2e,&5c,&20,&07,&49,&50
+            .byte &20,&8a,&ae,&9d,&43,&b3,&43,&12
+            .byte &c6,&a0,&41,&a4,&5c,&20,&bb,&9f
+            .byte &89,&46,&dd,&b9,&2e,&57,&ad,&9e
+            .byte &5c,&20,&57,&ff,&45,&2c,&5c,&20
+            .byte &46,&a9,&a0,&5c,&52,&c6,&4c,&46
+            .byte &20,&8f,&89,&c8,&4f,&9f,&7b,&89
+            .byte &88,&2c,&5c,&a3,&db,&53,&53,&b7
+            .byte &53,&9c,&a4,&47,&b3,&45,&21,&0d
+            .byte &23,&f5,&a0,&ad,&4c,&50,&a4,&a8
+            .byte &4f,&53,&9d,&57,&ed,&20,&ad,&4c
+            .byte &50,&20,&8b,&4d,&c6,&4c,&56,&b7
+            .byte &21,&0d,&22,&23,&a5,&ab,&be,&47
+            .byte &4e,&c9,&9d,&0d,&81,&ef,&f1,&99
+            .byte &21,&0d,&a8,&4f,&53,&9d,&47,&dd
+            .byte &56,&b7,&2e,&8b,&59,&27,&52,&9d
+            .byte &89,&23,&4b,&99,&27,&53,&21,&0d
+            .byte &81,&b4,&02,&21,&0d,&a8,&4f,&53
+            .byte &9d,&46,&55,&52,&b0,&56,&9d,&45
+            .byte &59,&b7,&21,&0d,&81,&54,&b9,&03
+            .byte &21,&0d,&a8,&4f,&53,&9d,&42,&8c
+            .byte &a2,&c3,&47,&53,&21,&0d,&a8,&4f
+            .byte &53,&9d,&ac,&4b,&4c,&b7,&21,&0d
+            .byte &a8,&4f,&53,&9d,&46,&0b,&54,&21
+            .byte &0d,&a8,&4f,&53,&9d,&48,&8c,&53
+            .byte &21,&0d,&23,&5c,&20,&42,&9d,&89
+            .byte &44,&b7,&50,&aa,&b2,&9d,&43,&52
+            .byte &49,&4d,&a9,&c7,&20,&6e,&89,&6c
+            .byte &53,&2c,&59,&b3,&44,&aa,&21,&5c
+            .byte &27,&d7,&20,&ee,&9f,&be,&4d,&9d
+            .byte &41,&d5,&ae,&a0,&4d,&a2,&95,&22
+            .byte &2c,&0f,&b5,&54,&a4,&89,&23,&d1
+            .byte &50,&cc,&a9,&2c,&8a,&b0,&45,&a4
+            .byte &5c,&a3,&ca,&f1,&20,&a9,&76,&56
+            .byte &ae,&49,&9b,&20,&ef,&e7,&b9,&27
+            .byte &a4,&4b,&ee,&54,&53,&21,&0d,&22
+            .byte &23,&ad,&d7,&4f,&20,&8b,&ab,&2c
+            .byte &62,&aa,&21,&5c,&27,&d7,&20,&42
+            .byte &9d,&57,&ac,&54,&a9,&27,&20,&50
+            .byte &0a,&ef,&47,&9d,&7e,&4d,&a2,&56
+            .byte &b7,&c6,&4c,&2c,&57,&49,&d7,&20
+            .byte &27,&45,&3f,&44,&df,&50,&20,&5c
+            .byte &a3,&79,&67,&20,&8b,&ab,&2c,&c8
+            .byte &a3,&1e,&59,&4d,&af,&54,&2c,&d4
+            .byte &4b,&45,&22,&2c,&0d,&ef,&59,&a4
+            .byte &89,&23,&d1,&50,&cc,&a9,&2e,&0d
+            .byte &22,&23,&19,&20,&5c,&a3,&db,&4f
+            .byte &50,&20,&bf,&f1,&2c,&c5,&b1,&59
+            .byte &21,&a5,&57,&ac,&9f,&4d,&b9,&9d
+            .byte &54,&ab,&0a,&55,&ab,&22,&2c,&0d
+            .byte &22,&23,&53,&bb,&bd,&a3,&4d,&9d
+            .byte &b0,&4d,&42,&aa,&53,&21,&a8,&b2
+            .byte &27,&d7,&20,&c1,&20,&4e,&49,&43
+            .byte &cd,&59,&2c,&d0,&52,&22,&2c,&0d
+            .byte &23,&50,&ab,&53,&53,&3c,&26,&ab
+            .byte &54,&55,&52,&4e,&26,&3c,&c8,&a3
+            .byte &ac,&4f,&8b,&a3,&47,&d6,&45,&2e
+            .byte &0d,&22,&23,&ad,&d7,&4f,&21,&c7
+            .byte &a8,&b5,&de,&20,&23,&49,&27,&a7
+            .byte &a1,&08,&47,&47,&ae,&2c,&23,&49
+            .byte &27,&a7,&41,&a4,&d3,&e2,&53,&a2
+            .byte &41,&a4,&0c,&aa,&59,&b3,&9d,&cd
+            .byte &c6,&2c,&4f,&4b,&1f,&3f,&03,&20
+            .byte &4a,&12,&9f,&44,&df,&50,&20,&0d
+            .byte &53,&e5,&9d,&c8,&4f,&a0,&0d,&a1
+            .byte &42,&41,&a3,&7b,&03,&41,&50,&20
+            .byte &0d,&a1,&da,&ac,&4b,&45,&9f,&0d
+            .byte &67,&20,&8b,&52,&9d,&c8,&a3,&f2
+            .byte &22,&2c,&ef,&59,&a4,&89,&08,&47
+            .byte &47,&ae,&2e,&0d,&22,&23,&bb,&21
+            .byte &49,&27,&56,&9d,&b4,&a0,&a1,&57
+            .byte &0a,&48,&22,&2c,&ef,&59,&a4,&89
+            .byte &08,&47,&47,&ae,&2c,&57,&41,&56
+            .byte &99,&20,&89,&03,&41,&50,&2e,&0d
+            .byte &23,&41,&9e,&4f,&42,&4a,&45,&43
+            .byte &9f,&46,&c7,&4c,&a4,&76,&89,&46
+            .byte &dd,&b9,&21,&0d,&22,&23,&08,&d1
+            .byte &12,&9d,&5c,&27,&56,&9d,&08,&45
+            .byte &9e,&03,&20,&4e,&49,&43,&9d,&76
+            .byte &f2,&2c,&b4,&56,&9d,&8b,&53,&9d
+            .byte &4d,&b6,&54,&af,&53,&22,&2c,&ef
+            .byte &59,&a4,&89,&08,&47,&47,&ae,&2c
+            .byte &47,&af,&aa,&9b,&4c,&59,&2e,&0d
+            .byte &23,&89,&1b,&e7,&44,&99,&20,&ab
+            .byte &53,&b5,&c4,&a4,&6d,&a1,&dd,&a6
+            .byte &50,&b6,&43,&ad,&a0,&e9,&a7,&41
+            .byte &a4,&89,&c5,&53,&d0,&56,&9d,&c1
+            .byte &4f,&a3,&53,&dd,&57,&4c,&a2,&68
+            .byte &53,&2c,&ab,&56,&bc,&4c,&99,&2c
+            .byte &41,&a4,&49,&9f,&c1,&45,&a4,&03
+            .byte &2c,&89,&cf,&4d,&4c,&a2,&d4,&9f
+            .byte &a9,&54,&aa,&49,&4f,&a3,&7b,&89
+            .byte &97,&21,&0d,&23,&57,&cd,&4c,&20
+            .byte &44,&b3,&45,&21,&5c,&20,&b4,&56
+            .byte &9d,&be,&e8,&c3,&b1,&a0,&22,&23
+            .byte &c9,&4c,&8a,&7b,&23,&58,&41,&ac
+            .byte &22,&20,&8a,&b4,&56,&9d,&a1,&c5
+            .byte &58,&49,&4d,&55,&a7,&53,&43,&b9
+            .byte &9d,&7b,&32,&35,&30,&20,&db,&a9
+            .byte &54,&53,&21,&0d,&53,&21,&0d,&22
+            .byte &23,&ad,&d7,&4f,&20,&8b,&ab,&2c
+            .byte &62,&23,&89,&54,&ab,&4d,&af,&44
+            .byte &9b,&20,&db,&05,&a3,&7b,&89,&93
+            .byte &46,&c7,&4c,&20,&46,&b9,&43,&45
+            .byte &a4,&5c,&20,&76,&5c,&a3,&4b,&ca
+            .byte &45,&a4,&8a,&5c,&20,&be,&4c,&cb
+            .byte &50,&c6,&2c,&42,&ab,&41,&a8,&82
+            .byte &4c,&59,&2c,&76,&89,&46,&dd,&b9
+            .byte &21,&5c,&20,&47,&4c,&ac,&43,&9d
+            .byte &5d,&57,&ae,&44,&a4,&8a,&c5,&4b
+            .byte &9d,&b5,&9f,&89,&b4,&5a,&a2,&53
+            .byte &b4,&50,&9d,&7b,&a1,&77,&20,&af
+            .byte &07,&ac,&43,&9d,&08,&59,&b3,&44
+            .byte &2e,&8b,&9e,&0c,&aa,&59,&a8,&99
+            .byte &20,&f5,&45,&a4,&42,&cb,&f1,&2e
+            .byte &0d,&23,&5b,&d2,&bf,&a3,&89,&43
+            .byte &c0,&0f,&99,&20,&93,&46,&c7,&4c
+            .byte &2c,&89,&68,&20,&d9,&42,&ab,&d7
+            .byte &a1,&ad,&4c,&a0,&ef,&46,&cd,&a2
+            .byte &6f,&5c,&2e,&89,&10,&b6,&9d,&93
+            .byte &20,&52,&12,&ad,&a4,&1e,&b8,&2c
+            .byte &b6,&a4,&53,&50,&c0,&a2,&03,&ff
+            .byte &99,&20,&5c,&20,&76,&89,&53,&4b
+            .byte &a9,&2e,&a8,&52,&b5,&de,&20,&89
+            .byte &05,&9f,&b4,&5a,&45,&2c,&76,&89
+            .byte &5d,&2c,&5c,&20,&71,&20,&89,&af
+            .byte &07,&ac,&43,&9d,&76,&a1,&74,&20
+            .byte &77,&2e,&0d,&23,&5b,&7a,&a1,&53
+            .byte &c5,&d7,&2c,&cf,&4d,&4c,&a2,&d4
+            .byte &9f,&6c,&2c,&46,&e7,&c3,&a0,&6d
+            .byte &89,&b8,&af,&d3,&20,&7b,&44,&bc
+            .byte &a8,&20,&8a,&bf,&d1,&59,&2e,&89
+            .byte &e4,&e2,&a8,&2c,&e1,&ac,&b6,&9d
+            .byte &64,&a4,&71,&a7,&76,&69,&20,&7a
+            .byte &7e,&5c,&2c,&66,&82,&20,&8a,&4d
+            .byte &af,&f6,&99,&21,&76,&89,&5d,&20
+            .byte &dd,&e5,&a4,&a1,&e9,&dc,&2c,&02
+            .byte &7e,&c1,&b9,&2e,&0d,&23,&5b,&8f
+            .byte &a1,&44,&bc,&a0,&af,&a0,&7a,&89
+            .byte &43,&b9,&8d,&b9,&2e,&89,&6c,&a4
+            .byte &5e,&20,&7b,&5c,&20,&06,&56,&9d
+            .byte &57,&41,&a2,&76,&52,&b5,&de,&2c
+            .byte &1c,&49,&f1,&20,&64,&53,&2c,&8a
+            .byte &89,&43,&45,&e7,&99,&20,&49,&a4
+            .byte &03,&20,&dd,&57,&2c,&81,&5b,&46
+            .byte &b9,&43,&45,&a0,&76,&b8,&e2,&50
+            .byte &2e,&0d,&23,&5b,&7a,&a1,&4c,&b3
+            .byte &47,&2c,&5f,&2d,&60,&20,&43,&b9
+            .byte &8d,&b9,&2e,&f8,&8b,&a3,&78,&20
+            .byte &7b,&5c,&2c,&6b,&20,&6c,&a4,&b8
+            .byte &ab,&54,&d3,&20,&a9,&76,&89,&47
+            .byte &dd,&e5,&2e,&0d,&23,&5b,&8f,&89
+            .byte &60,&aa,&9e,&af,&a0,&7b,&89,&4c
+            .byte &b3,&47,&20,&43,&b9,&8d,&b9,&2e
+            .byte &5e,&20,&7b,&5b,&89,&cb,&53,&9f
+            .byte &7b,&89,&6b,&20,&6c,&53,&2e,&a1
+            .byte &4e,&ae,&df,&a6,&ae,&d3,&57,&41
+            .byte &a2,&49,&a4,&4a,&12,&9f,&56,&c9
+            .byte &49,&da,&9d,&d6,&b3,&47,&53,&9f
+            .byte &89,&53,&b4,&c1,&57,&a4,&7b,&89
+            .byte &5d,&20,&64,&2e,&0d,&23,&5b,&7a
+            .byte &a1,&54,&57,&49,&b8,&99,&20,&7d
+            .byte &20,&7b,&45,&d3,&4f,&99,&20,&43
+            .byte &b9,&8d,&b9,&53,&2e,&bc,&d3,&20
+            .byte &53,&b5,&4e,&a0,&5c,&20,&c5,&4b
+            .byte &9d,&71,&4d,&a4,&d6,&50,&d4,&46
+            .byte &49,&45,&a0,&41,&a4,&49,&9f,&42
+            .byte &b5,&4e,&43,&45,&a4,&08,&54,&05
+            .byte &45,&9e,&89,&be,&4c,&44,&2c,&df
+            .byte &f1,&20,&64,&53,&21,&0d,&23,&5b
+            .byte &7a,&89,&61,&6a,&20,&7b,&89,&4b
+            .byte &45,&04,&2e,&d4,&9a,&20,&b8,&ab
+            .byte &d6,&a4,&7a,&6e,&41,&9e,&68,&20
+            .byte &c1,&b9,&57,&41,&a2,&76,&89,&5d
+            .byte &2c,&ab,&41,&d3,&99,&20,&0c,&aa
+            .byte &a2,&43,&b9,&4e,&aa,&2c,&53,&ed
+            .byte &57,&99,&20,&89,&46,&e7,&a8,&20
+            .byte &8a,&53,&f0,&c7,&4f,&a3,&81,&41
+            .byte &42,&b5,&c4,&53,&21,&a1,&53,&43
+            .byte &17,&46,&46,&a2,&61,&49,&a4,&53
+            .byte &c3,&04,&99,&20,&7e,&a1,&48,&ae
+            .byte &44,&2c,&57,&e2,&bf,&9e,&42,&af
+            .byte &d3,&20,&c6,&9f,&a9,&76,&89,&5d
+            .byte &20,&64,&2e,&0d,&23,&5b,&7e,&a1
+            .byte &88,&c2,&50,&20,&5d,&20,&7b,&89
+            .byte &4b,&45,&04,&2c,&dd,&4f,&4b,&99
+            .byte &20,&67,&20,&a1,&44,&ac,&47,&aa
+            .byte &9b,&20,&53,&43,&ab,&9d,&53,&dd
+            .byte &50,&9d,&76,&a1,&74,&20,&73,&08
+            .byte &59,&b3,&44,&2e,&0d,&23,&5b,&7e
+            .byte &89,&88,&c2,&50,&20,&5d,&60,&20
+            .byte &7b,&89,&4b,&45,&04,&2e,&76,&89
+            .byte &5d,&2c,&67,&20,&89,&88,&2c,&89
+            .byte &74,&20,&73,&53,&50,&ab,&fd,&a4
+            .byte &f6,&df,&53,&a4,&a1,&56,&c7,&c3
+            .byte &59,&2e,&0d,&23,&5b,&7e,&89,&88
+            .byte &c2,&50,&20,&5d,&5f,&20,&7b,&89
+            .byte &4b,&45,&04,&2e,&5d,&2c,&67,&20
+            .byte &89,&88,&2c,&49,&a4,&89,&c8,&ab
+            .byte &b8,&2e,&0d,&23,&5b,&7e,&a1,&be
+            .byte &42,&42,&c3,&a0,&75,&57,&41,&a2
+            .byte &4c,&bc,&44,&99,&20,&5e,&60,&20
+            .byte &76,&5d,&5f,&20,&67,&20,&89,&88
+            .byte &2e,&0d,&23,&5b,&7e,&a1,&be,&42
+            .byte &42,&c3,&a0,&75,&57,&41,&a2,&57
+            .byte &bb,&d3,&20,&4c,&bc,&44,&a4,&5e
+            .byte &5f,&20,&76,&5d,&60,&20,&67,&20
+            .byte &89,&88,&2e,&0d,&23,&5b,&7a,&a1
+            .byte &84,&20,&60,&20,&7b,&89,&4b,&45
+            .byte &04,&2e,&bb,&de,&20,&64,&a4,&97
+            .byte &20,&f8,&8b,&a3,&78,&20,&7b,&5c
+            .byte &2c,&0f,&52,&b5,&44,&99,&20,&5c
+            .byte &20,&7a,&a1,&bf,&04,&2c,&be,&4c
+            .byte &a0,&53,&b4,&c1,&57,&2e,&0d,&23
+            .byte &5b,&7a,&a1,&bb,&de,&20,&64,&45
+            .byte &a0,&83,&5f,&20,&7b,&89,&4b,&45
+            .byte &04,&2e,&89,&64,&a4,&b4,&56,&9d
+            .byte &08,&45,&9e,&57,&b9,&9e,&e4,&e2
+            .byte &a8,&20,&4f,&bd,&a3,&89,&47,&af
+            .byte &aa,&b2,&9c,&a4,&8a,&ae,&9d,&d2
+            .byte &53,&55,&52,&4d,&b5,&ba,&41,&42
+            .byte &c3,&2e,&0d,&23,&5b,&7a,&a1,&64
+            .byte &45,&a0,&84,&20,&60,&20,&7b,&89
+            .byte &4b,&45,&04,&2e,&a1,&43,&88,&20
+            .byte &42,&ab,&45,&5a,&9d,&ab,&44,&44
+            .byte &af,&a4,&5c,&a3,&46,&f6,&45,&2e
+            .byte &0d,&23,&5b,&7a,&a1,&64,&45,&a0
+            .byte &83,&5f,&20,&7b,&89,&4b,&45,&04
+            .byte &2e,&a1,&0f,&ae,&50,&20,&42,&ab
+            .byte &45,&5a,&9d,&57,&bb,&b8,&c3,&a4
+            .byte &19,&20,&89,&83,&6e,&89,&5e,&2e
+            .byte &0d,&23,&5b,&7e,&a1,&7c,&c2,&50
+            .byte &20,&5e,&60,&20,&7b,&89,&4b,&45
+            .byte &04,&2e,&89,&b8,&52,&b3,&47,&20
+            .byte &90,&20,&cb,&53,&ad,&a4,&89,&c6
+            .byte &a1,&a9,&76,&a1,&54,&55,&52,&00
+            .byte &e7,&2c,&53,&af,&44,&99,&20,&53
+            .byte &55,&52,&46,&20,&19,&20,&89,&4a
+            .byte &41,&47,&dc,&a0,&7c,&2d,&46,&f6
+            .byte &45,&2e,&0d,&23,&5b,&7e,&a1,&4e
+            .byte &ae,&df,&a6,&c3,&44,&47,&9d,&5e
+            .byte &20,&7b,&89,&4b,&45,&04,&2c,&bb
+            .byte &de,&20,&6f,&89,&c0,&47,&99,&20
+            .byte &53,&bc,&2e,&89,&90,&20,&da,&13
+            .byte &a4,&48,&ae,&a0,&8a,&46,&b9,&43
+            .byte &45,&a4,&5c,&20,&92,&41,&47,&41
+            .byte &a9,&53,&9f,&89,&4b,&45,&04,&20
+            .byte &64,&2c,&87,&20,&6e,&89,&bf,&1c
+            .byte &49,&a4,&a8,&df,&57,&9e,&19,&20
+            .byte &42,&a2,&89,&57,&0a,&48,&20,&41
+            .byte &a4,&49,&9f,&43,&c0,&53,&ad,&a4
+            .byte &a9,&76,&89,&53,&ad,&45,&a3,&7c
+            .byte &2e,&0d,&23,&5b,&5e,&5f,&20,&7b
+            .byte &89,&4b,&45,&04,&2c,&7e,&a1,&50
+            .byte &a9,&e3,&43,&4c,&9d,&4f,&56,&aa
+            .byte &dd,&4f,&4b,&99,&20,&89,&53,&bc
+            .byte &2e,&89,&fc,&02,&4c,&99,&20,&90
+            .byte &20,&ed,&57,&4c,&a4,&ae,&b5,&4e
+            .byte &a0,&5c,&2c,&42,&b6,&99,&20,&5c
+            .byte &a3,&11,&b7,&48,&20,&8a,&46,&ab
+            .byte &45,&5a,&99,&20,&5c,&a3,&42,&ab
+            .byte &41,&a8,&21,&0d,&23,&5b,&7e,&a1
+            .byte &50,&cb,&7a,&4f,&56,&aa,&dd,&4f
+            .byte &4b,&99,&20,&a1,&c0,&4d,&53,&b4
+            .byte &f1,&4c,&9d,&47,&c0,&bd,&59,&ae
+            .byte &44,&2e,&89,&90,&20,&ec,&f1,&a4
+            .byte &19,&20,&46,&a9,&9d,&44,&12,&9f
+            .byte &57,&bb,&d3,&20,&be,&56,&aa,&a4
+            .byte &5c,&20,&6e,&ad,&41,&a0,&76,&c2
+            .byte &45,&2c,&8a,&c5,&4b
+l5844:      .byte &45,&a4,&5c,&20,&71,&a7,&de,&4f
+            .byte &b8,&4c,&a2,&57,&bb,&b1,&2e,&0d
+            .byte &23,&5b,&bb,&de,&20,&6f,&a1,&90
+            .byte &fc,&04,&9f,&50,&cb,&a9,&2c,&dd
+            .byte &4f,&4b,&99,&20,&67,&20,&6e,&a1
+            .byte &df,&f1,&a2,&50,&ab,&43,&49,&ec
+            .byte &43,&45,&2e,&89,&b8,&52,&b3,&47
+            .byte &20,&90,&20,&52,&12,&ad,&a4,&50
+            .byte &0a,&9f,&5c,&2c,&a8,&52,&b5,&de
+            .byte &20,&a1,&dd,&a6,&ae,&d3,&57,&41
+            .byte &a2,&76,&89,&5d,&2c,&8a,&a9,&76
+            .byte &89,&4d,&55,&b8,&a2,&77,&53,&2e
+            .byte &0d,&23,&5b,&7e,&a1,&50,&ab,&43
+            .byte &49,&ec,&43,&9d,&46,&41,&a3,&6f
+            .byte &a1,&ea,&42,&da,&9d,&42,&bc,&d3
+            .byte &2e,&89,&da,&55,&b8,&aa,&a2,&90
+            .byte &20,&fc,&02,&4c,&a4,&ae,&b5,&4e
+            .byte &a0,&5c,&2c,&d1,&12,&99,&20,&5c
+            .byte &20,&76,&b1,&45,&b1,&a3,&50,&ab
+            .byte &43,&ae,&49,&9b,&4c,&a2,&7e,&89
+            .byte &e0,&dc,&21,&0d,&23,&5b,&7e,&a1
+            .byte &47,&55,&b8,&a2,&7c,&c2,&50,&20
+            .byte &dd,&4f,&4b,&99,&20,&b5,&9f,&f6
+            .byte &df,&53,&a4,&89,&53,&bc,&2e,&46
+            .byte &41,&a3,&70,&5c,&20,&49,&a4,&a1
+            .byte &57,&e2,&bf,&9e,&4a,&45,&54,&f3
+            .byte &2c,&60,&20,&7b,&57,&bb,&d3,&20
+            .byte &49,&a4,&4d,&e2,&ab,&a0,&a1,&ef
+            .byte &e7,&99,&20,&95,&2e,&0d,&23,&5b
+            .byte &7e,&a1,&ea,&42,&da,&9d,&85,&8f
+            .byte &89,&c8,&4f,&9f,&7b,&a1,&53,&b1
+            .byte &04,&20,&7c,&2e,&a1,&53,&c7,&54
+            .byte &a2,&42,&ab,&45,&5a,&9d,&da,&13
+            .byte &a4,&7a,&6e,&89,&53,&bc,&2e,&0d
+            .byte &23,&5b,&7e,&a1,&ea,&42,&da,&9d
+            .byte &42,&bc,&d3,&2c,&d2,&bf,&a3,&a1
+            .byte &bb,&de,&20,&7c,&2c,&ca,&58,&9f
+            .byte &76,&89,&52,&b5,&de,&20,&53,&bc
+            .byte &2e,&89,&90,&20,&49,&a4,&b8,&52
+            .byte &b3,&47,&2e,&0d,&23,&5b,&7e,&a1
+            .byte &54,&ab,&45,&82,&20,&75,&20,&8f
+            .byte &89,&c8,&4f,&9f,&7b,&a1,&bb,&de
+            .byte &20,&4d,&b5,&ba,&41,&a9,&2e,&b8
+            .byte &ae,&99,&20,&19,&2c,&b6,&a4,&53
+            .byte &b1,&04,&20,&64,&a4,&71,&a7,&76
+            .byte &44,&c9,&41,&eb,&bc,&a3,&a9,&76
+            .byte &89,&43,&4c,&b5,&44,&a2,&53,&4b
+            .byte &59,&2e,&0d,&23,&5c,&20,&8f,&89
+            .byte &d5,&54,&c2,&a7,&7b,&a1,&54,&c7
+            .byte &4c,&2c,&b8,&ae,&4b,&20,&4d,&b5
+            .byte &ba,&41,&a9,&2e,&76,&89,&5d,&2c
+            .byte &8b,&52,&9d,&49,&a4,&a1,&43,&ab
+            .byte &56,&49,&43,&9d,&7a,&89,&78,&20
+            .byte &7b,&89,&4d,&b5,&ba,&41,&a9,&2c
+            .byte &4c,&ae,&47,&9d,&af,&b5,&de,&20
+            .byte &76,&af,&54,&aa,&2e,&0d,&23,&5b
+            .byte &8f,&89,&af,&07,&ac,&43,&9d,&76
+            .byte &a1,&c5,&53,&d0,&56,&9d,&c8,&ab
+            .byte &b8,&2e,&5f,&20,&8a,&60,&20,&7b
+            .byte &5c,&20,&47,&df,&57,&a4,&a1,&a8
+            .byte &b9,&4e,&a2,&ad,&44,&47,&aa,&13
+            .byte &2c,&57,&bb,&d3,&20,&46,&b9,&4d
+            .byte &a4,&a1,&75,&20,&a9,&76,&89,&73
+            .byte &8a,&8b,&9e,&bd,&aa,&a4,&52,&49
+            .byte &9a,&20,&8a,&c3,&46,&54,&2c,&43
+            .byte &dd,&53,&99,&20,&7a,&89,&54,&ab
+            .byte &b7,&2e,&49,&9f,&49,&a4,&d4,&9a
+            .byte &20,&48,&aa,&45,&2c,&1b,&9f,&ea
+            .byte &aa,&99,&20,&a9,&2c,&c7,&4c,&20
+            .byte &49,&a4,&41,&9e,&45,&aa,&49,&9d
+            .byte &42,&cb,&f1,&4e,&b7,&53,&21,&0d
+            .byte &23,&5b,&8f,&89,&e0,&47,&9d,&7b
+            .byte &89,&c8,&ab,&b8,&2c,&5c,&a3,&57
+            .byte &41,&a2,&b5,&9f,&42,&6b,&20,&42
+            .byte &a2,&a1,&a8,&49,&f1,&20,&ad,&44
+            .byte &dc,&2e,&0d,&23,&5b,&8f,&89,&c8
+            .byte &ab,&b8,&27,&a4,&e0,&dc,&2e,&7a
+            .byte &89,&ad,&44,&47,&aa,&4f,&a6,&46
+            .byte &b9,&4d,&99,&20,&89,&5f,&aa,&9e
+            .byte &42,&b5,&c4,&ae,&a2,&49,&a4,&a1
+            .byte &ed,&c3,&2c,&4a,&12,&9f,&57,&49
+            .byte &44,&9d,&af,&b5,&de,&20,&c8,&a3
+            .byte &5c,&20,&76,&53,&f0,&0b,&5a,&9d
+            .byte &a8,&52,&b5,&de,&2e,&0d,&23,&5b
+            .byte &bf,&04,&20,&7a,&89,&c8,&ab,&b8
+            .byte &2e,&54,&c7,&4c,&20,&54,&ab,&45
+            .byte &a4,&ab,&41,&a3,&19,&20,&c7,&4c
+            .byte &20,&ae,&b5,&c4,&2c,&8b,&49,&a3
+            .byte &1c,&ac,&43,&ad,&a4,&a9,&54,&aa
+            .byte &54,&57,&a9,&99,&20,&76,&43,&55
+            .byte &9f,&b5,&9f,&c7,&4c,&20,&16,&59
+            .byte &d4,&9a,&2e,&5c,&a3,&cb,&e8,&20
+            .byte &d1,&b8,&a4,&a1,&59,&cd,&dd,&a6
+            .byte &b4,&dd,&20,&4f,&bd,&a3,&5c,&2c
+            .byte &57,&bb,&d3,&20,&53,&d1,&ab,&a4
+            .byte &89,&73,&43,&ab,&b2,&55,&ab,&a4
+            .byte &8a,&ed,&4c,&44,&a4,&8b,&a7,&8f
+            .byte &42,&1f,&2e,&0d,&23,&5b,&7a,&89
+            .byte &af,&07,&ac,&43,&9d,&43,&b4,&4d
+            .byte &08,&a3,&7b,&a1,&4c,&ae,&47,&9d
+            .byte &d1,&56,&9d,&53,&59,&53,&b1,&4d
+            .byte &2e,&5e,&20,&7b,&5c,&2c,&89,&d1
+            .byte &53,&d1,&44,&99,&20,&93,&46,&c7
+            .byte &4c,&20,&4f,&42,&53,&43,&55,&ab
+            .byte &a4,&5c,&a3,&56,&49,&45,&a6,&7b
+            .byte &89,&c8,&ab,&b8,&2e,&0d,&23,&5b
+            .byte &8f,&a1,&44,&bc,&a0,&af,&a0,&7a
+            .byte &89,&77,&20,&50,&0a,&ef,&47,&b7
+            .byte &2e,&5c,&20,&cb,&e8,&20,&d1,&b8
+            .byte &a4,&62,&45,&2c,&ac,&49,&c5,&b1
+            .byte &a0,&53,&b4,&c1,&57,&a4,&7e,&89
+            .byte &55,&ca,&bd,&9e,&64,&53,&2e,&0d
+            .byte &23,&5b,&7a,&a1,&7d,&20,&7b,&4e
+            .byte &ae,&df,&a6,&77,&20,&50,&0a,&ef
+            .byte &47,&b7,&2c,&4d,&a9,&44,&46,&55
+            .byte &4c,&20,&7b,&89,&df,&f1,&a2,&b5
+            .byte &54,&43,&df,&50,&a4,&8a,&db,&a9
+            .byte &b1,&a0,&b8,&c7,&f6,&b0,&b1,&a4
+            .byte &57,&bb,&d3,&20,&48,&ac,&47,&20
+            .byte &44,&ac,&47,&aa,&9b,&4c,&a2,&6e
+            .byte &89,&43,&45,&e7,&99,&2e,&0d,&23
+            .byte &5b,&7a,&a1,&4c,&ae,&47,&9d,&43
+            .byte &b4,&4d,&42,&aa,&2c,&41,&57,&ae
+            .byte &9d,&7b,&89,&be,&4c,&a0,&44,&c0
+            .byte &55,&9a,&20,&57,&bb,&d3,&20,&54
+            .byte &b5,&43,&ad,&a4,&5c,&a3,&46,&f6
+            .byte &9d,&6e,&89,&5d,&2e,&0d,&23,&5b
+            .byte &7a,&a1,&da,&55,&b8,&aa,&a2,&77
+            .byte &20,&50,&0a,&ef,&dc,&2e,&a1,&42
+            .byte &ab,&45,&5a,&9d,&da,&13,&a4,&7a
+            .byte &6e,&89,&5e,&2e,&0d,&23,&5b,&7a
+            .byte &a1,&c5,&53,&d0,&56,&9d,&b4,&d7
+            .byte &20,&7a,&89,&77,&53,&2e,&89,&53
+            .byte &b5,&4e,&a0,&7b,&0e,&49,&eb,&99
+            .byte &20,&93,&20,&45,&d3,&4f,&45,&a4
+            .byte &6e,&53,&e5,&45,&10,&aa,&9d,&cf
+            .byte &b8,&ac,&9f,&8a,&e6,&aa,&47,&99
+            .byte &20,&6e,&89,&53,&b4,&c1,&57,&a4
+            .byte &7b,&89,&43,&45,&e7,&99,&20,&5c
+            .byte &20,&71,&20,&e9,&dc,&2c,&43,&b3
+            .byte &49,&43,&c7,&20,&b8,&c7,&f6,&b0
+            .byte &b1,&53,&2c,&d4,&4d,&9d,&10,&b6
+            .byte &9d,&7a,&89,&47,&4c,&ae,&9d,&7b
+            .byte &5c,&a3,&cb,&e8,&2e,&0d,&23,&5b
+            .byte &8f,&89,&c2,&50,&20,&7b,&a1,&90
+            .byte &99,&20,&b8,&f4,&52,&d1,&c6,&2c
+            .byte &ad,&57,&9e,&6e,&89,&77,&20,&df
+            .byte &f1,&2e,&0d,&23,&5b,&7e,&a1,&90
+            .byte &99,&20,&b8,&f4,&52,&d1,&c6,&2c
+            .byte &43,&ae,&bd,&a0,&6e,&89,&77,&20
+            .byte &df,&f1,&2e,&0d,&23,&5b,&7a,&a1
+            .byte &cf,&4d,&4c,&a2,&d4,&9f,&47,&c0
+            .byte &bd,&59,&ae,&44,&2e,&fc,&02,&4c
+            .byte &99,&20,&01,&b8,&a4,&43,&dd,&ff
+            .byte &20,&89,&ad,&fd,&b8,&b3,&b7,&2c
+            .byte &c5,&4b,&99,&20,&8b,&a7,&53,&bb
+            .byte &4d,&f2,&a3,&6d,&41,&9e,&d2,&4e
+            .byte &b2,&55,&c0,&4c,&20,&d4,&9a,&2e
+            .byte &0d,&23,&5b,&7e,&a1,&01,&b8,&a2
+            .byte &46,&d4,&9a,&20,&7b,&53,&b1,&50
+            .byte &a4,&57,&bb,&d3,&20,&43,&b3,&ca
+            .byte &43,&54,&a4,&19,&ea,&a3,&8a,&dd
+            .byte &05,&a3,&c3,&bd,&4c,&a4,&7b,&89
+            .byte &47,&c0,&bd,&59,&ae,&44,&2e,&0d
+            .byte &23,&5b,&7e,&0e,&59,&2c,&53,&8c
+            .byte &a2,&42,&bc,&d3,&2e,&7a,&89,&cf
+            .byte &b8,&ac,&43,&9d,&76,&89,&5d,&2c
+            .byte &89,&52,&b5,&de,&20,&c6,&a1,&43
+            .byte &c0,&53,&ad,&a4,&76,&89,&53,&ed
+            .byte &ab,&2e,&a1,&4c,&b6,&54,&4c,&9d
+            .byte &57,&41,&a2,&5e,&2c,&89,&47,&ab
+            .byte &a2,&7c,&a4,&64,&20,&7a,&89,&42
+            .byte &bc,&d3,&2e,&0d,&23,&5b,&7e,&a1
+            .byte &53,&8c,&a2,&85,&42,&a2,&89,&52
+            .byte &b5,&de,&20,&53,&bc,&2e,&89,&53
+            .byte &8a,&49,&a4,&44,&d6,&50,&20,&8a
+            .byte &5c,&20,&4c,&bc,&56,&9d,&bf,&04
+            .byte &20,&c8,&4f,&54,&d8,&a9,&54,&53
+            .byte &2e,&0d,&23,&5b,&7e,&a1,&57,&49
+            .byte &bf,&2c,&11,&8f,&50,&cb,&a9,&2e
+            .byte &89,&90,&20,&da,&13,&a4,&b8,&52
+            .byte &b3,&47,&4c,&59,&2c,&4b,&49,&f1
+            .byte &99,&20,&19,&20,&89,&44,&12,&9f
+            .byte &a9,&76,&d3,&4f,&4b,&99,&20,&43
+            .byte &4c,&b5,&44,&53,&2e,&0d,&23,&5b
+            .byte &7e,&89,&c2,&50,&20,&7b,&a1,&44
+            .byte &ac,&47,&aa,&9b,&20,&53,&43,&ab
+            .byte &9d,&53,&dd,&50,&9d,&4f,&56,&aa
+            .byte &dd,&4f,&4b,&99,&20,&89,&c8,&ab
+            .byte &b8,&2e,&5c,&20,&47,&41,&5a,&9d
+            .byte &67,&20,&89,&88,&2c,&76,&89,&d5
+            .byte &54,&c2,&a7,&7b,&89,&53,&dd,&50
+            .byte &9d,&10,&aa,&9d,&89,&e1,&b5,&4e
+            .byte &a0,&71,&4d,&a4,&46,&02,&4d,&aa
+            .byte &2e,&8f,&81,&4d,&e5,&af,&54,&2c
+            .byte &a1,&b8,&b3,&9d,&00,&bd,&a4,&6e
+            .byte &d2,&bf,&a3,&5c,&2c,&8a,&5c,&20
+            .byte &53,&50,&c0,&57,&4c,&20,&f6,&df
+            .byte &53,&a4,&89,&4a,&41,&47,&dc,&a0
+            .byte &b8,&b3,&b7,&2e,&0d,&23,&5c,&20
+            .byte &af,&b1,&a3,&89,&cf,&cb,&ec,&16
+            .byte &b1,&a0,&48,&9b,&9d,&8a,&ea,&45
+            .byte &a3,&52,&b5,&c4,&2c,&d1,&55,&b0
+            .byte &9b,&4c,&59,&2e,&5c,&20,&ad,&41
+            .byte &a3,&a1,&4c,&b5,&a0,&53,&43,&c0
+            .byte &50,&99,&20,&8a,&8b,&9e,&be,&4c
+            .byte &cb,&50,&53,&9d,&76,&89,&46,&dd
+            .byte &b9,&2c,&41,&a4,&89,&df,&7b,&d1
+            .byte &bd,&a4,&7a,&8a,&43,&52,&12,&ad
+            .byte &a4,&5c,&2e,&0d,&23,&5c,&20,&af
+            .byte &b1,&a3,&89,&6a,&20,&8a,&46,&a9
+            .byte &a0,&5c,&52,&c6,&4c,&46,&20,&7a
+            .byte &a1,&b8,&55,&44,&59,&2e,&a1,&4c
+            .byte &bc,&8b,&a3,&fc,&49,&bd,&4c,&20
+            .byte &43,&b4,&49,&a3,&46,&f6,&45,&a4
+            .byte &87,&20,&6e,&5c,&2e,&53,&55,&44
+            .byte &44,&af,&4c,&59,&2c,&89,&43,&b4
+            .byte &49,&a3,&ab,&56,&4f,&4c,&bd,&a4
+            .byte &8a,&5c,&20,&46,&f6,&9d,&89,&23
+            .byte &4b,&99,&2e,&22,&23,&a5,&c1,&98
+            .byte &57,&ac,&9f,&76,&42,&9d,&cf,&b8
+            .byte &55,&52,&42,&e0,&22,&2c,&48,&9d
+            .byte &0f,&b5,&54,&53,&2c,&8a,&47,&c0
+            .byte &42,&42,&99,&20,&a1,&d0,&4c,&bd
+            .byte &a3,&c3,&54,&b1,&a3,&68,&aa,&2c
+            .byte &b8,&41,&42,&a4,&5c,&21,&0d,&23
+            .byte &5c,&20,&14,&d2,&47,&9d,&a9,&76
+            .byte &89,&46,&ab,&45,&5a,&99,&20,&53
+            .byte &bc,&2e,&a1,&06,&47,&ac,&b0,&43
+            .byte &20,&57,&41,&56,&9d,&46,&dd,&4f
+            .byte &44,&a4,&4f,&bd,&a3,&5c,&2c,&50
+            .byte &55,&d7,&99,&20,&5c,&20,&55,&c4
+            .byte &aa,&2e,&89,&cb,&53,&9f,&a8,&99
+            .byte &20,&5c,&20,&46,&45,&cd,&20,&49
+            .byte &a4,&89,&b8,&99,&20,&7b,&53,&c7
+            .byte &9f,&93,&20,&7a,&5c,&a3,&45,&59
+            .byte &b7,&2e,&0d,&23,&5b,&b5,&54,&78
+            .byte &20,&89,&23,&97,&20,&7b,&23,&58
+            .byte &41,&ac,&2e,&b6,&a4,&43,&55,&52
+            .byte &bd,&a0,&64,&a4,&ae,&9d,&e4,&e2
+            .byte &a8,&20,&8a,&bb,&de,&2c,&8a,&dd
+            .byte &e5,&2c,&49,&4d,&db,&53,&99,&4c
+            .byte &59,&2c,&4f,&bd,&a3,&89,&c9,&4c
+            .byte &8c,&2e,&89,&60,&20,&64,&20,&49
+            .byte &a4,&cc,&4b,&45,&9e,&19,&20,&42
+            .byte &a2,&41,&9e,&ae,&43,&ad,&44,&2c
+            .byte &57,&e2,&bf,&9e,&c1,&b9,&2c,&57
+            .byte &bb,&d3,&20,&49,&a4,&b8,&55,&44
+            .byte &bf,&a0,&6d,&42,&cb,&f1,&20,&02
+            .byte &7e,&8a,&1e,&a9,&b1,&a0,&6d,&89
+            .byte &23,&4b,&99,&27,&a4,&be,&8f,&7b
+            .byte &ae,&4d,&53,&2e,&0d,&23,&5b,&7a
+            .byte &89,&c5,&7a,&b4,&d7,&20,&7b,&89
+            .byte &97,&2e,&cc,&50,&b7,&07,&49,&45
+            .byte &a4,&bf,&ec,&43,&54,&99,&20,&89
+            .byte &23,&4b,&99,&20,&7b,&23,&58,&41
+            .byte &ac,&27,&a4,&0c,&e7,&20,&ab,&18
+            .byte &4e,&2c,&48,&ac,&47,&20,&6e,&89
+            .byte &47,&ab,&59,&2c,&b8,&b3,&9d,&64
+            .byte &53,&2e,&76,&89,&5f,&20,&49,&a4
+            .byte &89,&ae,&43,&ad,&a0,&c1,&4f,&a3
+            .byte &4c,&bc,&44,&99,&20,&b5,&54,&2e
+            .byte &0d,&23,&5b,&7a,&a1,&57,&49,&44
+            .byte &9d,&63,&7a,&89,&97,&2e,&a1,&53
+            .byte &c5,&d7,&20,&c1,&4f,&a3,&d4,&45
+            .byte &a4,&50,&ae,&b0,&c7,&4c,&a2,&bb
+            .byte &44,&bf,&9e,&8f,&89,&d5,&54,&c2
+            .byte &a7,&7b,&53,&e5,&9d,&53,&b1,&50
+            .byte &53,&2e,&0d,&23,&5b,&7a,&89,&57
+            .byte &49,&44,&9d,&43,&b9,&8d,&b9,&2c
+            .byte &1c,&49,&9a,&4c,&a2,&d4,&9f,&6e
+            .byte &6f,&42,&a2,&a1,&62,&9d,&d4,&9a
+            .byte &2d,&53,&b5,&52,&43,&9d,&5c,&20
+            .byte &43,&ac,&ee,&9f,&55,&c4,&aa,&b8
+            .byte &8c,&2e,&0d,&23,&5b,&8f,&89,&af
+            .byte &a0,&7b,&89,&57,&49,&44,&9d,&43
+            .byte &b9,&8d,&b9,&2e,&a1,&46,&d4,&9a
+            .byte &20,&7b,&b8,&f4,&52,&a4,&4c,&bc
+            .byte &44,&a4,&76,&89,&94,&41,&d5,&bd
+            .byte &2c,&8a,&a1,&53,&c5,&d7,&20,&c1
+            .byte &4f,&a3,&49,&a4,&c6,&9f,&7a,&89
+            .byte &5d,&20,&64,&2e,&0d,&23,&5b,&7a
+            .byte &a1,&57,&cd,&4c,&20,&46,&55,&52
+            .byte &4e,&c9,&ad,&a0,&53,&b6,&54,&99
+            .byte &20,&6a,&2c,&44,&b5,&da,&9d,&47
+            .byte &cb,&5a,&e0,&2c,&6d,&46,&0a,&48
+            .byte &9c,&41,&da,&9d,&42,&d6,&d5,&4f
+            .byte &20,&43,&b4,&02,&a4,&8a,&41,&9e
+            .byte &45,&c3,&43,&07,&49,&43,&20,&46
+            .byte &02,&9d,&6d,&50,&cb,&53,&b0,&43
+            .byte &20,&be,&c7,&2e,&0d,&23,&5b,&7a
+            .byte &a1,&4c,&ae,&dc,&2c,&1c,&49,&9a
+            .byte &20,&4b,&b6,&43,&ad,&4e,&2e,&57
+            .byte &bb,&b1,&2c,&af,&d6,&cd,&20,&b0
+            .byte &c3,&a4,&be,&bd,&a3,&89,&64,&a4
+            .byte &8a,&43,&b3,&43,&ab,&54,&9d,&53
+            .byte &b1,&50,&a4,&4c,&bc,&a0,&19,&20
+            .byte &76,&a1,&53,&c5,&d7,&2c,&1e,&a9
+            .byte &b1,&a0,&c1,&b9,&2e,&0d,&23,&5b
+            .byte &7a,&a1,&55,&b0,&4c,&b6,&a2,&6a
+            .byte &2e,&56,&ae,&49,&9b,&20,&be,&e8
+            .byte &c3,&58,&20,&c5,&d3,&a9,&b7,&2c
+            .byte &6d,&4e,&d6,&45,&a4,&81,&c7,&4c
+            .byte &20,&af,&a0,&7a,&22,&4f,&c5,&b0
+            .byte &43,&22,&2c,&1b,&5a,&5a,&2c,&43
+            .byte &4c,&ac,&4b,&20,&8a,&e9,&a7,&49
+            .byte &e8,&ab,&53,&d0,&bd,&4c,&59,&2e
+            .byte &f7,&b1,&a3,&47,&41,&5a,&99,&20
+            .byte &8f,&89,&22,&23,&cf,&47,&b6,&c7
+            .byte &20,&57,&0a,&ed,&c5,&b0,&43,&20
+            .byte &b8,&aa,&45,&4f,&20,&c0,&cf,&4f
+            .byte &20,&0e,&a9,&4b,&a4,&c5,&d3,&a9
+            .byte &45,&22,&2c,&5c,&20,&bf,&43,&49
+            .byte &44,&9d,&49,&9f,&b4,&a4,&ee,&20
+            .byte &7f,&20,&d0,&47,&4e,&49,&46,&49
+            .byte &43,&ac,&43,&45,&2e,&0d,&23,&5b
+            .byte &7a,&a1,&53,&50,&f6,&49,&9b,&20
+            .byte &50,&ac,&07,&a2,&6d,&57,&e2,&44
+            .byte &2d,&50,&ac,&cd,&c3,&a0,&64,&53
+            .byte &2e,&a1,&56,&ae,&4e,&c9,&ad,&44
+            .byte &2c,&50,&a9,&9d,&cc,&da,&9d,&49
+            .byte &a4,&dd,&d1,&b1,&a0,&7a,&89,&43
+            .byte &af,&07,&9d,&7b,&89,&6a,&20,&8a
+            .byte &4f,&43,&43,&55,&ec,&45,&a4,&4d
+            .byte &55,&d3,&20,&7b,&89,&94,&41,&ab
+            .byte &41,&2e,&0d,&23,&5b,&7e,&89,&dd
+            .byte &05,&a3,&4c,&8c,&99,&2e,&b8,&f4
+            .byte &52,&a4,&4c,&bc,&a0,&76,&89,&46
+            .byte &dd,&b9,&a4,&6f,&8a,&42,&cd,&13
+            .byte &2e,&0d,&23,&5b,&7a,&a1,&50,&0a
+            .byte &ef,&dc,&57,&41,&a2,&7e,&89,&46
+            .byte &02,&53,&9f,&46,&dd,&b9,&2e,&89
+            .byte &5e,&20,&64,&20,&b4,&a4,&65,&a4
+            .byte &76,&56,&ae,&49,&9b,&20,&6a,&53
+            .byte &2e,&0d,&23,&5b,&8f,&89,&af,&a0
+            .byte &7b,&89,&50,&0a,&ef,&dc,&57,&41
+            .byte &a2,&7e,&89,&46,&02,&53,&9f,&46
+            .byte &dd,&b9,&2e,&0d,&23,&5b,&7e,&89
+            .byte &19,&ea,&a3,&4c,&8c,&99,&2e,&53
+            .byte &b1,&50,&a4,&4c,&bc,&a0,&67,&20
+            .byte &76,&89,&94,&42,&cd,&13,&2e,&46
+            .byte &55,&52,&8b,&a3,&c7,&b3,&47,&20
+            .byte &89,&4c,&8c,&99,&20,&76,&89,&5f
+            .byte &2c,&5c,&20,&c5,&4b,&9d,&b5,&9f
+            .byte &89,&53,&b4,&50,&9d,&7b,&a1,&53
+            .byte &c5,&d7,&20,&c1,&b9,&2e,&0d,&23
+            .byte &5b,&8f,&89,&46,&41,&a3,&af,&a0
+            .byte &7b,&89,&19,&ea,&a3,&4c,&8c,&99
+            .byte &20,&b5,&54,&78,&20,&a1,&53,&c5
+            .byte &d7,&2c,&57,&e2,&bf,&9e,&c1,&b9
+            .byte &2e,&a1,&4d,&b7,&ef,&47,&9d,&7e
+            .byte &89,&c1,&4f,&a3,&ab,&fd,&a4,&22
+            .byte &26,&d8,&49,&56,&b2
+l6349:      .byte &9d,&4b,&45,&04,&20,&b5,&54,&26
+            .byte &22,&2e,&0d,&23,&5b,&7a,&a1,&44
+            .byte &c9,&55,&c6,&a0,&42,&e0,&6a,&2c
+            .byte &15,&b8,&a2,&8a,&42,&41,&ab,&2e
+            .byte &5c,&a3,&c8,&4f,&54,&53,&b1,&50
+            .byte &a4,&ab,&53,&b3,&b2,&9d,&7e,&89
+            .byte &46,&dd,&b9,&d5,&ae,&44,&53,&2e
+            .byte &76,&89,&5e,&20,&8b,&52,&9d,&49
+            .byte &a4,&a1,&43,&19,&d5,&ae,&a0,&c1
+            .byte &b9,&2e,&0d,&23,&5b,&7a,&a1,&43
+            .byte &bb,&4c,&44,&27,&a4,&42,&e0,&6a
+            .byte &2e,&89,&64,&a4,&ae,&9d,&1c,&49
+            .byte &9a,&4c,&a2,&bf,&43,&b9,&41,&b1
+            .byte &a0,&6d,&ec,&43,&54,&55,&ab,&a4
+            .byte &7b,&b1,&44,&44,&a2,&08,&ae,&a4
+            .byte &8a,&a1,&53,&c5,&d7,&20,&08,&a0
+            .byte &49,&a4,&50,&12,&ad,&a0,&41,&47
+            .byte &41,&a9,&53,&9f,&89,&5f,&20,&64
+            .byte &2e,&a1,&ab,&a0,&47,&dd,&53,&53
+            .byte &a2,&c1,&4f,&a3,&4d,&ae,&4b,&45
+            .byte &a0,&22,&23,&c2,&a2,&23,&43,&19
+            .byte &d5,&ae,&44,&22,&20,&cc,&4b,&45
+            .byte &a4,&19,&20,&89,&5e,&20,&64,&2e
+            .byte &0d,&23,&5b,&7a,&89,&c5,&53,&b1
+            .byte &a3,&42,&e0,&6a,&2e,&49,&9f,&49
+            .byte &a4,&53,&50,&f6,&49,&9b,&20,&8a
+            .byte &57,&cd,&4c,&20,&4c,&b6,&2e,&41
+            .byte &9e,&45,&c3,&47,&ac,&9f,&46,&b5
+            .byte &a3,&db,&53,&b1,&a3,&08,&a0,&49
+            .byte &a4,&db,&53,&b6,&9c,&45,&a0,&ca
+            .byte &58,&9f,&76,&a1,&c1,&4f,&a3,&7a
+            .byte &89,&5e,&20,&64,&2e,&0d,&23,&5b
+            .byte &7a,&a1,&4c,&ae,&dc,&2c,&cf,&4d
+            .byte &4c,&a2,&4c,&b6,&2c,&57,&c7,&4b
+            .byte &2d,&7a,&4c,&a9,&45,&9e,&43,&19
+            .byte &d5,&ae,&44,&2e,&a1,&e1,&49,&4d
+            .byte &a2,&c1,&4f,&a3,&4f,&43,&43,&55
+            .byte &ec,&45,&a4,&89,&5d,&20,&64,&2e
+            .byte &0d,&23,&5b,&7a,&a1,&53,&c5,&d7
+            .byte &20,&c2,&a2,&43,&19,&d5,&ae,&44
+            .byte &2c,&cf,&4d,&4c,&a2,&49,&d7,&d9
+            .byte &a9,&41,&b1,&a0,&42,&a2,&89,&d4
+            .byte &9a,&20,&57,&bb,&d3,&20,&43,&ab
+            .byte &04,&a4,&7a,&a8,&52,&b5,&de,&20
+            .byte &47,&41,&50,&a4,&d2,&bf,&a3,&89
+            .byte &c1,&4f,&a3,&76,&89,&5d,&2e,&0d
+            .byte &23,&5b,&7a,&a1,&00,&44,&aa,&9e
+            .byte &42,&41,&a8,&6a,&2e,&89,&53,&55
+            .byte &b6,&9d,&49,&a4,&41,&9e,&f9,&43
+            .byte &4c,&55,&d0,&56,&9d,&d3,&4f,&be
+            .byte &4c,&b2,&9d,&be,&4c,&b5,&52,&2c
+            .byte &53,&d2,&4b,&20,&a9,&76,&89,&46
+            .byte &dd,&b9,&2c,&6d,&af,&47,&c0,&bd
+            .byte &a0,&cc,&50,&53,&2c,&a1,&8b,&52
+            .byte &c5,&4c,&20,&c2,&57,&cd,&20,&c0
+            .byte &e7,&20,&8a,&53,&e5,&9d,&c0,&8b
+            .byte &a3,&f9,&50,&af,&d0,&56,&9d,&23
+            .byte &50,&c6,&55,&c1,&2d,&23,&56,&49
+            .byte &43,&54,&b9,&49,&41,&9e,&03,&41
+            .byte &50,&20,&44,&c9,&ad,&53,&21,&0d
+            .byte &23,&5b,&8f,&89,&c2,&50,&20,&7b
+            .byte &a1,&46,&d4,&9a,&20,&7b,&53,&b1
+            .byte &50,&53,&2c,&43,&ae,&bd,&a0,&b5
+            .byte &9f,&7b,&89,&4d,&b5,&ba,&41,&a9
+            .byte &2e,&8b,&52,&9d,&49,&a4,&a1,&46
+            .byte &ab,&0f,&20,&42,&ab,&45,&5a,&9d
+            .byte &57,&bb,&d3,&20,&71,&4d,&a4,&76
+            .byte &af,&d4,&bd,&9e,&5c,&21,&0d,&23
+            .byte &5b,&7e,&a1,&46,&d4,&9a,&20,&7b
+            .byte &45,&ae,&a8,&a2,&53,&b1,&50,&53
+            .byte &2c,&43,&ae,&bd,&a0,&b5,&9f,&7b
+            .byte &89,&4d,&b5,&ba,&41,&a9,&2e,&0d
+            .byte &23,&5b,&8f,&89,&d5,&54,&c2,&a7
+            .byte &7b,&a1,&46,&d4,&9a,&20,&7b,&53
+            .byte &b1,&50,&53,&2c,&f9,&d1,&56,&41
+            .byte &b1,&a0,&6e,&89,&4d,&b5,&ba,&41
+            .byte &a9,&78,&2e,&0d,&23,&5b,&7e,&a1
+            .byte &53,&ec,&c0,&4c,&20,&75,&57,&41
+            .byte &a2,&7e,&89,&78,&20,&7b,&89,&4d
+            .byte &b5,&ba,&41,&a9,&2e,&0d,&23,&5b
+            .byte &8f,&a1,&50,&cb,&b1,&41,&55,&20
+            .byte &b4,&4c,&46,&20,&57,&41,&a2,&19
+            .byte &20,&89,&4d,&b5,&ba,&41,&a9,&2e
+            .byte &a1,&ea,&43,&55,&d4,&ae,&2c,&da
+            .byte &55,&9d,&d4,&9a,&20,&50,&55,&4c
+            .byte &c6,&a4,&76,&89,&60,&2e,&0d,&23
+            .byte &5b,&8f,&89,&5f,&aa,&9e,&e0,&47
+            .byte &9d,&7b,&89,&50,&cb,&b1,&41,&55
+            .byte &2e,&bb,&de,&20,&42,&ac,&4b,&a4
+            .byte &7b,&45,&ae,&a8,&20,&b8,&4f,&50
+            .byte &20,&ac,&a2,&46,&55,&52,&8b,&a3
+            .byte &d8,&fb,&ab,&53,&53,&2e,&46,&41
+            .byte &a3,&76,&89,&60,&20,&5c,&20,&71
+            .byte &20,&a1,&50,&55,&4c,&53,&99,&2c
+            .byte &da,&55,&9d,&d4,&9a,&2e,&0d,&23
+            .byte &5b,&8f,&a1,&53,&c5,&d7,&20,&47
+            .byte &df,&54,&c2,&2c,&43,&55,&9f,&a9
+            .byte &76,&89,&4d,&b5,&ba,&41,&a9,&2e
+            .byte &a1,&da,&55,&45,&2c,&ca,&7e,&d0
+            .byte &47,&9e,&ab,&fd,&99,&3a,&22,&3c
+            .byte &23,&c5,&4b,&9d,&23,&5c,&a3,&23
+            .byte &57,&c9,&48,&20,&23,&48,&aa,&45
+            .byte &3c,&22,&2c,&db,&a9,&54,&a4,&76
+            .byte &a1,&53,&c5,&d7,&20,&57,&cd,&4c
+            .byte &2c,&43,&b3,&b8,&17,&43,&b1,&a0
+            .byte &7b,&1c,&49,&f1,&2c,&6d,&a1,&42
+            .byte &c0,&53,&a4,&14,&b2,&9d,&c6,&9f
+            .byte &a9,&76,&89,&64,&2e,&0d,&23,&5b
+            .byte &7a,&a1,&42,&ae,&ab,&9e,&72,&50
+            .byte &0a,&53,&2c,&53,&f0,&0b,&5a,&45
+            .byte &a0,&08,&54,&05,&45,&9e,&54,&57
+            .byte &4f,&20,&42,&ac,&4b,&a4,&7b,&45
+            .byte &ae,&a8,&20,&8a,&df,&f1,&2e,&89
+            .byte &e1,&b5,&4e,&a0,&49,&a4,&48,&ae
+            .byte &a0,&8a,&55,&ca,&56,&af,&2e,&0d
+            .byte &23,&5b,&7e,&a1,&47,&c0,&53,&53
+            .byte &a2,&53,&dd,&50,&9d,&4c,&bc,&44
+            .byte &99,&20,&67,&20,&89,&4d,&b5,&ba
+            .byte &41,&a9,&2e,&89,&bd,&dc,&cc,&b0
+            .byte &7e,&49,&a4,&52,&49,&d3,&20,&8a
+            .byte &47,&ab,&af,&2e,&0d,&23,&5b,&7e
+            .byte &a1,&47,&c0,&53,&53,&a2,&50,&cb
+            .byte &b1,&41,&55,&20,&4f,&56,&aa,&53
+            .byte &b4,&c1,&05,&a0,&42,&a2,&89,&01
+            .byte &9a,&a2,&23,&97,&20,&7b,&23,&58
+            .byte &41,&ac,&2e,&8b,&52,&9d,&ae,&9d
+            .byte &d0,&47,&4e,&a4,&81,&4f,&8b,&52
+            .byte &a4,&b4,&56,&9d,&08,&45,&9e,&48
+            .byte &aa,&9d,&08,&46,&b9,&9d,&5c,&21
+            .byte &0d,&23,&5b,&8f,&89,&d5,&54,&c2
+            .byte &a7,&7b,&a1,&47,&c0,&53,&53,&a2
+            .byte &53,&dd,&ea,&2e,&89,&47,&c0,&53
+            .byte &a4,&48,&aa,&9d,&49,&a4,&57,&bc
+            .byte &4b,&2c,&59,&cd,&dd,&a6,&8a,&a9
+            .byte &54,&aa,&4d,&99,&c3,&a0,&6d,&42
+            .byte &ae,&9d,&50,&b2,&43,&ad,&53,&2e
+            .byte &0d,&23,&5b,&7e,&89,&11,&8f,&4c
+            .byte &8c,&a4,&42,&af,&bc,&a8,&20,&89
+            .byte &23,&97,&20,&7b,&23,&58,&41,&ac
+            .byte &2e,&89,&4c,&8c,&a4,&ae,&9d,&53
+            .byte &50,&ae,&c6,&4c,&a2,&bd,&dc,&cc
+            .byte &b1,&a0,&8a,&b8,&b3,&59,&2e,&0d
+            .byte &23,&5b,&7a,&89,&01,&44,&53,&9f
+            .byte &7b,&89,&11,&8f,&4c,&8c,&a4,&42
+            .byte &af,&bc,&a8,&20,&89,&23,&97,&20
+            .byte &7b,&23,&58,&41,&ac,&2e,&89,&e1
+            .byte &b5,&4e,&a0,&49,&a4,&48,&ae,&a0
+            .byte &8a,&df,&f1,&59,&2c,&8a,&ee,&20
+            .byte &bd,&dc,&cc,&b0,&7e,&47,&df,&57
+            .byte &53,&2e,&0d,&23,&5b,&7a,&a1,&b8
+            .byte &a9,&4b,&99,&20,&44,&b6,&d3,&2e
+            .byte &89,&48,&ae,&a0,&94,&49,&a4,&be
+            .byte &56,&aa,&45,&a0,&6d,&db,&4f,&4c
+            .byte &a4,&7b,&b8,&41,&47,&4e,&ac,&9f
+            .byte &d4,&f0,&49,&a0,&8a,&b8,&af,&d3
+            .byte &99,&20,&53,&d4,&f2,&2e,&89,&d0
+            .byte &f1,&af,&99,&20,&e4,&cd,&4c,&20
+            .byte &4c,&99,&aa,&53,&2c,&44,&c9,&47
+            .byte &55,&b8,&99,&4c,&59,&2c,&7a,&5c
+            .byte &a3,&ee,&b8,&52,&e7,&53,&2e,&a8
+            .byte &49,&a4,&c9,&98,&a1,&47,&e2,&a0
+            .byte &50,&cb,&43,&9d,&76,&ec,&43,&4e
+            .byte &49,&43,&21,&0d,&23,&5b,&8f,&89
+            .byte &af,&a0,&7b,&a1,&15,&b8,&a2,&df
+            .byte &fd,&2c,&42,&b5,&4e,&bf,&a0,&42
+            .byte &a2,&44,&c0,&a9,&41,&47,&9d,&44
+            .byte &b6,&43,&ad,&53,&2e,&76,&89,&5d
+            .byte &20,&d4,&9d,&89,&11,&8f,&4c,&8c
+            .byte &a4,&42,&af,&bc,&a8,&20,&89,&23
+            .byte &97,&20,&7b,&23,&58,&41,&ac,&2e
+            .byte &0d,&23,&5b,&7e,&a1,&4c,&b3,&47
+            .byte &2c,&15,&b8,&a2,&df,&fd,&2e,&4f
+            .byte &56,&aa,&47,&df,&57,&9e,&75,&a4
+            .byte &4c,&bc,&a0,&5d,&2c,&76,&a1,&df
+            .byte &a6,&7b,&43,&b3,&bf,&4d,&ca,&a0
+            .byte &48,&9b,&b7,&2e,&8b,&49,&a3,&57
+            .byte &e2,&44,&57,&b9,&4b,&20,&49,&a4
+            .byte &df,&54,&54,&99,&2c,&8b,&49,&a3
+            .byte &1e,&a9,&54,&57,&b9,&4b,&20,&43
+            .byte &bb,&50,&ea,&a0,&8a,&46,&cb,&4b
+            .byte &99,&2c,&8a,&8b,&49,&a3,&66,&a4
+            .byte &53,&c5,&53,&ad,&a0,&4f,&a3,&d5
+            .byte &ae,&bf,&44,&2e,&0d,&23,&5b,&8f
+            .byte &89,&b8,&ae,&9f,&7b,&a1,&4c,&b3
+            .byte &47,&2c,&b8,&c0,&49,&9a,&20,&df
+            .byte &fd,&2c,&53,&55,&52,&46,&f6,&45
+            .byte &a0,&6d,&ab,&a0,&15,&b8,&2e,&89
+            .byte &df,&41,&a0,&49,&a4,&42,&b5,&4e
+            .byte &bf,&a0,&42,&a2,&0f,&b5,&4c,&44
+            .byte &aa,&2d,&bb,&de,&20,&44,&b6,&43
+            .byte &ad,&53,&2c,&43,&55,&9f,&c8,&a3
+            .byte &44,&c0,&a9,&41,&47,&9d,&50,&55
+            .byte &52,&db,&53,&b7,&2e,&0d,&23,&5b
+            .byte &8f,&89,&d5,&54,&c2,&a7,&7b,&89
+            .byte &88,&2e,&bb,&de,&20,&6f,&8a,&5e
+            .byte &2c,&89,&4b,&45,&04,&20,&97,&a4
+            .byte &4f,&bd,&a3,&5c,&2c,&71,&4d,&99
+            .byte &20,&76,&57,&b2,&d3,&20,&5c,&a3
+            .byte &0c,&aa,&a2,&00,&bd,&21,&89,&74
+            .byte &20,&73,&49,&a4,&76,&89,&5d,&2c
+            .byte &57,&bb,&4c,&9d,&df,&fd,&a4,&b8
+            .byte &ab,&54,&d3,&20,&5f,&20,&8a,&60
+            .byte &2e,&0d,&23,&5b,&7a,&a1,&4e,&ae
+            .byte &df,&57,&2c,&53,&b4,&44,&a2,&4c
+            .byte &ac,&45,&2e,&57,&e7,&a0,&46,&dd
+            .byte &57,&aa,&a4,&8a,&47,&c0,&53,&c6
+            .byte &a4,&11,&b5,&52,&c9,&48,&20,&08
+            .byte &54,&05,&45,&9e,&42,&ae,&9d,&43
+            .byte &ae,&54,&2d,&54,&c0,&f1,&53,&2e
+            .byte &0d,&23,&5b,&8f,&89,&af,&a0,&7b
+            .byte &89,&53,&b4,&44,&a2,&4c,&ac,&45
+            .byte &2e,&89,&46,&dd,&57,&aa,&a4,&8a
+            .byte &47,&c0,&53,&c6,&a4,&47,&df,&a6
+            .byte &54,&c7,&4c,&2c,&48,&aa,&45,&2e
+            .byte &a1,&44,&c9,&55,&c6,&a0,&54,&c0
+            .byte &f1,&20,&49,&a4,&56,&c9,&49,&da
+            .byte &9d,&76,&89,&5d,&2e,&0d,&23,&5b
+            .byte &7e,&a1,&44,&c9,&55,&c6,&a0,&54
+            .byte &c0,&f1,&2e,&89,&55,&c4,&aa,&47
+            .byte &df,&57,&a8,&20,&49,&a4,&a8,&49
+            .byte &f1,&20,&8a,&46,&55,&d7,&20,&7b
+            .byte &a8,&b9,&4e,&a2,&14,&ac,&54,&a4
+            .byte &8a,&ca,&54,&54,&4c,&b7,&2c,&47
+            .byte &55,&ae,&ac,&b1,&45,&a0,&76,&52
+            .byte &49,&50,&20,&8a,&b8,&99,&2e,&0d
+            .byte &23,&5b,&7e,&a1,&4e,&ae,&df,&a6
+            .byte &b8,&f4,&52,&57,&41,&a2,&57,&bb
+            .byte &d3,&20,&4c,&bc,&44,&a4,&19,&20
+            .byte &76,&89,&90,&a2,&50,&cb,&a9,&2c
+            .byte &8a,&67,&20,&76,&89,&01,&b8,&a2
+            .byte &47,&c0,&bd,&59,&ae,&44,&2e,&0d
+            .byte &23,&5b,&7a,&a1,&08,&47,&47,&ae
+            .byte &27,&a4,&ed,&bd,&4c,&3a,&a1,&54
+            .byte &a9,&a2,&57,&e2,&bf,&9e,&53,&b4
+            .byte &f1,&2c,&6d,&df,&54,&54,&99,&20
+            .byte &46,&dd,&b9,&d5,&ae,&44,&a4,&8a
+            .byte &44,&d6,&50,&20,&64,&53,&2e,&a1
+            .byte &08,&47,&47,&41,&a3,&53,&b6,&a4
+            .byte &7a,&89,&43,&b9,&4e,&aa,&2c,&43
+            .byte &df,&53,&53,&c3,&47,&dc,&44,&2c
+            .byte &8a,&48,&d9,&4d,&99,&20,&54,&55
+            .byte &ca,&82,&4c,&59,&2e,&0d,&23,&5b
+            .byte &7e,&a1,&57,&e2,&bf,&9e,&47,&ac
+            .byte &47,&14,&ac,&4b,&20,&76,&89,&95
+            .byte &2e,&a1,&ab,&44,&2d,&ee,&c6,&a0
+            .byte &23,&d1,&50,&cc,&a9,&2c,&6d,&a1
+            .byte &46,&c7,&53,&9d,&c3,&47,&20,&8a
+            .byte &a1,&b8,&55,&46,&46,&45,&a0,&50
+            .byte &ae,&df,&9f,&e3,&49,&c3,&a0,&76
+            .byte &bb,&a4,&14,&59,&57,&e2,&a0,&0f
+            .byte &b5,&4c,&44,&aa,&2c,&fc,&18,&a4
+            .byte &a1,&d5,&54,&54,&4c,&9d,&7b,&52
+            .byte &d9,&2c,&8a,&ea,&aa,&a4,&8f,&5c
+            .byte &2e,&0d,&23,&5c,&20,&d5,&ae,&a0
+            .byte &89,&56,&0a,&9f,&ef,&e7,&99,&20
+            .byte &95,&2c,&c8,&d7,&4f,&05,&a0,&42
+            .byte &a2,&89,&23,&d1,&50,&cc,&a9,&2e
+            .byte &89,&ac,&d3,&4f,&a3,&49,&a4,&d4
+            .byte &46,&b1,&44,&2c,&89,&90,&20,&43
+            .byte &b2,&43
+l6b63:      .byte &ad,&a4,&7a,&89,&ef,&e7,&a4,&8a
+            .byte &8b,&a2,&1a,&d7,&4f,&a6,&b5,&54
+            .byte &2e,&53,&dd,&57,&4c,&59,&2c,&89
+            .byte &95,&20,&4c,&bc,&bd,&a4,&89,&23
+            .byte &c9,&4c,&8a,&7b,&23,&58,&41,&ac
+            .byte &21,&5c,&20,&b4,&56,&9d,&b7,&d1
+            .byte &50,&e0,&21,&5b,&46,&ab,&9d,&8f
+            .byte &cb,&b8,&21,&0d,&23,&5b,&8f,&a1
+            .byte &43,&c3,&ae,&99,&20,&7a,&89,&c8
+            .byte &ab,&b8,&2e,&a1,&93,&46,&c7,&4c
+            .byte &20,&d1,&53,&d1,&bf,&a4,&67,&20
+            .byte &89,&53,&b1,&04,&20,&72,&64,&2c
+            .byte &df,&ae,&99,&20,&6d,&db,&57,&aa
+            .byte &21,&a1,&c0,&a9,&d5,&a6,&ae,&43
+            .byte &a4,&a8,&52,&b5,&de,&20,&89,&53
+            .byte &50,&c0,&a2,&41,&d5,&bd,&2e,&89
+            .byte &93,&a4,&44,&c9,&41,&eb,&bc,&a3
+            .byte &a9,&76,&a1,&43,&ab,&56,&49,&43
+            .byte &45,&2c,&46,&b9,&4d,&99,&20,&55
+            .byte &c4,&aa,&e1,&b5,&4e,&a0,&52,&49
+            .byte &56,&aa,&a4,&8a,&b8,&ab,&d6,&53
+            .byte &2e,&0d,&23,&5b,&8f,&89,&d5,&54
+            .byte &c2,&a7,&7b,&a1,&90,&99,&20,&b8
+            .byte &f4,&52,&d1,&53,&9d,&dd,&4f,&4b
+            .byte &99,&20,&b5,&9f,&b3,&76,&a1,&ea
+            .byte &42,&da,&9d,&42,&bc,&d3,&2e,&0d
+            .byte &23,&5b,&7e,&a1,&ea,&42,&da,&9d
+            .byte &85,&8f,&89,&af,&07,&ac,&43,&9d
+            .byte &76,&a1,&53,&59,&53,&b1,&a7,&7b
+            .byte &d1,&56,&b7,&2e,&7a,&89,&cf,&a7
+            .byte &d4,&9a,&20,&7b,&89,&a9,&54,&aa
+            .byte &49,&b9,&2c,&53,&b1,&50,&a4,&ae
+            .byte &9d,&56,&c9,&49,&42,&c3,&2c,&43
+            .byte &d4,&4d,&42,&99,&20,&19,&20,&89
+            .byte &a9,&ca,&a3,&df,&f1,&20,&64,&53
+            .byte &2e,&0d,&23,&5b,&7e,&a1,&b8,&b3
+            .byte &a2,&53,&43,&ab,&9d,&53,&dd,&ea
+            .byte &2e,&89,&e1,&b5,&4e,&a0,&49,&a4
+            .byte &46,&02,&a7,&8a,&ef,&46,&9d,&48
+            .byte &aa,&45,&2c,&1b,&9f,&46,&55,&52
+            .byte &8b,&a3,&19,&20,&89,&88,&20,&8b
+            .byte &52,&9d,&ae,&9d,&dd,&4f,&53,&9d
+            .byte &df,&f1,&a4,&8a,&bb,&44,&bf,&9e
+            .byte &50,&b6,&46,&c7,&4c,&53,&2e,&70
+            .byte &5c,&2c,&89,&74,&20,&73,&be,&56
+            .byte &aa,&a4,&89,&56,&c7,&c3,&59,&2e
+            .byte &0d,&23,&5b,&7e,&a1,&4c,&b3,&47
+            .byte &20,&57,&e2,&bf,&9e,&4a,&45,&54
+            .byte &f3,&2c,&f8,&8b,&a3,&78,&20,&7b
+            .byte &57,&bb,&d3,&2c,&ae,&9d,&57,&bb
+            .byte &b1,&2c,&53,&b1,&cd,&20,&c0,&e7
+            .byte &99,&53,&2e,&89,&4a,&45,&54,&54
+            .byte &a2,&b8,&ab,&54,&43,&ad,&a4,&b5
+            .byte &9f,&4f,&bd,&a3,&89,&53,&bc,&2e
+            .byte &0d,&23,&5b,&7a,&89,&53,&50,&ae
+            .byte &c6,&4c,&a2,&bd,&dc,&cc,&b1,&a0
+            .byte &11,&8f,&4c,&8c,&53,&2e,&76,&89
+            .byte &5d,&2c,&89,&23,&97,&20,&7b,&23
+            .byte &58,&41,&41,&9e,&ab,&f6,&ad,&a4
+            .byte &a9,&76,&89,&53,&4b,&59,&2e,&60
+            .byte &20,&7b,&5c,&20,&49,&a4,&a1,&53
+            .byte &c5,&d7,&2c,&57,&e2,&bf,&9e,&53
+            .byte &b4,&f1,&2c,&b6,&a4,&df,&7b,&42
+            .byte &df,&4b,&45,&9e,&8a,&b6,&a4,&c1
+            .byte &4f,&a3,&48,&ac,&47,&99,&20,&dd
+            .byte &4f,&c6,&4c,&a2,&6e,&17,&b8,&a2
             .byte &48,&99
-L6D75:      .byte &B7,&2E,&A1,&62,&9D,&48,&D9,&4D
-            .byte &99,&20,&E6,&AC,&41,&B1,&A4,&6E
-            .byte &57,&49,&A8,&A9,&2E,&0D,&23,&5B
-            .byte &7E,&A1,&56,&41,&B8,&2C,&90,&FC
-            .byte &04,&9F,&50,&CB,&A9,&2C,&5F,&20
-            .byte &7B,&89,&73,&42,&B5,&C4,&AE,&59
-            .byte &2E,&44,&12,&9F,&BF,&56,&E7,&A4
-            .byte &FC,&02,&4C,&20,&8A,&44,&AE,&9F
-            .byte &41,&42,&B5,&9F,&89,&4C,&8C,&53
-            .byte &D1,&EA,&2C,&53,&ED,&57,&AA,&99
-            .byte &20,&5C,&20,&6D,&A1,&46,&A9,&45
-            .byte &2C,&10,&B6,&9D,&DB,&57,&44,&AA
-            .byte &2E,&46,&C0,&E7,&20,&54,&AB,&B7
-            .byte &2C,&C2,&4F,&20,&53,&C5,&D7,&20
-            .byte &76,&43,&D4,&4D,&42,&2C,&AE,&43
-            .byte &20,&8B,&49,&A3,&42,&AE,&9D,&D4
-            .byte &4D,&42,&A4,&76,&89,&E1,&B5,&C4
-            .byte &2E,&0D,&23,&5B,&7E,&A1,&50,&CB
-            .byte &A9,&3A,&57,&49,&BF,&2C,&11,&8F
-            .byte &8A,&90,&FC,&04,&54,&2E,&76,&89
-            .byte &60,&20,&49,&A4,&A1,&4E,&AE,&DF
-            .byte &A6,&43,&C0,&57,&4C,&57,&41,&A2
-            .byte &4C,&BC,&44,&99,&20,&A9,&76,&89
-            .byte &74,&20,&C8,&AB,&B8,&2E,&89,&47
-            .byte &41,&C3,&A4,&55,&D8,&E2,&9F,&0E
-            .byte &59,&2C,&1C,&B6,&54,&4C,&9D,&14
-            .byte &AC,&54,&A4,&8A,&DA,&4F,&A6,&8B
-            .byte &A7,&F6,&DF,&53,&A4,&89,&4C,&8C
-            .byte &2E,&0D,&2E,&0D,&2E,&0D,&00,&E0
+l6d75:      .byte &b7,&2e,&a1,&62,&9d,&48,&d9,&4d
+            .byte &99,&20,&e6,&ac,&41,&b1,&a4,&6e
+            .byte &57,&49,&a8,&a9,&2e,&0d,&23,&5b
+            .byte &7e,&a1,&56,&41,&b8,&2c,&90,&fc
+            .byte &04,&9f,&50,&cb,&a9,&2c,&5f,&20
+            .byte &7b,&89,&73,&42,&b5,&c4,&ae,&59
+            .byte &2e,&44,&12,&9f,&bf,&56,&e7,&a4
+            .byte &fc,&02,&4c,&20,&8a,&44,&ae,&9f
+            .byte &41,&42,&b5,&9f,&89,&4c,&8c,&53
+            .byte &d1,&ea,&2c,&53,&ed,&57,&aa,&99
+            .byte &20,&5c,&20,&6d,&a1,&46,&a9,&45
+            .byte &2c,&10,&b6,&9d,&db,&57,&44,&aa
+            .byte &2e,&46,&c0,&e7,&20,&54,&ab,&b7
+            .byte &2c,&c2,&4f,&20,&53,&c5,&d7,&20
+            .byte &76,&43,&d4,&4d,&42,&2c,&ae,&43
+            .byte &20,&8b,&49,&a3,&42,&ae,&9d,&d4
+            .byte &4d,&42,&a4,&76,&89,&e1,&b5,&c4
+            .byte &2e,&0d,&23,&5b,&7e,&a1,&50,&cb
+            .byte &a9,&3a,&57,&49,&bf,&2c,&11,&8f
+            .byte &8a,&90,&fc,&04,&54,&2e,&76,&89
+            .byte &60,&20,&49,&a4,&a1,&4e,&ae,&df
+            .byte &a6,&43,&c0,&57,&4c,&57,&41,&a2
+            .byte &4c,&bc,&44,&99,&20,&a9,&76,&89
+            .byte &74,&20,&c8,&ab,&b8,&2e,&89,&47
+            .byte &41,&c3,&a4,&55,&d8,&e2,&9f,&0e
+            .byte &59,&2c,&1c,&b6,&54,&4c,&9d,&14
+            .byte &ac,&54,&a4,&8a,&da,&4f,&a6,&8b
+            .byte &a7,&f6,&df,&53,&a4,&89,&4c,&8c
+            .byte &2e,&0d,&2e,&0d,&2e,&0d,&00,&e0
             .byte &36,&83,&36,&02,&35,&83,&37,&00
             .byte &38,&82,&36,&00
-L6E69:      .byte &3B,&01,&37,&02,&3B,&03,&38,&04
-            .byte &3B,&05,&3B,&06,&37,&87,&37,&00
-            .byte &3B,&01,&38,&02,&38,&03,&3A,&04
-            .byte &3B,&05,&3B,&06,&38,&87,&38,&00
-            .byte &3B,&01,&39,&02,&3B,&03,&39,&04
-            .byte &3C,&05,&3B,&06,&38,&87,&39,&00
-            .byte &38,&01,&38,&02,&39,&03,&3B,&04
+l6e69:      .byte &3b,&01,&37,&02,&3b,&03,&38,&04
+            .byte &3b,&05,&3b,&06,&37,&87,&37,&00
+            .byte &3b,&01,&38,&02,&38,&03,&3a,&04
+            .byte &3b,&05,&3b,&06,&38,&87,&38,&00
+            .byte &3b,&01,&39,&02,&3b,&03,&39,&04
+            .byte &3c,&05,&3b,&06,&38,&87,&39,&00
+            .byte &38,&01,&38,&02,&39,&03,&3b,&04
             .byte &39,&05,&38,&06,&38,&87,&38,&00
-            .byte &3D,&86,&3A,&01,&3C,&02,&3F,&03
-            .byte &3E,&89,&94,&00,&40,&01,&42,&82
-            .byte &3D,&00,&41,&01,&43,&83,&3D,&04
-            .byte &CF,&87,&3E,&05,&CF,&86,&3F,&00
-            .byte &3E,&81,&44,&00,&3F,&81,&45,&00
+            .byte &3d,&86,&3a,&01,&3c,&02,&3f,&03
+            .byte &3e,&89,&94,&00,&40,&01,&42,&82
+            .byte &3d,&00,&41,&01,&43,&83,&3d,&04
+            .byte &cf,&87,&3e,&05,&cf,&86,&3f,&00
+            .byte &3e,&81,&44,&00,&3f,&81,&45,&00
             .byte &42,&81,&46,&00,&43,&81,&48,&00
             .byte &44,&82,&47,&02,&48,&83,&46,&00
             .byte &45,&83,&47,&00,&92,&03,&93,&04
-            .byte &D5,&85,&91,&80,&7F,&81,&7E,&81
-            .byte &AF,&00,&88,&02,&4E,&84,&89,&00
-            .byte &89,&03,&4D,&04,&52,&85,&88,&00
-            .byte &8B,&02,&50,&03,&DE,&04,&51,&85
-            .byte &8A,&00,&51,&03,&4F,&85,&8B,&00
-            .byte &54,&01,&50,&05,&90,&07,&4F,&83
-            .byte &8B,&00,&8D,&02,&53,&03,&89,&04
-            .byte &8E,&05,&8C,&87,&4E,&00,&8E,&02
-            .byte &8A,&03,&52,&04,&8F,&05,&8D,&86
-            .byte &DE,&00,&97,&01,&51,&03,&90,&05
-            .byte &97,&87,&8B,&00,&97,&01,&88,&02
-            .byte &8C,&04,&97,&86,&89,&00,&B8,&01
+            .byte &d5,&85,&91,&80,&7f,&81,&7e,&81
+            .byte &af,&00,&88,&02,&4e,&84,&89,&00
+            .byte &89,&03,&4d,&04,&52,&85,&88,&00
+            .byte &8b,&02,&50,&03,&de,&04,&51,&85
+            .byte &8a,&00,&51,&03,&4f,&85,&8b,&00
+            .byte &54,&01,&50,&05,&90,&07,&4f,&83
+            .byte &8b,&00,&8d,&02,&53,&03,&89,&04
+            .byte &8e,&05,&8c,&87,&4e,&00,&8e,&02
+            .byte &8a,&03,&52,&04,&8f,&05,&8d,&86
+            .byte &de,&00,&97,&01,&51,&03,&90,&05
+            .byte &97,&87,&8b,&00,&97,&01,&88,&02
+            .byte &8c,&04,&97,&86,&89,&00,&b8,&01
             .byte &63,&02,&57,&03,&62,&06,&64,&87
             .byte &61,&01,&64,&02,&58,&03,&56,&06
-            .byte &65,&87,&63,&01,&65,&02,&DC,&03
+            .byte &65,&87,&63,&01,&65,&02,&dc,&03
             .byte &57,&06,&66,&87,&64,&01,&67,&02
-            .byte &5E,&03,&DC,&06,&5B,&87,&66,&00
-            .byte &6B,&81,&CF,&00,&5E,&02,&93,&03
+            .byte &5e,&03,&dc,&06,&5b,&87,&66,&00
+            .byte &6b,&81,&cf,&00,&5e,&02,&93,&03
             .byte &67,&85,&59,&00,&67,&03,&68,&85
-            .byte &66,&00,&68,&03,&6B,&85,&69,&01
-            .byte &5B,&03,&59,&87,&67,&00,&6A,&02
-            .byte &6B,&84,&69,&00,&63,&02,&6A,&84
+            .byte &66,&00,&68,&03,&6b,&85,&69,&01
+            .byte &5b,&03,&59,&87,&67,&00,&6a,&02
+            .byte &6b,&84,&69,&00,&63,&02,&6a,&84
             .byte &64,&00,&62,&02,&63,&84,&56,&01
             .byte &61,&02,&56,&86,&63,&00,&56,&01
             .byte &60,&02,&64,&03,&61,&04,&57,&05
-            .byte &62,&86,&6A,&00,&57,&01,&6A,&02
+            .byte &62,&86,&6a,&00,&57,&01,&6a,&02
             .byte &65,&03,&63,&04,&58,&05,&56,&06
             .byte &69,&87,&60,&00,&58,&01,&69,&02
-            .byte &66,&03,&64,&04,&DC,&05,&57,&06
-            .byte &68,&87,&6A,&00,&DC,&01,&68,&02
+            .byte &66,&03,&64,&04,&dc,&05,&57,&06
+            .byte &68,&87,&6a,&00,&dc,&01,&68,&02
             .byte &67,&03,&65,&04,&59,&05,&58,&06
-            .byte &5C,&87,&69,&00,&59,&01,&5C,&02
-            .byte &5B,&03,&66,&04,&5E,&05,&DC,&87
-            .byte &68,&00,&66,&01,&5D,&02,&5C,&03
-            .byte &69,&04,&67,&05,&65,&87,&6B,&00
-            .byte &65,&01,&6B,&02,&68,&03,&6A,&04
-            .byte &66,&05,&64,&06,&5D,&87,&5F,&00
-            .byte &64,&01,&5F,&02,&69,&03,&60,&04
-            .byte &65,&05,&63,&86,&6B,&00,&69,&01
-            .byte &5A,&02,&5D,&03,&5F,&04,&68,&85
-            .byte &6A,&01,&98,&84,&80,&87,&76,&86
-            .byte &7E,&84,&70,&01,&6F,&03,&71,&86
-            .byte &7A,&00,&72,&82,&70,&01,&71,&82
+            .byte &5c,&87,&69,&00,&59,&01,&5c,&02
+            .byte &5b,&03,&66,&04,&5e,&05,&dc,&87
+            .byte &68,&00,&66,&01,&5d,&02,&5c,&03
+            .byte &69,&04,&67,&05,&65,&87,&6b,&00
+            .byte &65,&01,&6b,&02,&68,&03,&6a,&04
+            .byte &66,&05,&64,&06,&5d,&87,&5f,&00
+            .byte &64,&01,&5f,&02,&69,&03,&60,&04
+            .byte &65,&05,&63,&86,&6b,&00,&69,&01
+            .byte &5a,&02,&5d,&03,&5f,&04,&68,&85
+            .byte &6a,&01,&98,&84,&80,&87,&76,&86
+            .byte &7e,&84,&70,&01,&6f,&03,&71,&86
+            .byte &7a,&00,&72,&82,&70,&01,&71,&82
             .byte &73,&03,&72,&84,&81,&01,&75,&82
-            .byte &76,&00,&74,&06,&80,&87,&7A,&00
-            .byte &6D,&02,&78,&83,&74,&04,&78,&87
-            .byte &80,&01,&7F,&02,&79,&03,&76,&87
-            .byte &77,&03,&78,&86,&7B,&00,&75,&85
-            .byte &70,&00,&79,&02,&7C,&83,&7F,&03
-            .byte &7B,&86,&7D,&00,&7E,&85,&7C,&00
-            .byte &4B,&01,&7D,&85,&6E,&01,&4A,&02
-            .byte &7B,&85,&78,&01,&6C,&04,&77,&85
+            .byte &76,&00,&74,&06,&80,&87,&7a,&00
+            .byte &6d,&02,&78,&83,&74,&04,&78,&87
+            .byte &80,&01,&7f,&02,&79,&03,&76,&87
+            .byte &77,&03,&78,&86,&7b,&00,&75,&85
+            .byte &70,&00,&79,&02,&7c,&83,&7f,&03
+            .byte &7b,&86,&7d,&00,&7e,&85,&7c,&00
+            .byte &4b,&01,&7d,&85,&6e,&01,&4a,&02
+            .byte &7b,&85,&78,&01,&6c,&04,&77,&85
             .byte &75,&07,&73,&89,&82,&08,&81,&89
-            .byte &DD,&01,&84,&83,&D5,&00,&83,&81
+            .byte &dd,&01,&84,&83,&d5,&00,&83,&81
             .byte &85,&00,&84,&83,&87,&04,&87,&87
-            .byte &D4,&08,&85,&89,&86,&00,&55,&01
-            .byte &4D,&02,&89,&03,&D7,&04,&8C,&86
-            .byte &4E,&00,&8C,&01,&4E,&02,&52,&03
-            .byte &88,&04,&8D,&05,&55,&87,&4D,&00
-            .byte &8F,&01,&DE,&02,&8B,&03,&53,&04
-            .byte &90,&05,&8E,&86,&4F,&00,&90,&01
-            .byte &4F,&02,&51,&03,&8A,&04,&54,&05
-            .byte &8F,&06,&50,&87,&DE,&00,&97,&01
-            .byte &89,&02,&8D,&03,&55,&04,&97,&05
+            .byte &d4,&08,&85,&89,&86,&00,&55,&01
+            .byte &4d,&02,&89,&03,&d7,&04,&8c,&86
+            .byte &4e,&00,&8c,&01,&4e,&02,&52,&03
+            .byte &88,&04,&8d,&05,&55,&87,&4d,&00
+            .byte &8f,&01,&de,&02,&8b,&03,&53,&04
+            .byte &90,&05,&8e,&86,&4f,&00,&90,&01
+            .byte &4f,&02,&51,&03,&8a,&04,&54,&05
+            .byte &8f,&06,&50,&87,&de,&00,&97,&01
+            .byte &89,&02,&8d,&03,&55,&04,&97,&05
             .byte &97,&06,&52,&87,&88,&00,&97,&01
-            .byte &52,&02,&8E,&03,&8C,&04,&97,&05
+            .byte &52,&02,&8e,&03,&8c,&04,&97,&05
             .byte &97,&06,&53,&87,&89,&00,&97,&01
-            .byte &53,&02,&8F,&03,&8D,&04,&97,&05
-            .byte &97,&06,&8A,&87,&52,&00,&97,&01
-            .byte &8A,&02,&90,&03,&8E,&04,&97,&05
-            .byte &97,&06,&8B,&87,&53,&00,&97,&01
-            .byte &8B,&02,&54,&03,&8F,&04,&97,&05
-            .byte &97,&06,&51,&87,&8A,&01,&93,&02
-            .byte &92,&86,&49,&01,&49,&02,&D5,&03
+            .byte &53,&02,&8f,&03,&8d,&04,&97,&05
+            .byte &97,&06,&8a,&87,&52,&00,&97,&01
+            .byte &8a,&02,&90,&03,&8e,&04,&97,&05
+            .byte &97,&06,&8b,&87,&53,&00,&97,&01
+            .byte &8b,&02,&54,&03,&8f,&04,&97,&05
+            .byte &97,&06,&51,&87,&8a,&01,&93,&02
+            .byte &92,&86,&49,&01,&49,&02,&d5,&03
             .byte &91,&87,&93,&00,&91,&02,&49,&03
-            .byte &5B,&84,&92,&88,&3D,&81,&CD,&80
-            .byte &A8,&81,&55,&00,&6C,&81,&DC,&63
-            .byte &9A,&84,&AF,&62,&99,&83,&9B,&02
-            .byte &9A,&03,&9C,&E9,&9F,&02,&9B,&83
-            .byte &9D,&60,&9E,&02,&9C,&88,&A2,&E1
-            .byte &9D,&04,&A1,&05,&A0,&E8,&9B,&86
-            .byte &9F,&87,&9F,&02,&A3,&09,&9D,&88
-            .byte &A7,&02,&A4,&83,&A2,&01,&A9,&02
-            .byte &A5,&83,&A3,&01,&AA,&02,&A6,&83
-            .byte &A4,&01,&AB,&83,&A5,&02,&A8,&89
-            .byte &A2,&61,&96,&83,&A7,&00,&A4,&E1
-            .byte &AC,&00,&A5,&E1,&AD,&00,&A6,&E1
-            .byte &AE,&E0,&A9,&E0,&AA,&E0,&AB,&00
-            .byte &4C,&07,&99,&89,&B0,&08,&AF,&89
-            .byte &B1,&02,&B2,&88,&B0,&03,&B1,&86
-            .byte &B3,&01,&B4,&85,&B2,&00,&B3,&01
-            .byte &B7,&02,&B6,&83,&B5,&82,&B4,&83
-            .byte &B4,&00,&B4,&03,&B9,&86,&B8,&01
-            .byte &56,&85,&B7,&04,&B7,&87,&BA,&01
-            .byte &BC,&03,&BB,&84,&B9,&82,&BA,&00
-            .byte &BA,&81,&BD,&00,&BC,&01,&C5,&03
-            .byte &BE,&87,&C4,&01,&C4,&02,&BD,&86
-            .byte &C5,&00,&C7,&01,&CB,&03,&C0,&85
-            .byte &C6,&00,&C6,&02,&BF,&03,&C1,&04
-            .byte &C7,&85,&C2,&00,&C2,&02,&C0,&E3
-            .byte &D6,&00,&C3,&01,&C1,&02,&C6,&04
-            .byte &C4,&86,&C0,&01,&C2,&02,&C4,&86
-            .byte &C6,&00,&BE,&01,&C6,&02,&C5,&03
-            .byte &C3,&04,&BD,&06,&C7,&87,&C2,&00
-            .byte &BD,&01,&C7,&03,&C4,&05,&BE,&87
-            .byte &C6,&00,&C4,&01,&C0,&02,&C7,&03
-            .byte &C2,&04,&C5,&05,&C3,&06,&BF,&87
-            .byte &C1,&00,&C5,&01,&BF,&03,&C6,&05
-            .byte &C4,&87,&C0,&02,&C9,&88,&CB,&02
-            .byte &CA,&03,&C8,&88,&CC,&03,&C9,&88
-            .byte &CD,&00,&BF,&02,&CC,&89,&C8,&00
-            .byte &95,&02,&CD,&03,&CB,&89,&C9,&00
-            .byte &95,&02,&CE,&03,&CC,&89,&CA,&02
-            .byte &CF,&83,&CD,&00,&5A,&02,&D0,&03
-            .byte &CE,&06,&41,&07,&40,&88,&DF,&02
-            .byte &D1,&83,&CF,&02,&D2,&83,&D0,&00
-            .byte &D3,&83,&D1,&01,&D2,&84,&D4,&01
-            .byte &D3,&82,&86,&08,&92,&89,&83,&E2
-            .byte &C1,&02,&88,&85,&D8,&02,&D7,&85
-            .byte &D9,&02,&D8,&83,&DA,&02,&D9,&83
-            .byte &DB,&82,&DA,&10,&98,&01,&66,&02
+            .byte &5b,&84,&92,&88,&3d,&81,&cd,&80
+            .byte &a8,&81,&55,&00,&6c,&81,&dc,&63
+            .byte &9a,&84,&af,&62,&99,&83,&9b,&02
+            .byte &9a,&03,&9c,&e9,&9f,&02,&9b,&83
+            .byte &9d,&60,&9e,&02,&9c,&88,&a2,&e1
+            .byte &9d,&04,&a1,&05,&a0,&e8,&9b,&86
+            .byte &9f,&87,&9f,&02,&a3,&09,&9d,&88
+            .byte &a7,&02,&a4,&83,&a2,&01,&a9,&02
+            .byte &a5,&83,&a3,&01,&aa,&02,&a6,&83
+            .byte &a4,&01,&ab,&83,&a5,&02,&a8,&89
+            .byte &a2,&61,&96,&83,&a7,&00,&a4,&e1
+            .byte &ac,&00,&a5,&e1,&ad,&00,&a6,&e1
+            .byte &ae,&e0,&a9,&e0,&aa,&e0,&ab,&00
+            .byte &4c,&07,&99,&89,&b0,&08,&af,&89
+            .byte &b1,&02,&b2,&88,&b0,&03,&b1,&86
+            .byte &b3,&01,&b4,&85,&b2,&00,&b3,&01
+            .byte &b7,&02,&b6,&83,&b5,&82,&b4,&83
+            .byte &b4,&00,&b4,&03,&b9,&86,&b8,&01
+            .byte &56,&85,&b7,&04,&b7,&87,&ba,&01
+            .byte &bc,&03,&bb,&84,&b9,&82,&ba,&00
+            .byte &ba,&81,&bd,&00,&bc,&01,&c5,&03
+            .byte &be,&87,&c4,&01,&c4,&02,&bd,&86
+            .byte &c5,&00,&c7,&01,&cb,&03,&c0,&85
+            .byte &c6,&00,&c6,&02,&bf,&03,&c1,&04
+            .byte &c7,&85,&c2,&00,&c2,&02,&c0,&e3
+            .byte &d6,&00,&c3,&01,&c1,&02,&c6,&04
+            .byte &c4,&86,&c0,&01,&c2,&02,&c4,&86
+            .byte &c6,&00,&be,&01,&c6,&02,&c5,&03
+            .byte &c3,&04,&bd,&06,&c7,&87,&c2,&00
+            .byte &bd,&01,&c7,&03,&c4,&05,&be,&87
+            .byte &c6,&00,&c4,&01,&c0,&02,&c7,&03
+            .byte &c2,&04,&c5,&05,&c3,&06,&bf,&87
+            .byte &c1,&00,&c5,&01,&bf,&03,&c6,&05
+            .byte &c4,&87,&c0,&02,&c9,&88,&cb,&02
+            .byte &ca,&03,&c8,&88,&cc,&03,&c9,&88
+            .byte &cd,&00,&bf,&02,&cc,&89,&c8,&00
+            .byte &95,&02,&cd,&03,&cb,&89,&c9,&00
+            .byte &95,&02,&ce,&03,&cc,&89,&ca,&02
+            .byte &cf,&83,&cd,&00,&5a,&02,&d0,&03
+            .byte &ce,&06,&41,&07,&40,&88,&df,&02
+            .byte &d1,&83,&cf,&02,&d2,&83,&d0,&00
+            .byte &d3,&83,&d1,&01,&d2,&84,&d4,&01
+            .byte &d3,&82,&86,&08,&92,&89,&83,&e2
+            .byte &c1,&02,&88,&85,&d8,&02,&d7,&85
+            .byte &d9,&02,&d8,&83,&da,&02,&d9,&83
+            .byte &db,&82,&da,&10,&98,&01,&66,&02
             .byte &59,&03,&58,&06,&67,&87,&65,&02
-            .byte &DE,&88,&82,&00,&8A,&02,&4F,&03
-            .byte &DD,&04,&8B,&85,&53,&08,&94,&89
-            .byte &CF,&00,&00,&00,&00,&00,&00,&00
+            .byte &de,&88,&82,&00,&8a,&02,&4f,&03
+            .byte &dd,&04,&8b,&85,&53,&08,&94,&89
+            .byte &cf,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &00,&00,&00,&00,&00,&00,&00,&FF
+            .byte &00,&00,&00,&00,&00,&00,&00,&ff
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -4569,7 +4620,7 @@ L6E69:      .byte &3B,&01,&37,&02,&3B,&03,&38,&04
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00
-L736F:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l736f:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -4586,31 +4637,31 @@ L736F:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
-            .byte &08,&07,&06,&44,&04,&7B,&72,&00
+            .byte &08,&07,&06,&44,&04,&7b,&72,&00
             .byte &00
-L7400:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l7400:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00
-L740A:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l740a:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00
-L7414:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l7414:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00
-L741E:      .byte &01
-L741F:      .byte &00
-L7420:      .byte &00
-L7421:      .byte &00
-L7422:      .byte &00
-L7423:      .byte &00
-L7424:      .byte &00
-L7425:      .byte &00
-L7426:      .byte &00
-L7427:      .byte &00
-L7428:      .byte &00
-L7429:      .byte &00,&00,&00,&00,&00,&00,&00,&00
-L7431:      .byte &00
-L7432:      .byte &00
-L7433:      .byte &00
-L7434:      .byte &00
-L7435:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l741e:      .byte &01
+l741f:      .byte &00
+l7420:      .byte &00
+l7421:      .byte &00
+l7422:      .byte &00
+l7423:      .byte &00
+l7424:      .byte &00
+l7425:      .byte &00
+l7426:      .byte &00
+l7427:      .byte &00
+l7428:      .byte &00
+l7429:      .byte &00,&00,&00,&00,&00,&00,&00,&00
+l7431:      .byte &00
+l7432:      .byte &00
+l7433:      .byte &00
+l7434:      .byte &00
+l7435:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
@@ -4629,263 +4680,263 @@ L7435:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00
-L74CC:      .byte &00,&00,&55,&45,&00,&04,&04,&03
+l74cc:      .byte &00,&00,&55,&45,&00,&04,&04,&03
             .byte &44,&07,&00,&00,&00,&45,&20,&34
             .byte &34,&00,&45,&04,&10,&00,&34,&04
             .byte &34,&04,&20,&04,&00,&24,&34,&06
-            .byte &20,&B4,&05,&05,&05,&10,&20,&05
+            .byte &20,&b4,&05,&05,&05,&10,&20,&05
             .byte &00,&00
-L74F6:      .byte &00,&00,&34,&D6
-L74FA:      .byte &AC
-L74FB:      .byte &EA
-L74FC:      .byte &FF
-L74FD:      .byte &02
-L74FE:      .byte &35
-L74FF:      .byte &27
-L7500:      .byte &12
-L7501:      .byte &6A,&AD,&AB
-L7504:      .byte &22
-L7505:      .byte &E1
-L7506:      .byte &0D
-L7507:      .byte &EC
-L7508:      .byte &35
-L7509:      .byte &76
-L750A:      .byte &E2
-L750B:      .byte &47
-L750C:      .byte &E3
-L750D:      .byte &C9
-L750E:      .byte &FF
-L750F:      .byte &B6
-L7510:      .byte &DF
-L7511:      .byte &70
-L7512:      .byte &9E
-L7513:      .byte &01
-L7514:      .byte &6E
-L7515:      .byte &24
-L7516:      .byte &AE
-L7517:      .byte &69,&A1,&91,&83
-L751B:      .byte &3D
-L751C:      .byte &98
-L751D:      .byte &B5,&00,&00
-L7520:      .byte &00,&00,&1F,&75,&76,&77,&78,&44
-            .byte &42,&41,&50,&79,&7A,&1F,&43,&47
-            .byte &6A,&7B
-L7532:      .byte &55,&6B,&79
-L7535:      .byte &3F,&6C,&7C,&7D,&7E,&45,&7F,&80
-            .byte &6D,&49,&48,&81,&46,&1F,&39,&1F
-L7545:      .byte &3A,&1F,&6F,&00,&00,&00,&00,&00
+inventory:      .byte &00,&00,&34,&d6
+l74fa:      .byte &ac
+l74fb:      .byte &ea
+l74fc:      .byte &ff
+chainloc:      .byte &02
+l74fe:      .byte &35
+l74ff:      .byte &27
+l7500:      .byte &12
+l7501:      .byte &6a,&ad,&ab
+l7504:      .byte &22
+l7505:      .byte &e1
+l7506:      .byte &0d
+l7507:      .byte &ec
+guardloc:      .byte &35
+l7509:      .byte &76
+l750a:      .byte &e2
+l750b:      .byte &47
+l750c:      .byte &e3
+l750d:      .byte &c9
+l750e:      .byte &ff
+l750f:      .byte &b6
+l7510:      .byte &df
+l7511:      .byte &70
+l7512:      .byte &9e
+l7513:      .byte &01
+l7514:      .byte &6e
+l7515:      .byte &24
+l7516:      .byte &ae
+l7517:      .byte &69,&a1,&91,&83
+l751b:      .byte &3d
+l751c:      .byte &98
+l751d:      .byte &b5,&00,&00
+l7520:      .byte &00,&00,&1f,&75,&76,&77,&78,&44
+            .byte &42,&41,&50,&79,&7a,&1f,&43,&47
+            .byte &6a,&7b
+l7532:      .byte &55,&6b,&79
+l7535:      .byte &3f,&6c,&7c,&7d,&7e,&45,&7f,&80
+            .byte &6d,&49,&48,&81,&46,&1f,&39,&1f
+l7545:      .byte &3a,&1f,&6f,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&02
             .byte &03,&04,&05,&06,&06,&06,&06,&07
-            .byte &08,&09,&0A,&0B,&0C,&0D,&0E,&0F
+            .byte &08,&09,&0a,&0b,&0c,&0d,&0e,&0f
             .byte &10,&11,&12,&13,&14,&15,&16,&17
             .byte &18,&18,&18,&18,&18,&18,&18,&19
-            .byte &19,&1B,&1A,&1A,&1A,&1C,&1E,&1D
-            .byte &1D,&1D,&1D,&1D,&1D,&1D,&1F,&1F
-            .byte &1F,&1F,&1F,&1F,&1F,&1F,&1F,&20
+            .byte &19,&1b,&1a,&1a,&1a,&1c,&1e,&1d
+            .byte &1d,&1d,&1d,&1d,&1d,&1d,&1f,&1f
+            .byte &1f,&1f,&1f,&1f,&1f,&1f,&1f,&20
             .byte &21,&21,&21,&22,&22,&22,&22,&22
             .byte &22,&22,&22,&22,&22,&22,&22,&22
             .byte &22,&23,&24,&25,&26,&27,&28,&28
-            .byte &28,&28,&29,&2A,&2A,&2A,&2A,&2B
-            .byte &2B,&2B,&2B,&2B,&64,&2C,&65,&2D
-            .byte &2E,&2F,&30
-L75B8:      .byte &00,&31,&32,&33,&34,&35,&36,&37
-            .byte &38,&39,&3A,&3B,&3B,&3B,&3C,&3D
-            .byte &3E,&3F,&40,&41,&42,&43,&44,&45
-            .byte &46,&47,&48,&48,&49,&4B,&4A,&4C
-            .byte &4C,&4D,&4D,&4E,&4F,&50,&50,&50
+            .byte &28,&28,&29,&2a,&2a,&2a,&2a,&2b
+            .byte &2b,&2b,&2b,&2b,&64,&2c,&65,&2d
+            .byte &2e,&2f,&30
+l75b8:      .byte &00,&31,&32,&33,&34,&35,&36,&37
+            .byte &38,&39,&3a,&3b,&3b,&3b,&3c,&3d
+            .byte &3e,&3f,&40,&41,&42,&43,&44,&45
+            .byte &46,&47,&48,&48,&49,&4b,&4a,&4c
+            .byte &4c,&4d,&4d,&4e,&4f,&50,&50,&50
             .byte &50,&63,&51,&51,&51,&51,&51,&51
             .byte &52,&52,&52,&53,&54,&54,&55,&56
-            .byte &57,&57,&58,&59,&59,&5A,&5B,&62
-            .byte &62,&62,&5C,&5D,&5E,&5F,&60,&61
-            .byte &C4,&F9,&37,&B9,&CE,&74,&06,&2C
-            .byte &81,&2B,&AA,&2E,&CA,&2F,&41,&57
-            .byte &00,&09,&06,&C4,&AE,&78,&7C,&19
-            .byte &42,&42,&4C,&4C,&59,&44,&44,&9B
-            .byte &E9,&3C,&22,&56,&56,&60,&60,&A6
-            .byte &A5,&8C,&C4,&C4,&2F,&06,&6A,&35
-            .byte &3C,&8A,&3C,&4C,&96,&96,&C9,&96
-            .byte &17,&18,&1F,&18,&19,&1E,&13,&1A
-            .byte &1A,&1E,&1A,&14,&14,&12,&13,&22
-            .byte &12,&1A,&18,&17,&19,&1F,&14,&1E
-            .byte &1E,&1E,&1E,&1E,&18,&16,&16,&0C
-            .byte &1F,&18,&1E,&1E,&1E,&1E,&1E,&17
-            .byte &13,&21,&17,&1F,&12,&13,&1E,&1E
-            .byte &18,&0C,&18,&13,&0C,&0C,&19,&0C
+            .byte &57,&57,&58,&59,&59,&5a,&5b,&62
+            .byte &62,&62,&5c,&5d,&5e,&5f,&60,&61
+            .byte &c4,&f9,&37,&b9,&ce,&74,&06,&2c
+            .byte &81,&2b,&aa,&2e,&ca,&2f,&41,&57
+            .byte &00,&09,&06,&c4,&ae,&78,&7c,&19
+            .byte &42,&42,&4c,&4c,&59,&44,&44,&9b
+            .byte &e9,&3c,&22,&56,&56,&60,&60,&a6
+            .byte &a5,&8c,&c4,&c4,&2f,&06,&6a,&35
+            .byte &3c,&8a,&3c,&4c,&96,&96,&c9,&96
+            .byte &17,&18,&1f,&18,&19,&1e,&13,&1a
+            .byte &1a,&1e,&1a,&14,&14,&12,&13,&22
+            .byte &12,&1a,&18,&17,&19,&1f,&14,&1e
+            .byte &1e,&1e,&1e,&1e,&18,&16,&16,&0c
+            .byte &1f,&18,&1e,&1e,&1e,&1e,&1e,&17
+            .byte &13,&21,&17,&1f,&12,&13,&1e,&1e
+            .byte &18,&0c,&18,&13,&0c,&0c,&19,&0c
             .byte &00,&00,&00,&40,&61,&74,&74,&61
-            .byte &63,&6B,&40,&62,&72,&65,&61,&6B
-            .byte &40,&62,&6F,&61,&72,&64,&40,&63
-            .byte &6C,&6F,&73,&65,&40,&63,&6C,&69
-            .byte &6D,&62,&40,&64,&6F,&77,&6E,&40
-            .byte &64,&72,&6F,&70,&40,&64,&69,&67
-            .byte &40,&64,&72,&69,&6E,&6B,&40,&65
+            .byte &63,&6b,&40,&62,&72,&65,&61,&6b
+            .byte &40,&62,&6f,&61,&72,&64,&40,&63
+            .byte &6c,&6f,&73,&65,&40,&63,&6c,&69
+            .byte &6d,&62,&40,&64,&6f,&77,&6e,&40
+            .byte &64,&72,&6f,&70,&40,&64,&69,&67
+            .byte &40,&64,&72,&69,&6e,&6b,&40,&65
             .byte &61,&73,&74,&40,&65,&61,&74,&40
-            .byte &65,&78,&61,&6D,&69,&6E,&65,&40
-            .byte &66,&69,&6C,&6C,&40,&67,&65,&74
-            .byte &40,&67,&6F,&40,&68,&65,&6C,&70
-            .byte &40,&69,&6E,&76,&65,&6E,&74,&6F
-            .byte &72,&79,&40,&6A,&75,&6D,&70,&40
-            .byte &6B,&6E,&6F,&63,&6B,&40,&6B,&69
-            .byte &6C,&6C,&40,&6B,&61,&74,&72,&6F
-            .byte &73,&40,&6C,&6F,&6F,&6B,&40,&6C
-            .byte &61,&6D,&70,&40,&6E,&6F,&72,&74
-            .byte &68,&40,&6E,&65,&40,&6E,&6F,&72
-            .byte &74,&68,&65,&61,&73,&74,&40,&6E
-            .byte &77,&40,&6E,&6F,&72,&74,&68,&77
-            .byte &65,&73,&74,&40,&6F,&70,&65,&6E
-            .byte &40,&70,&75,&74,&40,&70,&6C,&61
+            .byte &65,&78,&61,&6d,&69,&6e,&65,&40
+            .byte &66,&69,&6c,&6c,&40,&67,&65,&74
+            .byte &40,&67,&6f,&40,&68,&65,&6c,&70
+            .byte &40,&69,&6e,&76,&65,&6e,&74,&6f
+            .byte &72,&79,&40,&6a,&75,&6d,&70,&40
+            .byte &6b,&6e,&6f,&63,&6b,&40,&6b,&69
+            .byte &6c,&6c,&40,&6b,&61,&74,&72,&6f
+            .byte &73,&40,&6c,&6f,&6f,&6b,&40,&6c
+            .byte &61,&6d,&70,&40,&6e,&6f,&72,&74
+            .byte &68,&40,&6e,&65,&40,&6e,&6f,&72
+            .byte &74,&68,&65,&61,&73,&74,&40,&6e
+            .byte &77,&40,&6e,&6f,&72,&74,&68,&77
+            .byte &65,&73,&74,&40,&6f,&70,&65,&6e
+            .byte &40,&70,&75,&74,&40,&70,&6c,&61
             .byte &63,&65,&40,&71,&75,&69,&74,&40
-            .byte &72,&65,&73,&74,&6F,&72,&65,&40
-            .byte &72,&75,&62,&40,&73,&6F,&75,&74
-            .byte &68,&40,&73,&65,&40,&73,&6F,&75
+            .byte &72,&65,&73,&74,&6f,&72,&65,&40
+            .byte &72,&75,&62,&40,&73,&6f,&75,&74
+            .byte &68,&40,&73,&65,&40,&73,&6f,&75
             .byte &74,&68,&65,&61,&73,&74,&40,&73
-            .byte &77,&40,&73,&6F,&75,&74,&68,&77
-            .byte &65,&73,&74,&40,&73,&69,&6E,&67
+            .byte &77,&40,&73,&6f,&75,&74,&68,&77
+            .byte &65,&73,&74,&40,&73,&69,&6e,&67
             .byte &40,&73,&65,&61,&72,&63,&68,&40
-            .byte &73,&63,&6F,&72,&65,&40,&73,&74
-            .byte &72,&61,&6E,&67,&6C,&65,&40,&73
-            .byte &61,&76,&65,&40,&74,&61,&6B,&65
-            .byte &40,&74,&68,&72,&6F,&77,&40,&75
+            .byte &73,&63,&6f,&72,&65,&40,&73,&74
+            .byte &72,&61,&6e,&67,&6c,&65,&40,&73
+            .byte &61,&76,&65,&40,&74,&61,&6b,&65
+            .byte &40,&74,&68,&72,&6f,&77,&40,&75
             .byte &70,&40,&77,&65,&73,&74,&40,&77
             .byte &69,&73,&68,&40,&77,&61,&69,&74
             .byte &40,&77,&61,&76,&65,&40,&77,&65
-            .byte &61,&72,&40,&73,&69,&74,&40,&6C
+            .byte &61,&72,&40,&73,&69,&74,&40,&6c
             .byte &69,&65,&40,&70,&72,&61,&79,&40
-            .byte &0D,&40,&58,&40,&58,&40,&61,&6C
-            .byte &63,&6F,&76,&65,&40,&62,&65,&67
-            .byte &67,&61,&72,&40,&62,&6C,&61,&6E
-            .byte &6B,&65,&74,&40,&62,&72,&61,&63
-            .byte &65,&6C,&65,&74,&40,&62,&72,&6F
-            .byte &6F,&63,&68,&40,&63,&68,&61,&69
-            .byte &6E,&40,&63,&6C,&6F,&61,&6B,&40
-            .byte &63,&6F,&69,&6E,&40,&63,&6F,&6D
+            .byte &0d,&40,&58,&40,&58,&40,&61,&6c
+            .byte &63,&6f,&76,&65,&40,&62,&65,&67
+            .byte &67,&61,&72,&40,&62,&6c,&61,&6e
+            .byte &6b,&65,&74,&40,&62,&72,&61,&63
+            .byte &65,&6c,&65,&74,&40,&62,&72,&6f
+            .byte &6f,&63,&68,&40,&63,&68,&61,&69
+            .byte &6e,&40,&63,&6c,&6f,&61,&6b,&40
+            .byte &63,&6f,&69,&6e,&40,&63,&6f,&6d
             .byte &70,&61,&73,&73,&40,&64,&69,&61
-            .byte &6D,&6F,&6E,&64,&40,&64,&6F,&6C
-            .byte &6C,&40,&64,&72,&65,&73,&73,&65
-            .byte &72,&40,&66,&6F,&6F,&64,&40,&67
-            .byte &6C,&61,&73,&73,&65,&73,&40,&67
-            .byte &6C,&6F,&76,&65,&73,&40,&67,&6F
-            .byte &62,&6C,&65,&74,&40,&67,&75,&61
+            .byte &6d,&6f,&6e,&64,&40,&64,&6f,&6c
+            .byte &6c,&40,&64,&72,&65,&73,&73,&65
+            .byte &72,&40,&66,&6f,&6f,&64,&40,&67
+            .byte &6c,&61,&73,&73,&65,&73,&40,&67
+            .byte &6c,&6f,&76,&65,&73,&40,&67,&6f
+            .byte &62,&6c,&65,&74,&40,&67,&75,&61
             .byte &72,&64,&40,&68,&61,&74,&40,&69
-            .byte &6E,&67,&6F,&74,&40,&6C,&61,&6D
-            .byte &70,&40,&6C,&65,&67,&67,&69,&6E
-            .byte &67,&73,&40,&6C,&6F,&63,&6B,&65
-            .byte &74,&40,&6D,&69,&74,&74,&65,&6E
-            .byte &73,&40,&6E,&65,&63,&6B,&6C,&61
-            .byte &63,&65,&40,&6F,&69,&6C,&40,&72
-            .byte &69,&6E,&67,&40,&72,&75,&67,&40
-            .byte &73,&61,&63,&6B,&69,&6E,&67,&40
-            .byte &73,&68,&6F,&65,&73,&40,&73,&68
-            .byte &6F,&76,&65,&6C,&40,&73,&6F,&61
-            .byte &70,&40,&73,&6F,&63,&6B,&73,&40
-            .byte &74,&61,&62,&6C,&65,&40,&74,&65
-            .byte &6C,&65,&70,&72,&69,&6E,&74,&65
-            .byte &72,&40,&74,&6F,&6F,&6C,&73,&68
-            .byte &65,&64,&40,&75,&6D,&62,&72,&65
-            .byte &6C,&6C,&61,&40,&77,&61,&74,&65
-            .byte &72,&40,&77,&65,&6C,&6C,&40,&64
-            .byte &6F,&6F,&72,&40,&6C,&75,&6C,&6C
-            .byte &61,&62,&79,&40,&73,&6F,&6E,&67
-            .byte &40,&73,&68,&69,&70,&40,&74,&6F
+            .byte &6e,&67,&6f,&74,&40,&6c,&61,&6d
+            .byte &70,&40,&6c,&65,&67,&67,&69,&6e
+            .byte &67,&73,&40,&6c,&6f,&63,&6b,&65
+            .byte &74,&40,&6d,&69,&74,&74,&65,&6e
+            .byte &73,&40,&6e,&65,&63,&6b,&6c,&61
+            .byte &63,&65,&40,&6f,&69,&6c,&40,&72
+            .byte &69,&6e,&67,&40,&72,&75,&67,&40
+            .byte &73,&61,&63,&6b,&69,&6e,&67,&40
+            .byte &73,&68,&6f,&65,&73,&40,&73,&68
+            .byte &6f,&76,&65,&6c,&40,&73,&6f,&61
+            .byte &70,&40,&73,&6f,&63,&6b,&73,&40
+            .byte &74,&61,&62,&6c,&65,&40,&74,&65
+            .byte &6c,&65,&70,&72,&69,&6e,&74,&65
+            .byte &72,&40,&74,&6f,&6f,&6c,&73,&68
+            .byte &65,&64,&40,&75,&6d,&62,&72,&65
+            .byte &6c,&6c,&61,&40,&77,&61,&74,&65
+            .byte &72,&40,&77,&65,&6c,&6c,&40,&64
+            .byte &6f,&6f,&72,&40,&6c,&75,&6c,&6c
+            .byte &61,&62,&79,&40,&73,&6f,&6e,&67
+            .byte &40,&73,&68,&69,&70,&40,&74,&6f
             .byte &77,&65,&72,&40,&74,&72,&65,&65
-            .byte &40,&63,&6C,&69,&66,&66,&40,&6D
-            .byte &6F,&75,&6E,&74,&61,&69,&6E,&40
-            .byte &0D,&00,&00,&00,&40,&59,&4F,&55
-            .byte &20,&41,&52,&45,&20,&40,&59,&4F
-            .byte &55,&40,&4E,&4F,&52,&54,&48,&40
-            .byte &53,&4F,&55,&54,&48,&40,&45,&41
+            .byte &40,&63,&6c,&69,&66,&66,&40,&6d
+            .byte &6f,&75,&6e,&74,&61,&69,&6e,&40
+            .byte &0d,&00,&00,&00,&40,&59,&4f,&55
+            .byte &20,&41,&52,&45,&20,&40,&59,&4f
+            .byte &55,&40,&4e,&4f,&52,&54,&48,&40
+            .byte &53,&4f,&55,&54,&48,&40,&45,&41
             .byte &53,&54,&40,&57,&45,&53,&54,&40
             .byte &47,&55,&41,&52,&44,&20,&40,&53
-            .byte &54,&52,&41,&4E,&47,&40,&43,&4F
-            .byte &52,&52,&49,&44,&4F,&52,&20,&40
-            .byte &57,&41,&4C,&4C,&40,&45,&58,&49
-            .byte &54,&40,&57,&49,&4E,&44,&4F,&57
-            .byte &40,&44,&4F,&57,&4E,&40,&4F,&50
-            .byte &45,&4E,&40,&43,&4C,&4F,&53,&45
-            .byte &40,&52,&4F,&4F,&4D,&40,&4C,&4F
-            .byte &43,&4B,&45,&44,&40,&50,&52,&49
-            .byte &53,&4F,&4E,&20,&43,&45,&4C,&4C
+            .byte &54,&52,&41,&4e,&47,&40,&43,&4f
+            .byte &52,&52,&49,&44,&4f,&52,&20,&40
+            .byte &57,&41,&4c,&4c,&40,&45,&58,&49
+            .byte &54,&40,&57,&49,&4e,&44,&4f,&57
+            .byte &40,&44,&4f,&57,&4e,&40,&4f,&50
+            .byte &45,&4e,&40,&43,&4c,&4f,&53,&45
+            .byte &40,&52,&4f,&4f,&4d,&40,&4c,&4f
+            .byte &43,&4b,&45,&44,&40,&50,&52,&49
+            .byte &53,&4f,&4e,&20,&43,&45,&4c,&4c
             .byte &40,&57,&49,&54,&48,&20,&40,&46
-            .byte &52,&4F,&4D,&20,&40,&41,&42,&4F
-            .byte &56,&45,&20,&40,&42,&45,&4C,&4F
-            .byte &57,&20,&40,&53,&45,&45,&40,&4D
-            .byte &4F,&55,&4E,&54,&41,&49,&4E,&20
-            .byte &40,&46,&4F,&52,&45,&53,&54,&20
-            .byte &40,&44,&41,&52,&4B,&40,&50,&41
-            .byte &54,&48,&40,&54,&4F,&20,&40,&43
-            .byte &41,&56,&45,&52,&4E,&40,&53,&49
+            .byte &52,&4f,&4d,&20,&40,&41,&42,&4f
+            .byte &56,&45,&20,&40,&42,&45,&4c,&4f
+            .byte &57,&20,&40,&53,&45,&45,&40,&4d
+            .byte &4f,&55,&4e,&54,&41,&49,&4e,&20
+            .byte &40,&46,&4f,&52,&45,&53,&54,&20
+            .byte &40,&44,&41,&52,&4b,&40,&50,&41
+            .byte &54,&48,&40,&54,&4f,&20,&40,&43
+            .byte &41,&56,&45,&52,&4e,&40,&53,&49
             .byte &44,&45,&40,&54,&52,&45,&41,&53
-            .byte &55,&52,&45,&20,&40,&49,&4E,&20
-            .byte &40,&4F,&46,&20,&40,&43,&4C,&49
-            .byte &46,&46,&40,&4D,&41,&5A,&45,&40
-            .byte &4F,&4E,&20,&40,&41,&44,&56,&45
-            .byte &4E,&54,&55,&52,&45,&40,&43,&4F
+            .byte &55,&52,&45,&20,&40,&49,&4e,&20
+            .byte &40,&4f,&46,&20,&40,&43,&4c,&49
+            .byte &46,&46,&40,&4d,&41,&5a,&45,&40
+            .byte &4f,&4e,&20,&40,&41,&44,&56,&45
+            .byte &4e,&54,&55,&52,&45,&40,&43,&4f
             .byte &50,&59,&52,&49,&47,&48,&54,&20
             .byte &28,&43,&29,&20,&31,&39,&38,&34
-            .byte &40,&54,&48,&41,&54,&20,&40,&4C
-            .byte &45,&53,&53,&40,&47,&55,&4C,&4C
-            .byte &59,&20,&40,&54,&52,&45,&4E,&43
+            .byte &40,&54,&48,&41,&54,&20,&40,&4c
+            .byte &45,&53,&53,&40,&47,&55,&4c,&4c
+            .byte &59,&20,&40,&54,&52,&45,&4e,&43
             .byte &48,&40,&42,&45,&41,&43,&48,&20
-            .byte &40,&54,&55,&4E,&4E,&45,&4C,&20
+            .byte &40,&54,&55,&4e,&4e,&45,&4c,&20
             .byte &40,&41,&57,&41,&59,&40,&48,&49
-            .byte &4C,&4C,&40,&54,&48,&45,&20,&40
-            .byte &41,&4E,&44,&20,&40,&54,&48,&45
-            .byte &40,&41,&4E,&44,&40,&52,&49,&44
-            .byte &40,&4F,&4E,&4C,&59,&20,&40,&41
-            .byte &54,&20,&40,&57,&49,&4E,&44,&40
+            .byte &4c,&4c,&40,&54,&48,&45,&20,&40
+            .byte &41,&4e,&44,&20,&40,&54,&48,&45
+            .byte &40,&41,&4e,&44,&40,&52,&49,&44
+            .byte &40,&4f,&4e,&4c,&59,&20,&40,&41
+            .byte &54,&20,&40,&57,&49,&4e,&44,&40
             .byte &54,&59,&50,&45,&40,&42,&41,&43
-            .byte &4B,&20,&40,&57,&41,&54,&45,&52
-            .byte &40,&46,&4C,&4F,&4F,&52,&20,&40
-            .byte &53,&48,&49,&50,&40,&53,&41,&4E
-            .byte &44,&40,&54,&4F,&57,&45,&52,&40
-            .byte &4E,&27,&54,&20,&40,&49,&4E,&47
-            .byte &40,&47,&48,&54,&40,&4F,&55,&53
-            .byte &40,&49,&4F,&4E,&40,&45,&20,&40
-            .byte &4E,&20,&40,&54,&20,&40,&44,&20
+            .byte &4b,&20,&40,&57,&41,&54,&45,&52
+            .byte &40,&46,&4c,&4f,&4f,&52,&20,&40
+            .byte &53,&48,&49,&50,&40,&53,&41,&4e
+            .byte &44,&40,&54,&4f,&57,&45,&52,&40
+            .byte &4e,&27,&54,&20,&40,&49,&4e,&47
+            .byte &40,&47,&48,&54,&40,&4f,&55,&53
+            .byte &40,&49,&4f,&4e,&40,&45,&20,&40
+            .byte &4e,&20,&40,&54,&20,&40,&44,&20
             .byte &40,&41,&20,&40,&59,&20,&40,&52
             .byte &20,&40,&53,&20,&40,&49,&20,&40
-            .byte &57,&20,&40,&4D,&20,&40,&54,&48
-            .byte &40,&49,&4E,&40,&45,&52,&40,&52
-            .byte &45,&40,&41,&4E,&40,&48,&45,&40
-            .byte &41,&52,&40,&45,&4E,&40,&54,&49
-            .byte &40,&54,&45,&40,&41,&54,&40,&4F
-            .byte &4E,&40,&48,&41,&40,&4F,&55,&40
+            .byte &57,&20,&40,&4d,&20,&40,&54,&48
+            .byte &40,&49,&4e,&40,&45,&52,&40,&52
+            .byte &45,&40,&41,&4e,&40,&48,&45,&40
+            .byte &41,&52,&40,&45,&4e,&40,&54,&49
+            .byte &40,&54,&45,&40,&41,&54,&40,&4f
+            .byte &4e,&40,&48,&41,&40,&4f,&55,&40
             .byte &49,&54,&40,&45,&53,&40,&53,&54
-            .byte &40,&4F,&52,&40,&4E,&54,&40,&48
+            .byte &40,&4f,&52,&40,&4e,&54,&40,&48
             .byte &49,&40,&45,&41,&40,&56,&45,&40
-            .byte &43,&4F,&40,&44,&45,&40,&52,&41
-            .byte &40,&44,&4F,&40,&54,&4F,&40,&4C
-            .byte &45,&40,&4E,&44,&40,&4D,&41,&40
-            .byte &53,&45,&40,&41,&4C,&40,&46,&4F
-            .byte &40,&49,&53,&40,&4E,&45,&40,&4C
-            .byte &41,&40,&54,&41,&40,&45,&4C,&40
+            .byte &43,&4f,&40,&44,&45,&40,&52,&41
+            .byte &40,&44,&4f,&40,&54,&4f,&40,&4c
+            .byte &45,&40,&4e,&44,&40,&4d,&41,&40
+            .byte &53,&45,&40,&41,&4c,&40,&46,&4f
+            .byte &40,&49,&53,&40,&4e,&45,&40,&4c
+            .byte &41,&40,&54,&41,&40,&45,&4c,&40
             .byte &49,&53,&40,&44,&49,&40,&53,&49
-            .byte &40,&43,&41,&40,&55,&4E,&40,&43
-            .byte &48,&40,&4C,&49,&40,&42,&4F,&40
-            .byte &41,&4D,&40,&4C,&4C,&40,&50,&52
-            .byte &40,&55,&4D,&40,&42,&4C,&40,&50
-            .byte &4F,&40,&47,&45,&40,&4C,&4F,&40
-            .byte &47,&48,&40,&52,&4F,&40,&45,&44
-            .byte &40,&47,&52,&40,&4F,&4F,&40,&4E
-            .byte &41,&40,&53,&4D,&40,&4F,&4D,&40
-            .byte &45,&4D,&40,&49,&4C,&40,&4D,&50
+            .byte &40,&43,&41,&40,&55,&4e,&40,&43
+            .byte &48,&40,&4c,&49,&40,&42,&4f,&40
+            .byte &41,&4d,&40,&4c,&4c,&40,&50,&52
+            .byte &40,&55,&4d,&40,&42,&4c,&40,&50
+            .byte &4f,&40,&47,&45,&40,&4c,&4f,&40
+            .byte &47,&48,&40,&52,&4f,&40,&45,&44
+            .byte &40,&47,&52,&40,&4f,&4f,&40,&4e
+            .byte &41,&40,&53,&4d,&40,&4f,&4d,&40
+            .byte &45,&4d,&40,&49,&4c,&40,&4d,&50
             .byte &40,&48,&55,&40,&50,&45,&40,&50
-            .byte &50,&40,&50,&49,&40,&48,&4F,&40
-            .byte &4E,&4F,&40,&53,&41,&40,&51,&55
-            .byte &40,&43,&4B,&40,&4D,&45,&40,&54
-            .byte &59,&40,&41,&49,&40,&47,&4F,&40
+            .byte &50,&40,&50,&49,&40,&48,&4f,&40
+            .byte &4e,&4f,&40,&53,&41,&40,&51,&55
+            .byte &40,&43,&4b,&40,&4d,&45,&40,&54
+            .byte &59,&40,&41,&49,&40,&47,&4f,&40
             .byte &41,&43,&40,&41,&46,&40,&45,&49
-            .byte &40,&45,&58,&40,&55,&54,&40,&4F
+            .byte &40,&45,&58,&40,&55,&54,&40,&4f
             .byte &47,&40,&53,&57,&40,&41,&44,&40
-            .byte &53,&4C,&40,&41,&4B,&40,&4D,&4F
-            .byte &40,&4D,&49,&40,&49,&52,&40,&53
-            .byte &4F,&40,&45,&50,&40,&57,&45,&40
+            .byte &53,&4c,&40,&41,&4b,&40,&4d,&4f
+            .byte &40,&4d,&49,&40,&49,&52,&40,&53
+            .byte &4f,&40,&45,&50,&40,&57,&45,&40
             .byte &47,&49,&40,&54,&52,&40,&42,&45
             .byte &40,&50,&48,&40,&41,&53,&40,&45
             .byte &45,&40,&45,&56,&40,&44,&52,&40
-            .byte &53,&48,&40,&57,&48,&40,&46,&4C
-            .byte &40,&55,&53,&40,&4F,&57,&40,&50
-            .byte &4C,&40,&44,&55,&40,&44,&41,&40
+            .byte &53,&48,&40,&57,&48,&40,&46,&4c
+            .byte &40,&55,&53,&40,&4f,&57,&40,&50
+            .byte &4c,&40,&44,&55,&40,&44,&41,&40
             .byte &52,&55,&40,&49,&47,&40,&55,&50
             .byte &40,&42,&49,&40,&42,&55,&40,&42
             .byte &52,&40,&46,&52,&40,&50,&41,&40
-            .byte &41,&59,&40,&0D
+            .byte &41,&59,&40,&0d
