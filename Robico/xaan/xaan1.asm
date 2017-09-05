@@ -614,8 +614,12 @@ l0c75:      jsr osnewl
             jmp l0c72
 l0c91:      ldx #&00
             jmp l0c72
+; 0c96
+.quitcmd
+{        
             ldx #&05
             jmp l0c72
+}
             bne l0c91
             ldx #&07
             jsr l09cf

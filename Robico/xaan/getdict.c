@@ -2,6 +2,19 @@
 #include <stdlib.h>
 #include <string.h>
 
+#define VERB_PTR 0x6473
+#define NOUN_PTR 0x65A9
+#define VERB_NUM 56
+#define NOUN_NUM 49
+#define VERB_OFFL 0x6400
+#define VERB_OFFH 0x6438
+
+typedef struct
+{
+   char verb[64];
+   int  address;
+} verb_struct;
+
 typedef struct
 {
    int description;
@@ -17,6 +30,10 @@ typedef struct
    int down;
 } room_struct;
 
+verb_struct verbs[255];
+char nouns[255][64];
+char intro[15][255];
+
 int main (void)
 {
    FILE *infile;
@@ -27,7 +44,7 @@ int main (void)
    unsigned char byte, byte2;
    int i=0,size=0,ptr=0,lower=0,bracket;
    int endtok=0,lowtok=0,token=0;
-   int msgcount=0, roomcount=0;
+   int msgcount=0, roomcount=0, introcount=0;
 
    infile = fopen("XAAN","rb");
    if (infile == NULL)
@@ -53,10 +70,74 @@ int main (void)
    } while (!feof(infile));
    size=i;
 
-   fseek(infile,0x3100,SEEK_SET);
-   //printf("%4x %2x: ", ftell(infile),count);
-   endtok=0x0d;
+   printf("Reading Intro\n");
    
+   fseek(infile,0x3100,SEEK_SET);
+   endtok=0x0d;
+   do
+   {
+      byte=fgetc(infile);
+      
+      if (byte == endtok)
+      {
+         introcount++;
+         bracket=0;
+         lower=0;
+      }
+      else if (byte < 0x20 || byte > 0x5a)
+      {
+         if (byte < 0x0e) token = byte + 0xa5;
+         else if (byte < 0x20) token = byte + 0xa4;
+         else token = byte - 0x5b;
+         /* look up in dictionary */
+         if (lower==1)
+         {
+            sprintf(intro[introcount],"%s%c",intro[introcount],tokens[token][0]);
+         }
+         for (i=lower;i<strlen(tokens[token]);i++)
+         {
+            sprintf(intro[introcount],"%s%c",intro[introcount],tolower(tokens[token][i]));
+         }
+         lower=0;
+      }
+      else if (byte == 0x2e || byte == 0x3f || byte == 0x21 || byte == 0x2c ||
+               byte == 0x3b || byte == 0x3a)
+      {
+         sprintf(intro[introcount],"%s%c ",intro[introcount],byte);
+         if (byte == 0x2e || byte == 0x3f || byte == 0x21) lower=1;
+      }
+      else if (byte > 0x40 && byte < 0x5b)
+      {
+         if (lower == 1)
+         {
+            token=byte;
+            lower=0;
+         }
+         else
+         {
+            token=tolower(byte);
+         }
+         sprintf(intro[introcount],"%s%c",intro[introcount],token);
+      }
+      else if (byte == 0x23)
+      {
+         lower=1;
+      }
+      else if (byte == 0x2b)
+      {
+         sprintf(intro[introcount],"%s\\n",intro[introcount]);
+      }
+      else
+      {
+         sprintf(intro[introcount],"%s%c",intro[introcount],byte);
+      }
+   } while (ftell(infile) < 0x3249);
+
+   printf("Reading Messages\n");
+   
+   fseek(infile,0x3300,SEEK_SET);
+   endtok=0x0d;
+   msgcount=0;
    do
    {
       byte=fgetc(infile);
@@ -202,11 +283,57 @@ int main (void)
    } while (i < roomcount);
    printf("%lx\n",ftell(infile));
    
+   printf("Gathering Verbs\n");
+   fseek(infile,VERB_PTR,SEEK_SET);
+   for (i=0; i<VERB_NUM; i++)
+   {
+      int ptr=0, j=0;
+      do
+      {
+         j=fgetc(infile);
+         if (j != '@') verbs[i].verb[ptr++]=j;
+      } while (j != '@');
+      verbs[i].verb[ptr]='\0';
+   }
+
+   // addresses
+   fseek(infile, VERB_OFFL, SEEK_SET);
+   for (i=1; i<VERB_NUM; i++)
+   {
+      verbs[i].address=fgetc(infile);
+   }
+   fseek(infile, VERB_OFFH, SEEK_SET);
+   for (i=1; i<VERB_NUM; i++)
+   {
+      verbs[i].address+=(fgetc(infile)<<8);
+   }
+   verbs[0].address=0; 
+
+   printf("Gathering Nouns\n");
+   fseek(infile,NOUN_PTR,SEEK_SET);
+   for (i=0; i<NOUN_NUM; i++)
+   {
+      int ptr=0, j=0;
+      do
+      {
+         j=fgetc(infile);
+         if (j != '@') nouns[i][ptr++]=j;
+      } while (j != '@');
+      nouns[i][ptr]='\0';
+   }
+
+   printf("\n\nDumping it all:\n");
+   printf("Intro:\n");
+   for (i=0; i<=introcount; i++)
+   {
+      printf("%s\n", intro[i]);
+   }
    // Display messages
    for (i=0; i<=msgcount; i++)
    {
       printf("Message %d: %s\n", i, messages[i]);
    }
+   
    // Display rooms
    for (i=0; i<=roomcount; i++)
    {
@@ -224,6 +351,15 @@ int main (void)
       if (rooms[i].down > 0) printf("D to room %d (%s)\n", rooms[i].down, messages[rooms[rooms[i].down].description]);
    }
    
+   // Display Verbs
+   for (i=0; i<VERB_NUM; i++)
+   {
+      printf("Verb %d: %s\n address &%04x\n", i, verbs[i].verb, verbs[i].address);
+   }
+   for (i=0; i<NOUN_NUM; i++)
+   {
+      printf("Noun %d: %s\n", i, nouns[i]);
+   }
          
    fclose(infile);
    return 0;
