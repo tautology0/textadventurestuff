@@ -30,7 +30,7 @@ org     &ffb9
 ; code equates
 ;
 l0060       = &0060
-msgnumber       = &0061
+msgnumber   = &0061
 capflag     = &0062        ; if == 0; then next character is a capital
 l0063       = &0063
 l0064       = &0064
@@ -52,12 +52,12 @@ msglist     = &0084
 msglisth    = &0085
 verbv       = &0086
 verbvh      = &0087
-l0089       = &0089
+quitflag    = &0089
 inputbuf    = &0400
 verbbuf     = &041f
 nounbuf     = &043e
 wordbuf     = &0600
-l0922       = &0922
+colourinst  = &0922
 verbptrsl   = &7600
 verbptrsh   = &7638
 l7a20       = &7a20
@@ -135,7 +135,7 @@ org &0880
 ; &10921
 .printmsg
 {            
-            lda #&86
+            lda #&86          ; this instruction can be altered
             jmp oswrch        ; VDU 134 (Colour = cyan)
 .msgnocol   jsr setwordbufptr
 .clrmsgloop lda lwrormask     ; == 20
@@ -212,7 +212,7 @@ l09c6:      lda #&01
             eor l006b
             sta l006b
             jmp storechar
-; l09cf
+; &9cf
 ; findmsg - finds message in X (and passes it to print routine)
 .findmsg
 {            
@@ -581,66 +581,74 @@ l0b22:      jsr osnewl
             sta verbvh
             jsr setnouns
             jmp (verbv)
-.badverb    ldx #&00
-            jsr l09cf
-            ldx #&02
-            jsr l09cf
+.badverb    ldx #&00          ; message 0 - "I don't understand"  
+            jsr findmsg
+            ldx #&02          ; message 2 - "how to "verb"" 
+            jsr findmsg
             ldx nounflag
-            beq l0c75
+            beq havenoun
             ldx curnoun
             cpx #&ff
-            bne l0c75
+            bne havenoun
             ldx #&01
-l0c6d:      jsr l09cf
+.nounprt    jsr findmsg
             ldx #&03
-l0c72:      jsr l09cf
-l0c75:      jsr osnewl
-            lda #&86
-            sta l0922
+.prtmsg     jsr findmsg
+.havenoun   jsr osnewl
+            lda #&86          ; changes the colour in the printmsg instruction to cyan
+            sta colourinst    ; self modifying code; tsk
             jmp osnewl
-}            
 ; setnouns - quick helper to set X to current noun and A to whether there is a noun
-.setnouns
-{      
-            ldx curnoun
+.setnouns   ldx curnoun
             lda nounflag
             rts
+; c85 
+.badnoun    ldx #&00          ; message 0 - "I don't understand"  
+            jmp nounprt
 }
-; c85            
-            ldx #&00
-            jmp l0c6d
-            bne l0c91
-            ldx #&04
-            jmp l0c72
-l0c91:      ldx #&00
-            jmp l0c72
+            
+.waitcmd
+{
+            bne waitnoun      ; if there is a noun say I don't understand
+            ldx #&04          ; message 4 - "You pause for a while"
+            jmp prtmsg
+.waitnoun   ldx #&00          ; message 0 - "I don't understand"
+            jmp prtmsg
+}
 ; 0c96
-.quitcmd
+; code for sit and lie
+.sitcmd
 {        
-            ldx #&05
-            jmp l0c72
+            ldx #&05          ; message 5 - "Okay"
+            jmp prtmsg
 }
-            bne l0c91
-            ldx #&07
-            jsr l09cf
+; c9b
+; code for quit
+.quitcmd
+{
+            bne badverb
+            ldx #&07          ; message 7 - "Are you sure you want to quit?"
+            jsr findmsg
             jsr osnewl
             jsr osnewl
-l0ca8:      jsr osrdch
-            cmp #&1b
-            beq l0cba
-            cmp #&4e
-            beq l0cc2
-            cmp #&59
-            beq l0cc7
-            jmp l0ca8
-l0cba:      lda #&7e
-            jsr osbyte
-            jmp l0ca8
-l0cc2:      ldx #&08
-            jmp l0c72
-l0cc7:      ldx #&09
-            stx l0089
-            jmp l0c72
+.ynloop     jsr osrdch        ; loop for a Y/N request
+            cmp #&1b          ; escape
+            beq ackescyn         
+            cmp #&4e          ; "N"
+            beq ynno
+            cmp #&59          ; "Y"
+            beq ynyes         
+            jmp ynloop
+.ackescyn   lda #&7e
+            jsr osbyte        ; OSBYTE 126 - acknowledge escape
+            jmp ynloop
+.ynno       ldx #&08          ; message 8 - "I thought you were only kidding"
+            jmp prtmsg
+ynyes:      ldx #&09          ; message 9 - "Bye!"
+            stx quitflag
+            jmp prtmsg
+}
+
             jsr setbufnoun
             ldy #&00
             stx msgnumber
