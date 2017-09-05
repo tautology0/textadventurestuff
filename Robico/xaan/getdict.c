@@ -15,19 +15,23 @@ typedef struct
    int  address;
 } verb_struct;
 
+char directions[10][20]={
+   "north",     "south",     "east",      "west",
+   "northeast", "northwest", "southeast", "southwest",
+   "up",        "down"
+};
+
 typedef struct
 {
-   int description;
-   int north;
-   int south;
-   int east;
-   int west;
-   int northeast;
-   int northwest;
-   int southeast;
-   int southwest;
-   int up;
-   int down;
+   int direction;
+   int destination;
+   int blocked:1;
+} exit_struct;
+
+typedef struct
+{
+   int         description;
+   exit_struct exits[10];
 } room_struct;
 
 verb_struct verbs[255];
@@ -43,8 +47,9 @@ int main (void)
    
    unsigned char byte, byte2;
    int i=0,size=0,ptr=0,lower=0,bracket;
-   int endtok=0,lowtok=0,token=0;
+   int endtok=0,lowtok=0,token=0,j=0;
    int msgcount=0, roomcount=0, introcount=0;
+   int curexit=0;
 
    infile = fopen("XAAN","rb");
    if (infile == NULL)
@@ -199,11 +204,10 @@ int main (void)
 
    printf("Enumerating rooms\n");
    fseek(infile,0x6354,SEEK_SET);
-   
    do
    {
       byte = fgetc(infile);
-      token = byte + 172;
+      token = byte + 162;
       rooms[roomcount].description=token;
       roomcount++;
    } while (ftell(infile) < 0x6400);
@@ -212,74 +216,29 @@ int main (void)
    printf("Gathering exits\n");
    fseek(infile, 0x5c5c, SEEK_SET);
    i=0;
+   curexit=0;
+   for (j=0;j<10;j++) rooms[i].exits[j].destination=0xff;   
    do
    {
       unsigned char byte2;
       byte=fgetc(infile);
       byte2=fgetc(infile);
-   
+
+      rooms[i].exits[curexit].direction=byte & 0xf;
+      rooms[i].exits[curexit].destination=byte2 - 0x34;
+      if (byte & 0x40)
+      {
+         rooms[i].exits[curexit].blocked=1;
+      }
+      curexit++;
+      
       if (byte & 0x80)
       {
          i++;
+         for (j=0;j<10;j++) rooms[i].exits[j].destination=0xff;
+         curexit=0;
       }
       
-      switch(byte & 0xf)
-      {
-         case 0:
-         {
-            rooms[i].north=(byte2 - 0x34);
-            break;
-         }   
-         case 1:
-         {
-            rooms[i].south=(byte2 - 0x34);
-            break;
-         }   
-         case 2:
-         {
-            rooms[i].east=(byte2 - 0x34);
-            break;
-         }   
-         case 3:
-         {
-            rooms[i].west=(byte2 - 0x34);
-            break;
-         }   
-         case 4:
-         {
-            rooms[i].northeast=(byte2 - 0x34);
-            break;
-         }   
-         case 5:
-         {
-            rooms[i].northwest=(byte2 - 0x34);
-            break;
-         }   
-         case 6:
-         {
-            rooms[i].southeast=(byte2 - 0x34);
-            break;
-         }   
-         case 7:
-         {
-            rooms[i].southwest=(byte2 - 0x34);
-            break;
-         }   
-         case 8:
-         {
-            rooms[i].up=(byte2 - 0x34);
-            break;
-         }   
-         case 9:
-         {
-            rooms[i].down=(byte2 - 0x34);
-            break;
-         }
-         default:
-         {
-            printf("Unknown exit type (%d) at %lx\n",byte & 0xf, ftell(infile)-2);
-         }
-      }
    } while (i < roomcount);
    printf("%lx\n",ftell(infile));
    
@@ -338,17 +297,21 @@ int main (void)
    for (i=0; i<=roomcount; i++)
    {
       printf("\nRoom %d: %s\n", i, messages[rooms[i].description]);
-      printf("Exits\n");
-      if (rooms[i].north > 0) printf("N to room %d (%s)\n", rooms[i].north, messages[rooms[rooms[i].north].description]);
-      if (rooms[i].south > 0) printf("S to room %d (%s)\n", rooms[i].south, messages[rooms[rooms[i].south].description]);
-      if (rooms[i].east > 0) printf("E to room %d (%s)\n", rooms[i].east, messages[rooms[rooms[i].east].description]);
-      if (rooms[i].west > 0) printf("W to room %d (%s)\n", rooms[i].west, messages[rooms[rooms[i].west].description]);
-      if (rooms[i].northeast > 0) printf("NE to room %d (%s)\n", rooms[i].northeast, messages[rooms[rooms[i].northeast].description]);
-      if (rooms[i].northwest > 0) printf("NW to room %d (%s)\n", rooms[i].northwest, messages[rooms[rooms[i].northwest].description]);
-      if (rooms[i].southeast > 0) printf("SE to room %d (%s)\n", rooms[i].southeast, messages[rooms[rooms[i].southeast].description]);
-      if (rooms[i].southwest > 0) printf("SW to room %d (%s)\n", rooms[i].southwest, messages[rooms[rooms[i].southwest].description]);
-      if (rooms[i].up > 0) printf("U to room %d (%s)\n", rooms[i].up, messages[rooms[rooms[i].up].description]);
-      if (rooms[i].down > 0) printf("D to room %d (%s)\n", rooms[i].down, messages[rooms[rooms[i].down].description]);
+      printf("Exits:\n");
+      for (j=0; j < 10; j++)
+      {
+         if (rooms[i].exits[j].destination != 0xff)
+         {
+            printf(" %s to %d (%s)", directions[rooms[i].exits[j].direction],
+                                     rooms[i].exits[j].destination,
+                                     messages[rooms[rooms[i].exits[j].destination].description]);
+            if (rooms[i].exits[j].blocked)
+            {
+               printf("(blocked)");
+            }
+            printf("\n");
+         }
+      }
    }
    
    // Display Verbs
