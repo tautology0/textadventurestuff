@@ -5,6 +5,7 @@ Gathering exits
 60c6
 Gathering Verbs
 Gathering Nouns
+Object Locations
 
 
 Dumping it all:
@@ -1475,52 +1476,95 @@ Verb 54: lie
  address &0c96
 Verb 55: pray
  address &19c9
-Noun 0: X
-Noun 1: X
 Noun 2: alcove
+ Starts in: 52 (You are in a small, dimly lit prison cell, filled with the stench of death and decay. The smooth, granite walls seem to close in on you, windowless and menacing! To the north looms a huge, iron door. )
 Noun 3: beggar
+ Starts in: 214 (You are in a beggar's hovel: a tiny wooden shack, with rotting floorboards and damp walls. A beggar sits in the corner, crosslegged, and humming tunelessly. )
 Noun 4: blanket
+ Starts in: 172 (You are in a large, dimly lit, walk-in linen cupboard. A grimy door occupies the north wall. )
 Noun 5: bracelet
+ Starts in: 234 (nowhere)
 Noun 6: brooch
+ Starts in: 255 (nowhere)
 Noun 7: chain
+ Starts in: 2 (alcove)
 Noun 8: cloak
+ Starts in: 53 (You are at a dead end in the corridor. The prison cells south of you give way to rough, brick walls, and the ceiling is so low, that you are forced to stoop. )
 Noun 9: coin
+ Starts in: 39 (well)
 Noun 10: compass
+ Starts in: 18 (guard)
 Noun 11: diamond
+ Starts in: 106 (You are deep in the forest. Tall trees rear up all around, their branches intertwining to cut out all daylight. Your lamp casts a yellow halo over you, which scares the forest creatures and holds them at bay. )
 Noun 12: doll
+ Starts in: 173 (You are in a small toy cupboard, dimly illuminated by the light which creeps in through gaps under the door to the north. )
 Noun 13: dresser
+ Starts in: 171 (You are in the master bedroom. It is spacious and well lit. An elegant four poster bed is positioned next to a door in the south wall. )
 Noun 14: food
+ Starts in: 34 (table)
 Noun 15: glasses
+ Starts in: 225 (nowhere)
 Noun 16: gloves
+ Starts in: 13 (dresser)
 Noun 17: goblet
+ Starts in: 236 (nowhere)
 Noun 18: guard
+ Starts in: 53 (You are at a dead end in the corridor. The prison cells south of you give way to rough, brick walls, and the ceiling is so low, that you are forced to stoop. )
 Noun 19: hat
+ Starts in: 118 (You are in a maze of narrow cavern passages, mindful of the rocky outcrops and pointed stalactites which hang dangerously from the ceiling. )
 Noun 20: ingot
+ Starts in: 226 (nowhere)
 Noun 21: lamp
+ Starts in: 71 (You are on a narrow ledge south of the keep, high above the raging sea. The wind blows hard and forces you back against the keep wall, away from the debris thrown up by the wash as it crashes into the sheer cliff. )
 Noun 22: leggings
+ Starts in: 227 (nowhere)
 Noun 23: locket
+ Starts in: 201 (You are in a stinking ditch. The hard floor is covered with pools of stagnant liquid and stenching slime. The sickening smell lingers, disgustingly, in your nostrils. This isn't a good place to picnic! )
 Noun 24: mittens
+ Starts in: 255 (nowhere)
 Noun 25: necklace
+ Starts in: 182 (You are at the eastern edge of the plateau. High banks of earth stop any further progress. Far to the west you see a pulsing, blue light. )
 Noun 26: oil
+ Starts in: 223 (You are on a stony scree slope. The ground is firm and safe here, but further up the hill there are loose rocks and hidden pitfalls. Below you, the dark forest covers the valley. )
 Noun 27: ring
+ Starts in: 112 (You are in a maze of narrow cavern passages, mindful of the rocky outcrops and pointed stalactites which hang dangerously from the ceiling. )
 Noun 28: rug
+ Starts in: 158 (You are in a well furnished sitting room, double glazed, with fashionable bamboo chairs and an electric fire with plastic coal. )
 Noun 29: sacking
+ Starts in: 1 (worn)
 Noun 30: shoes
+ Starts in: 110 (You are at a dead end in the cavern passages. You lamp casts strange, animated shadows on the uneven walls. )
 Noun 31: shovel
+ Starts in: 36 (toolshed)
 Noun 32: soap
+ Starts in: 174 (You are in a modern bathroom. The suite is an exclusive chocolate colour, sunk into the floor, with engraved taps, a thermal towel rail and some rather expensive Pseudo-Victorian soap dishes! )
 Noun 33: socks
+ Starts in: 105 (You are deep in the forest. Tall trees rear up all around, their branches intertwining to cut out all daylight. Your lamp casts a yellow halo over you, which scares the forest creatures and holds them at bay. )
 Noun 34: table
+ Starts in: 161 (You are in a spacious pantry with wood-panelled walls. A varnished, pine table is located in the centre of the room and occupies much of the floor area. )
 Noun 35: teleprinter
+ Starts in: 145 (You are on a vast, windswept plain, east of the forest boundary. Dust devils swirl and dart about the landscape, showering you with a fine, white powder. Frail trees, too small to climb, arc their bare limbs to the ground. )
 Noun 36: toolshed
+ Starts in: 131 (You are in a dimly lit graveyard. Swirling mists cloak the headstones, making them shimmer with an unnatural light. )
 Noun 37: umbrella
+ Starts in: 61 (You are on a hilltop north of the keep, looking down a dangerous scree slope to a dark forest beyond. )
 Noun 38: water
+ Starts in: 152 ("Hello there, strangThe tremendous power of the waterfall forces you to your knees and you collapse, breathlessly, to the floor! You glance northwards and make out the hazy shape of a cavern entrance beyond. Then everything goes black. )
 Noun 39: well
+ Starts in: 181 (You are at a small grotto, cut into the mountain. A blue, neon sign reading: "<Make Your Wish Here<", points to a small well, constructed of brick, with a brass plate set into the wall. )
 Noun 40: door
+ Starts in: 0 (inventory)
 Noun 41: lullaby
+ Starts in: 0 (inventory)
 Noun 42: song
+ Starts in: 0 (inventory)
 Noun 43: ship
+ Starts in: 0 (inventory)
 Noun 44: tower
+ Starts in: 31 (shovel)
 Noun 45: tree
+ Starts in: 117 (You are in a maze of narrow cavern passages, mindful of the rocky outcrops and pointed stalactites which hang dangerously from the ceiling. )
 Noun 46: cliff
+ Starts in: 118 (You are in a maze of narrow cavern passages, mindful of the rocky outcrops and pointed stalactites which hang dangerously from the ceiling. )
 Noun 47: mountain
-Noun 48: 
+ Starts in: 119 (You are in a maze of narrow cavern passages, mindful of the rocky outcrops and pointed stalactites which hang dangerously from the ceiling. )

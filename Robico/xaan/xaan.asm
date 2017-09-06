@@ -178,7 +178,7 @@ l127c:      lda invsize
 l1290:      lda l74cc,x
             and #&0f
             bne l12b3
-l1297:      jsr l1854
+l1297:      jsr doverb
 l129a:      inc invsize
             ldx l0525
             lda inventory,x
@@ -221,7 +221,7 @@ l12db:      lda l7514
             jmp l1297
 l12ea:      ldx #&68
             jmp prtmsg
-l12ef:      lda l751c
+l12ef:      lda waterloc
             cmp #&27
             bne l12ea
             lda #&00
@@ -259,7 +259,7 @@ l132d:      lda inventory,x
 l1337:      dec invsize
             lda l008a
             sta inventory,x
-            jmp l1854
+            jmp doverb
             ldx #&19
             jmp prtmsg
 l1346:      jmp l142e
@@ -286,7 +286,7 @@ l1374:      lda l008c
             bcs l1396
             cpx #&13
             bne l138a
-            lda l751c
+            lda waterloc
             cmp #&13
             bne l138a
             ldx #&72
@@ -295,7 +295,7 @@ l138a:      lda #&01
             sta inventory,x
             inc l008c
             dec invsize
-            jmp l1854
+            jmp doverb
 l1396:      ldx #&17
             jmp prtmsg
 l139b:      ldx #&0f
@@ -837,8 +837,12 @@ l1845:      cpx #&28
 l184c:      lda inventory,x
             beq nowthapp
             jmp youarenothold
-l1854:      ldx #&67
+; e.g. DRINK WATER
+.doverb
+{            
+            ldx #&67          ; message 103 "You $ the %."
             jmp prtmsg
+}            
             bne l185e
             jmp neednoun
 l185e:      cpx #&ff
@@ -947,13 +951,13 @@ l18b4:      ldx #&64
 l1938:      lda l7509
             beq l1940
             jmp l1477
-l1940:      lda l751c
+l1940:      lda waterloc
             cmp #&13
             beq l1958
             cmp currentroom
             bne l1953
             lda #&13
-            sta l751c
+            sta waterloc
             jmp sitcmd
 l1953:      ldx #&70
             jmp prtmsg
@@ -963,13 +967,13 @@ l195d:      lda l751d
             cmp currentroom
             beq l1967
             jmp nothere
-l1967:      lda l751c
+l1967:      lda waterloc
             cmp #&13
             bne l1953
             lda l7509
             bne l1953
             lda #&27
-            sta l751c
+            sta waterloc
             jmp sitcmd
 l197b:      lda currentroom
             cmp #&38
@@ -1005,8 +1009,13 @@ l19bf:      lda #&00
             sta doorflag
             ldx #&9f
             jmp prtmsg
-            ldx #&86
+ 
+; &19c9
+.praycmd
+{            
+            ldx #&86          ; message 134 "God helps those who help themselves!"
             jmp prtmsg
+}
             
 ; &19ce
 ; climbcmd - handles CLIMB
@@ -1107,40 +1116,48 @@ l1a7d:      dex
             rts
 }
 
-            bne l1a86
+.drinkcmd
+{
+            bne havenoun
             jmp neednoun
-l1a86:      cpx #&ff
-            bne l1a8d
+.havenoun   cpx #&ff
+            bne validnoun
             jmp jbadnoun
-l1a8d:      cpx #&26
-            beq l1a94
+.validnoun  cpx #&26          ; noun 38 - water
+            beq iswater
             jmp cantdo
-l1a94:      lda l751c
-            cmp currentroom
-            beq l1aa2
-            cmp #&13
-            beq l1aa2
+.iswater    lda waterloc
+            cmp currentroom 
+            beq ishere
+            cmp #&13          ; noun 19 - hat   
+            beq ishere
             jmp nothere
-l1aa2:      lda #&ff
-            sta l751c
-            jmp l1854
-            bne l1aaf
+.ishere     lda #&ff
+            sta waterloc
+            jmp doverb
+}
+
+.eatcmd
+{
+            bne havenoun
             jmp neednoun
-l1aaf:      cpx #&ff
-            bne l1ab6
+.havenoun   cpx #&ff
+            bne validnoun
             jmp jbadnoun
-l1ab6:      cpx #&0e
-            beq l1abd
+.validnoun  cpx #&0e          ; noun 14 - food
+            beq isfood
             jmp cantdo
-l1abd:      lda l7504
-            beq l1ac9
+.isfood     lda foodloc
+            beq ininv
             cmp currentroom
-            beq l1acb
+            beq inroom
             jmp nothere
-l1ac9:      dec invsize
-l1acb:      lda #&ff
-            sta l7504
-            jmp l1854
+.ininv      dec invsize
+.inroom     lda #&ff
+            sta foodloc
+            jmp doverb
+}
+            
 l1ad3:      jsr l20d0
             lda currentroom
             jsr l1cff
@@ -1838,7 +1855,7 @@ l20d0:      lda currentroom
             cmp #&d6
             beq l20d7
             rts
-l20d7:      lda l7504
+l20d7:      lda foodloc
             cmp #&d6
             beq l20f1
             cmp #&03
@@ -1977,7 +1994,7 @@ l21f8:      lda l74fa
             cmp #&d6
             bne l2204
 l2203:      iny
-l2204:      lda l7504
+l2204:      lda foodloc
             cmp #&03
             beq l220f
             cmp #&d6
@@ -1989,7 +2006,7 @@ l2210:      lda l7516
             cmp #&d6
             bne l221c
 l221b:      iny
-l221c:      lda l751c
+l221c:      lda waterloc
             cmp #&27
             bne l2224
             iny
@@ -4738,7 +4755,7 @@ l74fe:      .byte &35
 l74ff:      .byte &27
 l7500:      .byte &12
 l7501:      .byte &6a,&ad,&ab
-l7504:      .byte &22
+.foodloc    .byte &22
 l7505:      .byte &e1
 l7506:      .byte &0d
 l7507:      .byte &ec
@@ -4759,7 +4776,7 @@ shovelloc:      .byte &24
 l7516:      .byte &ae
 l7517:      .byte &69,&a1,&91,&83
 .umbrellaloc .byte &3d
-l751c:      .byte &98
+.waterloc   .byte &98
 l751d:      .byte &b5,&00,&00
 l7520:      .byte &00,&00,&1f,&75,&76,&77,&78,&44
             .byte &42,&41,&50,&79,&7a,&1f,&43,&47
