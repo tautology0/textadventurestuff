@@ -35,14 +35,14 @@ l0085       = &0085
 currentroom = &0088
 l0089       = &0089
 l008a       = &008a
-invsize       = &008b
+invsize     = &008b
 l008c       = &008c
 l008d       = &008d
 l008e       = &008e
 l0522       = &0522
 l0523       = &0523
 l0525       = &0525
-l0526       = &0526
+tempstore       = &0526
 l0527       = &0527
 l0900       = &0900
 l0922       = &0922
@@ -59,8 +59,8 @@ l0c3e       = &0c3e
 prtmsg      = &0c72
 l0c80       = &0c80
 badnoun     = &0c85
-l0c91       = &0c91
-l0c96       = &0c96
+waitnoun    = &0c91
+sitcmd      = &0c96
 l0cce       = &0cce
 l1855       = &1855
 l1c03       = &1c03
@@ -71,13 +71,15 @@ l20ac       = &20ac
 ;
             *= &1200
 ;
-            bne l1224
-            ldx #&0b
+.invcmd
+{
+            bne jwaitnoun
+            ldx #&0b       ; message 11 "Inventory: \n \nYou are carrying"
             jsr findmsg
             ldx #&00
             lda #&01
             jsr l158e
-            ldx #&0c
+            ldx #&0c       ; message 12 "and wearing "
             jsr findmsg
             ldx #&01
             lda #&01
@@ -87,7 +89,12 @@ l20ac       = &20ac
 l121e:      lda #&7f
             jmp l15ab
 l1223:      rts
-l1224:      jmp l0c91
+}
+.jwaitnoun
+{
+            jmp waitnoun
+}
+
 l1227:      lda #&3f
             sta l7535
             jmp l1290
@@ -305,7 +312,7 @@ l13a7:      ldx #&52
             bne l13ba
             jmp l121e
 l13ba:      rts
-l13bb:      sty l0526
+l13bb:      sty tempstore
             lda #&83
             jsr oswrch
             txa
@@ -313,7 +320,7 @@ l13bb:      sty l0526
             lda #&30
             sta l0527
             lda #&00
-            ldx l0526
+            ldx tempstore
             beq l13df
             sed
             clc
@@ -345,7 +352,7 @@ l13f6:      jsr oswrch
             jsr oswrch
             pla
             tax
-            ldy l0526
+            ldy tempstore
             lda #&86
             jmp oswrch
 l140b:      lda #&83
@@ -427,7 +434,7 @@ l14bc:      ldx #&3e
             jmp l14a2
 l14c1:      jmp l14a2
 l14c4:      jmp neednoun
-l14c7:      jmp l1224
+l14c7:      jmp jwaitnoun
             beq l14c4
             cpx #&ff
             beq l150d
@@ -455,7 +462,7 @@ l14fe:      lda #&3c
             lda #&15
             sta l7510
             dec invsize
-            jmp l0c96
+            jmp sitcmd
 l150d:      jmp l1437
 l1510:      lda #&00
             sta l7427
@@ -649,7 +656,7 @@ l16b1:      lda l0525
             cmp #&1a
             bne l1654
             jmp l14e2
-l16bb:      jmp l1224
+l16bb:      jmp jwaitnoun
 l16be:      lda #&00
             sta l0089
             sta l7424
@@ -694,22 +701,22 @@ l170b:      lda l74fe
 l1722:      rts
 l1723:      ldx #&26
 l1725:      jsr findmsg
-l1728:      lda #&01
+killplayer:      lda #&01
             sta l7422
             ldx #&27
             jmp prtmsg
-l1732:      lda l7545
+l1732:      lda umbrflag
             cmp #&3a
             beq l173c
             jmp l1705
-l173c:      lda l751b
+l173c:      lda umbrellaloc
             beq l1748
             cmp currentroom
             beq l174a
             jmp l1705
 l1748:      dec invsize
 l174a:      lda #&ff
-            sta l751b
+            sta umbrellaloc
             ldx #&4a
             jmp prtmsg
 l1754:      lda guardloc
@@ -742,7 +749,7 @@ l178f:      ldx #&59
 l1794:      lda #&35
             sta guardloc
             lda #&01
-            sta l741e
+            sta doorflag
             ldx #&5a
             jsr prtmsg
             jmp l1700
@@ -797,25 +804,30 @@ l17ba:      lda #&01
             bne l180f
             jmp jbadnoun
 l180f:      cpx #&28
-            bcc l1837
+            bcc nowthapp
             cpx #&28
-            bne l1837
-l1817:      lda l741e
+            bne nowthapp
+l1817:      lda doorflag
             cmp #&01
             beq l1821
             jmp cantdo
 l1821:      lda currentroom
             cmp #&34
-            bne l1837
+            bne nowthapp
             sta guardloc
             lda #&00
-            sta l741e
+            sta doorflag
             ldx #&62
             stx l7425
             jmp prtmsg
-l1837:      ldx #&1d
+; nowthapp - serves cases where noun is not present
+; e.g. BOARD SHIP when no ship
+.nowthapp
+{
+            ldx #&1d          ; message 29 "Nothing Happens"
             jmp prtmsg
-            beq l1837
+}
+            beq nowthapp
             cpx #&ff
             bne l1845
             jmp jbadnoun
@@ -823,7 +835,7 @@ l1845:      cpx #&28
             bcc l184c
             jmp cantdo
 l184c:      lda inventory,x
-            beq l1837
+            beq nowthapp
             jmp youarenothold
 l1854:      ldx #&67
             jmp prtmsg
@@ -836,14 +848,14 @@ l1865:      cpx #&25
             beq l1870
             cpx #&28
             beq l1880
-            jmp l1224
-l1870:      lda l751b
+            jmp jwaitnoun
+l1870:      lda umbrellaloc
             beq l1878
             jmp youarenothold
 l1878:      ldx #&3a
-            stx l7545
+            stx umbrflag
             jmp prtmsg
-l1880:      lda l741e
+l1880:      lda doorflag
             cmp #&02
             bne l188a
             jmp nothere
@@ -858,8 +870,8 @@ l1897:      ldx #&65
 l189c:      cmp #&99
             beq l1897
             lda #&00
-            sta l741e
-l18a5:      lda l741e
+            sta doorflag
+l18a5:      lda doorflag
             beq l18af
             cmp #&01
             beq l18b4
@@ -868,32 +880,38 @@ l18af:      ldx #&63
             jmp prtmsg
 l18b4:      ldx #&64
             jmp prtmsg
-            bne l18be
+
+; &18b9
+; closecmd - handles CLOSE
+.closecmd
+{
+            bne havenoun
             jmp neednoun
-l18be:      cpx #&ff
-            bne l18c5
+.havenoun   cpx #&ff
+            bne validnoun
             jmp jbadnoun
-l18c5:      cpx #&25
-            beq l18d0
-            cpx #&28
-            beq l18e0
-            jmp l1224
-l18d0:      lda l751b
-            beq l18d8
+.validnoun  cpx #&25          ; noun 37 - umbrella
+            beq isumbrella
+            cpx #&28          ; noun 40 - door
+            beq isdoor
+            jmp jwaitnoun
+.isumbrella lda umbrellaloc
+            beq haveumbr
             jmp youarenothold
-l18d8:      ldx #&3b
-            stx l7545
+.haveumbr   ldx #&3b          ; the Umbrella is closed
+            stx umbrflag
             jmp prtmsg
-l18e0:      lda l741e
+.isdoor     lda doorflag
             cmp #&02
-            bne l18ea
+            bne doorhere
             jmp nothere
-l18ea:      cmp #&00
-            beq l18f1
+.doorhere   cmp #&00
+            beq closedoor
             jmp cantdo
-l18f1:      lda #&01
-            sta l741e
+.closedoor  lda #&01
+            sta doorflag
             jmp l18a5
+}            
 ; &18f9
 ; breakcmd - handles BREAK
 .breakcmd
@@ -922,7 +940,7 @@ l18f1:      lda #&01
             jsr findmsg
             ldx #&9d          ; message 157 "An object falls to the floor"
             lda currentroom
-            sta l74fc         ; Move brooch to current room
+            sta broochloc     ; Move brooch to current room
             jmp stampit
 }
             
@@ -936,7 +954,7 @@ l1940:      lda l751c
             bne l1953
             lda #&13
             sta l751c
-            jmp l0c96
+            jmp sitcmd
 l1953:      ldx #&70
             jmp prtmsg
 l1958:      ldx #&72
@@ -952,7 +970,7 @@ l1967:      lda l751c
             bne l1953
             lda #&27
             sta l751c
-            jmp l0c96
+            jmp sitcmd
 l197b:      lda currentroom
             cmp #&38
             bcc l19ab
@@ -979,95 +997,116 @@ l19ab:      jmp l1458
             lda currentroom
             cmp #&99
             beq l19b7
-            jmp l1837
-l19b7:      lda l741e
+            jmp nowthapp
+l19b7:      lda doorflag
             bne l19bf
-            jmp l1837
+            jmp nowthapp
 l19bf:      lda #&00
-            sta l741e
+            sta doorflag
             ldx #&9f
             jmp prtmsg
             ldx #&86
             jmp prtmsg
-            bne l19d3
+            
+; &19ce
+; climbcmd - handles CLIMB
+.climbcmd
+{
+            bne havenoun
             jmp neednoun
-l19d3:      cpx #&ff
-            bne l19da
+.havenoun   cpx #&ff
+            bne validnoun
             jmp jbadnoun
-l19da:      lda currentroom
-            cmp #&46
-            bcc l19e4
-            cmp #&6c
-            bcc l19e9
-l19e4:      ldx #&23
+.validnoun  lda currentroom
+            cmp #&46          ; room 70 - clifftop southwest of keep
+            bcc noclimb
+            cmp #&6c          ; room 108 - entrance chamber of large cave system
+            bcc validroom     ; between 70 and 108
+.noclimb    ldx #&23          ; message 35 "you can't verb here"
             jmp prtmsg
-l19e9:      cmp #&5a
-            bcc l19f9
-            cpx #&2d
-            beq l19f4
-l19f1:      jmp cantdo
-l19f4:      ldx #&38
+.validroom  cmp #&5a          ; room 90 - entrance to a massive forest
+            bcc notforest
+            cpx #&2d          ; noun 45 - tree
+            beq climbtree
+.cantclimb  jmp cantdo
+.climbtree  ldx #&38          ; message 56 "you verb the tree ..."
             jmp prtmsg
-l19f9:      cpx #&2e
-            beq l1a01
-            cpx #&2f
-            bne l19f1
-l1a01:      ldx #&29
+.notforest  cpx #&2e          ; noun 46 cliff
+            beq climbcliff
+            cpx #&2f          ; noun 47 mountain
+            bne cantclimb
+.climbcliff ldx #&29          ; message 41 "you being to verb the sheer face ..."
             jsr findmsg
-            jmp l1728
-            beq l1a0e
-l1a0b:      jmp l1224
-l1a0e:      lda currentroom
+            jmp killplayer
+}
+
+; &1a09
+; jumpcmd - handles JUMP
+.jumpcmd
+{
+            beq nonoun
+.jjwaitnoun jmp jwaitnoun
+.nonoun     lda currentroom
             cmp #&46
-            bcc l1a1c
+            bcc jsitcmd
             cmp #&49
-            bcc l1a1f
+            bcc jumpcliff
             cmp #&4d
-            bcc l1a27
-l1a1c:      jmp l0c96
-l1a1f:      ldx #&37
-l1a21:      jsr findmsg
-            jmp l1728
-l1a27:      ldx #&25
-            jmp l1a21
-            bne l1a0b
-            lda l7515
-            beq l1a38
-            ldx #&21
+            bcc jumpmount
+.jsitcmd    jmp sitcmd
+.jumpcliff  ldx #&37       ; message 55 "You verb and plunge off the cliff ..."
+.kill       jsr findmsg
+            jmp killplayer
+.jumpmount  ldx #&25       ; message 37 ""I'm sick of this adventure", you scream ..."
+            jmp kill
+}
+
+jjwaitnoun  = &1a0b
+
+; &1a2c
+; digcmd - handles DIG
+.digcmd
+{
+            bne jjwaitnoun
+            lda shovelloc
+            beq haveshov
+            ldx #&21       ; message 33 "You need a shovel to verb!"
             jmp prtmsg
-l1a38:      lda currentroom
-            cmp #&83
-            bcc l1a4c
-            cmp #&87
-            bcc l1a51
-            beq l1a4c
+.haveshov   lda currentroom
+            cmp #&83       ; room 131 "You are in a dimly lit graveyard ..."
+            bcc nodig
+            cmp #&87       ; room 135 "You are on a misty flight of steps ..."
+            bcc gravedig
+            beq nodig
             cmp #&8c
-            bcc l1a59
-            cmp #&91
+            bcc sanddig
+            cmp #&91       ; room 145 "You are on a vast, windswept plain ..."
             bcc l1a5e
-l1a4c:      ldx #&22
+.nodig      ldx #&22       ; message 34 "The floor is too hard ..."
             jmp prtmsg
-l1a51:      jsr l1a66
-            ldx #&82
+.gravedig   jsr l1a66
+            ldx #&82       ; message 130 "You $ long and deep, and ..."
             jmp prtmsg
-l1a59:      ldx #&83
+.sanddig    ldx #&83       ; message 131 "The sand is dry and the hole ..."
             jmp prtmsg
 l1a5e:      jsr l1a66
-            ldx #&84
+            ldx #&84       ; message 132 "The damp sand is firm ..."
             jmp prtmsg
-l1a66:      ldx #&27
+l1a66:      ldx #&27       ; object 27 - well
             lda currentroom
             clc
             adc #&5d
-            sta l0526
+            sta tempstore
 l1a70:      lda inventory,x
-            cmp l0526
+            cmp tempstore
             bne l1a7d
             lda currentroom
             sta inventory,x
 l1a7d:      dex
             bpl l1a70
             rts
+}
+
             bne l1a86
             jmp neednoun
 l1a86:      cpx #&ff
@@ -1107,7 +1146,7 @@ l1ad3:      jsr l20d0
             jsr l1cff
             lda l007c
             beq l1ae2
-            jmp l1728
+            jmp killplayer
 l1ae2:      lda currentroom
             cmp #&63
             bcc l1af4
@@ -1257,7 +1296,7 @@ l1c0b:      sta l7400,y
             cpy #&1f
             bne l1c0b
             lda #&02
-            sta l741e
+            sta doorflag
             ldy #&00
             lda currentroom
             sec
@@ -1297,7 +1336,7 @@ l1c43:      lda (l007e),y
             and #&40
             beq l1c65
             lda #&01
-            sta l741e
+            sta doorflag
 l1c65:      lda l7414,x
             bmi l1c6d
             jmp l1c43
@@ -1380,9 +1419,9 @@ l1d03:      lda #&00
             rts
 l1d08:      lda #&00
             sta l75b8
-            lda l751b
+            lda umbrellaloc
             bne l1d21
-            lda l7545
+            lda umbrflag
             cmp #&3b
             beq l1d21
             lda #&01
@@ -1477,7 +1516,7 @@ l1def:      jsr findmsg
             nop
             nop
 l1df9:      beq l1dfe
-            jmp l1224
+            jmp jwaitnoun
 l1dfe:      lda guardloc
             cmp currentroom
             bne l1e11
@@ -1489,7 +1528,7 @@ l1dfe:      lda guardloc
 l1e11:      ldx #&00
             rts
 l1e14:      beq l1e11
-            jmp l1224
+            jmp jwaitnoun
             jsr l1df9
             bne l1e21
             jmp l1e7e
@@ -1537,7 +1576,7 @@ l1e7e:      lda l7400,x
             lda l7414,x
             and #&40
             beq l1ea2
-            lda l741e
+            lda doorflag
             beq l1e99
             ldx #&64
             jmp prtmsg
@@ -1557,7 +1596,7 @@ l1ea2:      lda l740a,x
             jsr l1d47
             lda l007c
             beq l1eba
-            jmp l1728
+            jmp killplayer
 l1eba:      lda currentroom
             jsr l1cff
             jsr l1f57
@@ -1568,7 +1607,7 @@ l1eba:      lda currentroom
             cmp #&98
             bne l1ed0
             rts
-l1ed0:      jmp l1728
+l1ed0:      jmp killplayer
 l1ed3:      lda currentroom
             cmp #&db
             beq l1edc
@@ -1577,12 +1616,12 @@ l1edc:      lda #&01
             sta l007b
             rts
 l1ee1:      lda currentroom
-            cmp #&da
+            cmp #&da             ; room 166 "End of passageway on first floor"
             beq l1eea
             jmp l1e3d
 l1eea:      cmp l74fb
             bne l1f2d
-            cmp l74fc
+            cmp broochloc
             bne l1f2d
             cmp l74ff
             bne l1f2d
@@ -1613,24 +1652,28 @@ l1f2d:      ldx #&94
             jsr findmsg
             ldx #&93
             jmp prtmsg
-            bne l1f3c
+; boardcmd - handles BOARD
+.boardcmd
+{
+            bne havenoun
             jmp neednoun
-l1f3c:      cpx #&ff
-            bne l1f43
+.havenoun   cpx #&ff
+            bne validnoun
             jmp badnoun
-l1f43:      cpx #&2b
-            beq l1f4b
-            jmp l1224
-            nop
-l1f4b:      lda currentroom
-            cmp #&da
-            bne l1f54
+.validnoun  cpx #&2b          ; noun 43 - ship
+            beq isship
+            jmp jwaitnoun     
+            nop               ; ??
+.isship     lda currentroom
+            cmp #&da          ; in room 1 
+            bne noship
             jmp l1e35
-l1f54:      jmp l1837
+.noship     jmp nowthapp
+}
 l1f57:      jsr l1fa0
             beq l1f69
             jsr l1f86
-            lda l741e
+            lda doorflag
             beq l1f6e
             cmp #&01
             beq l1f73
@@ -1690,7 +1733,7 @@ l1fd5:      lda currentroom,x
             ldx #&c0
             ldy #&22
             jsr oscli
-            jmp l0c96
+            jmp sitcmd
             ldx #&07
             jsr prtmsg
             jsr l200f
@@ -1705,7 +1748,7 @@ l1fff:      lda l7429,x
             inx
             cpx #&08
             bne l1fff
-            jsr l0c96
+            jsr sitcmd
             jmp l1f78
 l200f:      jsr osrdch
             cmp #&1b
@@ -1879,7 +1922,7 @@ l218c:      ldy #&00
             cmp l74fb
             bne l2196
             iny
-l2196:      cmp l74fc
+l2196:      cmp broochloc
             bne l219c
             iny
 l219c:      cmp l74ff
@@ -4645,7 +4688,7 @@ l740a:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00
 l7414:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00
-l741e:      .byte &01
+.doorflag   .byte &01         ; 01 == locked; 02 == open
 l741f:      .byte &00
 l7420:      .byte &00
 l7421:      .byte &00
@@ -4686,11 +4729,11 @@ l74cc:      .byte &00,&00,&55,&45,&00,&04,&04,&03
             .byte &34,&04,&20,&04,&00,&24,&34,&06
             .byte &20,&b4,&05,&05,&05,&10,&20,&05
             .byte &00,&00
-inventory:      .byte &00,&00,&34,&d6
+.inventory  .byte &00,&00,&34,&d6
 l74fa:      .byte &ac
 l74fb:      .byte &ea
-l74fc:      .byte &ff
-chainloc:      .byte &02
+.broochloc  .byte &ff
+.chainloc   .byte &02
 l74fe:      .byte &35
 l74ff:      .byte &27
 l7500:      .byte &12
@@ -4699,7 +4742,7 @@ l7504:      .byte &22
 l7505:      .byte &e1
 l7506:      .byte &0d
 l7507:      .byte &ec
-guardloc:      .byte &35
+.guardloc   .byte &35
 l7509:      .byte &76
 l750a:      .byte &e2
 l750b:      .byte &47
@@ -4712,10 +4755,10 @@ l7511:      .byte &70
 l7512:      .byte &9e
 l7513:      .byte &01
 l7514:      .byte &6e
-l7515:      .byte &24
+shovelloc:      .byte &24
 l7516:      .byte &ae
 l7517:      .byte &69,&a1,&91,&83
-l751b:      .byte &3d
+.umbrellaloc .byte &3d
 l751c:      .byte &98
 l751d:      .byte &b5,&00,&00
 l7520:      .byte &00,&00,&1f,&75,&76,&77,&78,&44
@@ -4724,7 +4767,8 @@ l7520:      .byte &00,&00,&1f,&75,&76,&77,&78,&44
 l7532:      .byte &55,&6b,&79
 l7535:      .byte &3f,&6c,&7c,&7d,&7e,&45,&7f,&80
             .byte &6d,&49,&48,&81,&46,&1f,&39,&1f
-l7545:      .byte &3a,&1f,&6f,&00,&00,&00,&00,&00
+.umbrflag   .byte &3a         ; umbrella flag if == 0 is open otherwise closed.
+            .byte &1f,&6f,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&02
             .byte &03,&04,&05,&06,&06,&06,&06,&07
             .byte &08,&09,&0a,&0b,&0c,&0d,&0e,&0f
