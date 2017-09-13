@@ -34,7 +34,7 @@ l0084       = &0084
 l0085       = &0085
 currentroom = &0088
 l0089       = &0089
-l008a       = &008a
+droploc       = &008a
 invsize     = &008b
 l008c       = &008c
 l008d       = &008d
@@ -61,7 +61,7 @@ l0c80       = &0c80
 badnoun     = &0c85
 waitnoun    = &0c91
 sitcmd      = &0c96
-l0cce       = &0cce
+printnoun   = &0cce
 l1855       = &1855
 l1c03       = &1c03
 l1c16       = &1c16
@@ -96,7 +96,7 @@ l1223:      rts
 }
 
 l1227:      lda #&3f
-            sta l7535
+            sta lampflag
             jmp l1290
             bne l1236
             
@@ -229,26 +229,31 @@ l12ef:      lda waterloc
             jmp l1297
 l12fe:      ldx #&71
             jmp prtmsg
-l1303:      jmp jbadnoun
-            bne l130b
+           
+.tjbadnoun  jmp jbadnoun
+
+.throwcmd
+{
+            bne havenoun
             jmp neednoun
-l130b:      ldy currentroom
-l130d:      sty l008a
+.havenoun   ldy currentroom
+l130d:      sty droploc
             cpx #&ff
-            beq l1303
-            cpx #&28
-            bcc l131a
+            beq tjbadnoun
+            cpx #&28          ; noun 40 - door
+            bcc canthrow      ; < noun 40
             jmp cantdo
-l131a:      lda invsize
-            bne l132d
-            ldx #&10
+.canthrow   lda invsize
+            bne stuffinv      ; if we have stuff in inv
+            ldx #&10          ; message 16 "You are not"
             jsr findmsg
-            ldx #&1a
+            ldx #&1a          ; message 26 "holding"
             jsr findmsg
-            ldx #&18
+            ldx #&18          ; "anything"
             jmp prtmsg
-l132d:      lda inventory,x
-            beq l1337
+.stuffinv   lda inventory,x
+            beq thininv
+}
 
 ; youarenothold - deals with the case where noun is not in inventory
 .youarenothold
@@ -256,11 +261,15 @@ l132d:      lda inventory,x
             ldx #&10          ; message 16 "You are not"
             jmp holdnoun
 }            
-l1337:      dec invsize
-            lda l008a
+.thininv
+{
+            dec invsize
+            lda droploc
             sta inventory,x
             jmp doverb
-            ldx #&19
+}
+           
+            ldx #&19          ; message 25 "Just type a direction."
             jmp prtmsg
 l1346:      jmp l142e
 l1349:      jmp badnoun
@@ -368,12 +377,12 @@ l141c:      ldy l008d
             jsr oswrch
             ldy #&fa
             jsr l13bb
-            jmp l15b3
+            jmp lflf
 l142e:      bne l1433
             jmp neednoun
 l1433:      cpx #&ff
             bne l143a
-l1437:      jmp badnoun
+.jbadnoun   jmp badnoun
 l143a:      cpx #&28
             bcc l1441
             jmp cantdo
@@ -400,12 +409,17 @@ l1462:      ldx #&52
             bne l1476
             jmp l121e
 l1476:      rts
-l1477:      ldx #&20
+
+.donthave
+{
+            ldx #&20          ; message 20 "You don't possess it!"
             jmp prtmsg
-            bne l14c7
-            lda l750b
-            bne l1477
-            ldx l7535
+}   
+         
+            bne jjwaitnoun
+            lda lamploc
+            bne donthave
+            ldx lampflag
             cpx #&3f
             beq l14c1
             cpx #&40
@@ -420,7 +434,7 @@ l1477:      ldx #&20
             cmp #&28
             bcc l14bc
             ldx #&3d
-l14a2:      stx l7535
+l14a2:      stx lampflag
             jmp prtmsg
 l14a8:      lda l7420
             beq l14b2
@@ -433,40 +447,45 @@ l14b7:      ldx #&40
 l14bc:      ldx #&3e
             jmp l14a2
 l14c1:      jmp l14a2
-l14c4:      jmp neednoun
-l14c7:      jmp jwaitnoun
-            beq l14c4
+.jneednoun  jmp neednoun
+.jjwaitnoun jmp jwaitnoun
+
+; &14ca
+.fillcmd
+{
+            beq jneednoun
             cpx #&ff
-            beq l150d
-            cpx #&15
-            beq l14e2
-            cpx #&27
-            bne l14db
-            jmp l195d
-l14db:      cpx #&13
-            bne l14c7
-            jmp l1938
-l14e2:      lda l750b
-            bne l1477
-            lda l7510
-            beq l14fe
-            ldx #&10
+            beq jjbadnoun
+            cpx #&15             ; noun 21 - lamp
+            beq islamp
+            cpx #&27             ; noun 39 - well
+            bne notwell
+            jmp fillwell
+.notwell    cpx #&13             ; noun 19 - hat
+            bne jjwaitnoun
+            jmp fillhat
+.islamp     lda lamploc
+            bne donthave
+            lda oilloc
+            beq haveoil
+            ldx #&10             ; message 16 "You are not"
             jsr findmsg
-            ldx #&1a
+            ldx #&1a             ; message 26 "holding"
             jsr findmsg
-            ldx #&1a
-            jsr l0cce
-            jmp l15b3
-l14fe:      lda #&3c
-            sta l7535
-            lda #&15
-            sta l7510
+            ldx #&1a             ; noun 26 - oil
+            jsr printnoun
+            jmp lflf
+.haveoil    lda #&3c
+            sta lampflag
+            lda #&15             ; noun 21 - lamp
+            sta oilloc
             dec invsize
             jmp sitcmd
-l150d:      jmp l1437
+.jjbadnoun  jmp jbadnoun
+}
 l1510:      lda #&00
             sta l7427
-            ldx l7535
+            ldx lampflag
             cpx #&3d
             beq l1521
             cpx #&3e
@@ -484,11 +503,11 @@ l1521:      lda #&01
             rts
 l1535:      dec l008e
             lda #&ff
-            sta l7510
+            sta oilloc
             ldx #&3f
             jmp l14a2
 l1541:      ldx #&3e
-            stx l7535
+            stx lampflag
             dec l008e
             rts
 l1549:      dec l008e
@@ -511,7 +530,7 @@ l1551:      tya
             cpx #&1c
             bcs l1588
 l156d:      ldx l0525
-            jsr l0cce
+            jsr printnoun
             pla
             tay
             iny
@@ -529,7 +548,7 @@ l1583:      dey
 l1588:      jsr l0b22
             jmp l156d
 l158e:      sta l0523
-            stx l008a
+            stx droploc
             ldy #&00
             sty l0522
             jsr l15c1
@@ -543,7 +562,7 @@ l15a6:      lda #&7f
 l15ab:      jsr oswrch
             lda #&2e
             jsr oswrch
-l15b3:      jsr osnewl
+.lflf       jsr osnewl
             jmp osnewl
 l15b9:      ldx #&0d
             jsr findmsg
@@ -552,7 +571,7 @@ l15b9:      ldx #&0d
 l15c1:      ldy #&01
             ldx #&02
 l15c5:      lda inventory,x
-            cmp l008a
+            cmp droploc
             bne l15eb
             lda l0523
             beq l160d
@@ -588,9 +607,9 @@ l160d:      lda l7420
             beq l1628
             lda l74cc,x
             bmi l1630
-            lda l750b
+            lda lamploc
             beq l1623
-            cmp l008a
+            cmp droploc
             beq l1623
 l1620:      jmp l15eb
 l1623:      lda l7427
@@ -598,9 +617,9 @@ l1623:      lda l7427
 l1628:      lda l0522
             beq l15e6
             jmp l15e3
-l1630:      lda l750b
+l1630:      lda lamploc
             beq l163c
-            cmp l008a
+            cmp droploc
             beq l163c
             jmp l1628
 l163c:      lda l7427
@@ -655,7 +674,7 @@ l16ac:      ldx #&54
 l16b1:      lda l0525
             cmp #&1a
             bne l1654
-            jmp l14e2
+            jmp islamp
 l16bb:      jmp jwaitnoun
 l16be:      lda #&00
             sta l0089
@@ -701,7 +720,7 @@ l170b:      lda l74fe
 l1722:      rts
 l1723:      ldx #&26
 l1725:      jsr findmsg
-killplayer:      lda #&01
+.killplayer lda #&01
             sta l7422
             ldx #&27
             jmp prtmsg
@@ -767,7 +786,7 @@ l17ba:      lda #&01
             ldx #&5d
             jmp prtmsg
 ; &17c4
-; handles the ATTACK and KILL commands.
+; handles the ATTACK, STRANGLE and KILL commands.
 .attackcmd
 {
             bne havenoun
@@ -948,9 +967,9 @@ l18b4:      ldx #&64
             jmp stampit
 }
             
-l1938:      lda l7509
+.fillhat    lda l7509
             beq l1940
-            jmp l1477
+            jmp donthave
 l1940:      lda waterloc
             cmp #&13
             beq l1958
@@ -963,7 +982,7 @@ l1953:      ldx #&70
             jmp prtmsg
 l1958:      ldx #&72
             jmp prtmsg
-l195d:      lda l751d
+fillwell:      lda l751d
             cmp currentroom
             beq l1967
             jmp nothere
@@ -998,17 +1017,22 @@ l19a3:      dex
 l19a7:      dex
             jmp l19a3
 l19ab:      jmp l1458
+
+; &19ae
+.katroscmd
+{
             lda currentroom
-            cmp #&99
-            beq l19b7
+            cmp #&99          ; room 153 "You are outside the Tower of Xaan..."
+            beq outxaan
             jmp nowthapp
-l19b7:      lda doorflag
-            bne l19bf
+.outxaan    lda doorflag
+            bne dooropen
             jmp nowthapp
-l19bf:      lda #&00
+.dooropen   lda #&00
             sta doorflag
-            ldx #&9f
+            ldx #&9f          ; message 159 "The building resounds with a low..."
             jmp prtmsg
+}
  
 ; &19c9
 .praycmd
@@ -1721,12 +1745,12 @@ l1f86:      lda #&53
             rts
 l1fa0:      lda l7420
             beq l1fb9
-            lda l7535
+            lda lampflag
             cmp #&3c
             beq l1fbf
             cmp #&3f
             beq l1fbf
-            lda l750b
+            lda lamploc
             beq l1fb9
             cmp currentroom
             bne l1fbf
@@ -4762,12 +4786,12 @@ l7507:      .byte &ec
 .guardloc   .byte &35
 l7509:      .byte &76
 l750a:      .byte &e2
-l750b:      .byte &47
+.lamploc    .byte &47
 l750c:      .byte &e3
 l750d:      .byte &c9
 l750e:      .byte &ff
 l750f:      .byte &b6
-l7510:      .byte &df
+.oilloc     .byte &df
 l7511:      .byte &70
 l7512:      .byte &9e
 l7513:      .byte &01
@@ -4782,7 +4806,8 @@ l7520:      .byte &00,&00,&1f,&75,&76,&77,&78,&44
             .byte &42,&41,&50,&79,&7a,&1f,&43,&47
             .byte &6a,&7b
 l7532:      .byte &55,&6b,&79
-l7535:      .byte &3f,&6c,&7c,&7d,&7e,&45,&7f,&80
+.lampflag   .byte &3f         ; lamp flag 
+            .byte &6c,&7c,&7d,&7e,&45,&7f,&80
             .byte &6d,&49,&48,&81,&46,&1f,&39,&1f
 .umbrflag   .byte &3a         ; umbrella flag if == 0 is open otherwise closed.
             .byte &1f,&6f,&00,&00,&00,&00,&00
