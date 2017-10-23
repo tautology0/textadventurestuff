@@ -58,6 +58,7 @@ verbbuf     = &041f
 nounbuf     = &043e
 wordbuf     = &0600
 colourinst  = &0922
+nounprt     = &0c6d
 verbptrsl   = &7600
 verbptrsh   = &7638
 l7a20       = &7a20
@@ -162,13 +163,13 @@ org &0880
             cmp #&3a          ; ": "
             beq punctlwr
             cmp #&24          ; verb
-            beq l09a6 
+            beq prtverb 
             cmp #&25          ; noun
-            beq l09b0
+            beq prtnoun
             cmp #&26          ; ?
-            beq l09ba
+            beq prtquery
             cmp #&3c          ; "<"
-            beq l09c6
+            beq prtblink
             ora capflag
 .storechar  sta (wordbufptr),y
             lda #&01
@@ -195,20 +196,20 @@ l0981:      jsr l0a6e
             rts
 .punctlwr   jsr spaceafter
             jmp incptrs
-l09a6:      lda #&1f
+prtverb:    lda #&1f
             sta cmpbufh
             jsr l0a86
             jmp incptrs
-l09b0:      lda #&3e
+prtnoun:    lda #&3e
             sta cmpbufh
             jsr l0a86
             jmp incptrs
-l09ba:      jsr incbufptr
+prtquery:   jsr incbufptr
             lda lwrormask
             eor #&20
             sta lwrormask
             jmp msgloop
-l09c6:      lda #&01
+prtblink:   lda #&01
             eor l006b
             sta l006b
             jmp storechar
@@ -602,8 +603,12 @@ l0b22:      jsr osnewl
 .setnouns   ldx curnoun
             lda nounflag
             rts
+}
 ; c85 
-.badnoun    ldx #&00          ; message 0 - "I don't understand"  
+; badnoun - in the case a non-existent noun gets through
+.badnoun
+{
+            ldx #&00          ; message 0 - "I don't understand"  
             jmp nounprt
 }
             
@@ -649,6 +654,10 @@ ynyes:      ldx #&09          ; message 9 - "Bye!"
             jmp prtmsg
 }
 
+;&cce
+
+.printnoun
+{
             jsr setbufnoun
             ldy #&00
             stx msgnumber

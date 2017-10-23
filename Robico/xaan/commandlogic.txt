@@ -1,0 +1,72 @@
+Command logic
+
+def THROW(noun):
+   if noun == 0:
+      message("I can't guess what you want to $")
+      return
+   if noun == 255:
+      message("I don't understand")
+      return
+   if noun < 40:
+      message("You can't do that")
+      return
+   if invsize == 0:
+      message("You are not")
+      message("holding")
+      message("anything")
+      return
+   if location[noun] != 0:
+      message("You are not")
+      message("holding")
+      message("the %!")
+      return
+   location[noun] = currentroom
+   inventory.size -= 1
+   
+def GO(noun):
+   message("Just type a direction.")
+
+def ATTACK(noun):
+   if noun == 0:
+      message("I can't guess what you want to $")
+      return
+   if noun == 255:
+      message("I don't understand")
+      return
+   if noun != 18:          # "guard"
+      message("You can't do that")
+      return
+   if location[18] != currentroom:
+      message("You can't see")
+      message("the %!")
+      return
+   if location[7] != 0:    # "chain"
+      message("You need a weapon.")
+      return
+   [...]
+   message("You grip the chain tightly and start to twist it around the guard's neck. As the last breath of life is squeezed from his body, he slumps to the floor.")
+   location[7] = 255       # "chain"
+   inventory.size -= 1   
+   message("The ancient chain dissolves into a pile of rust, which mingles with the surrounding dirt and is lost forever!")
+   
+def SEARCH(noun):
+   if noun != 0:
+   [...]
+   if noun == 0:
+      message("You find")
+      [...]
+
+def FILL(noun):
+   if noun == 0:
+      message("I can't guess what you want to $")
+      return
+   if noun == 255:
+      message("I don't understand")
+      return
+   if noun == 21:          # "lamp"
+         if lamp in inventory
+         [...]
+         and oilloc == 0
+         
+      
+      

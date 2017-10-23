@@ -3,16 +3,20 @@ XAAN2: copy protection code
 XAAN1: Message mangling code
 
 XAAN:
-From	To	Purpose
+From	To	Addr	Purpose
 -----------------------------------
-3100 	3248	Introduction text
-3249	32ff	Unknown
-3300	5c56	Messages
-5c57	6472	Unknown
-6355		Room messages
-6473	65a8	List of verbs
-65a9	66e1	List of nouns
-66e4	69fb	List of tokens
+3100 	3248	4300	Introduction text
+3249	32ff	4449	Unknown
+3300	5c56	4500	Messages
+5c57	5c5b	6e57	Unknown
+5c5c		6e5c	Room exits
+62f6		74f6	Object locations
+6354		7554	Room messages
+6400	6437	7600	Verb action pointer (low)
+6438	646f	7638	Verb action point (high)
+6473	65a8	7673	List of verbs
+65a9	66e1	77a9	List of nouns
+66e4	69fb	78e4	List of tokens
 
 Objects:
 x

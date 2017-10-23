@@ -4,8 +4,9 @@
 
 #define VERB_PTR 0x6473
 #define NOUN_PTR 0x65A9
+#define OBJLOC_PTR 0x62f5
 #define VERB_NUM 56
-#define NOUN_NUM 49
+#define NOUN_NUM 48
 #define VERB_OFFL 0x6400
 #define VERB_OFFH 0x6438
 
@@ -14,6 +15,12 @@ typedef struct
    char verb[64];
    int  address;
 } verb_struct;
+
+typedef struct
+{
+   char noun[64];
+   int location;
+} noun_struct;
 
 char directions[10][20]={
    "north",     "south",     "east",      "west",
@@ -35,7 +42,7 @@ typedef struct
 } room_struct;
 
 verb_struct verbs[255];
-char nouns[255][64];
+noun_struct nouns[255];
 char intro[15][255];
 
 int main (void)
@@ -204,6 +211,7 @@ int main (void)
 
    printf("Enumerating rooms\n");
    fseek(infile,0x6354,SEEK_SET);
+   roomcount=0x34;
    do
    {
       byte = fgetc(infile);
@@ -215,7 +223,7 @@ int main (void)
   
    printf("Gathering exits\n");
    fseek(infile, 0x5c5c, SEEK_SET);
-   i=0;
+   i=0x34;
    curexit=0;
    for (j=0;j<10;j++) rooms[i].exits[j].destination=0xff;   
    do
@@ -225,7 +233,7 @@ int main (void)
       byte2=fgetc(infile);
 
       rooms[i].exits[curexit].direction=byte & 0xf;
-      rooms[i].exits[curexit].destination=byte2 - 0x34;
+      rooms[i].exits[curexit].destination=byte2;
       if (byte & 0x40)
       {
          rooms[i].exits[curexit].blocked=1;
@@ -269,18 +277,27 @@ int main (void)
    verbs[0].address=0; 
 
    printf("Gathering Nouns\n");
-   fseek(infile,NOUN_PTR,SEEK_SET);
+   fseek(infile,NOUN_PTR+1,SEEK_SET);
    for (i=0; i<NOUN_NUM; i++)
    {
       int ptr=0, j=0;
       do
       {
          j=fgetc(infile);
-         if (j != '@') nouns[i][ptr++]=j;
+         if (j != '@') nouns[i].noun[ptr++]=j;
       } while (j != '@');
-      nouns[i][ptr]='\0';
+      nouns[i].noun[ptr]='\0';
    }
-
+   
+   printf("Object Locations\n");
+   fseek(infile,OBJLOC_PTR+1,SEEK_SET);  
+   for (i=0; i<NOUN_NUM; i++)
+   {
+      int ptr=0, j=0;
+      j=fgetc(infile);
+      nouns[i].location=j;
+   }
+   
    printf("\n\nDumping it all:\n");
    printf("Intro:\n");
    for (i=0; i<=introcount; i++)
@@ -294,7 +311,7 @@ int main (void)
    }
    
    // Display rooms
-   for (i=0; i<=roomcount; i++)
+   for (i=0x34; i<=roomcount; i++)
    {
       printf("\nRoom %d: %s\n", i, messages[rooms[i].description]);
       printf("Exits:\n");
@@ -319,9 +336,15 @@ int main (void)
    {
       printf("Verb %d: %s\n address &%04x\n", i, verbs[i].verb, verbs[i].address);
    }
-   for (i=0; i<NOUN_NUM; i++)
+   for (i=2; i<NOUN_NUM; i++)
    {
-      printf("Noun %d: %s\n", i, nouns[i]);
+      printf("Noun %d: %s\n Starts in: %d (%s)\n", 
+               i, nouns[i].noun, nouns[i].location,
+               (nouns[i].location==0)?"inventory":
+               (nouns[i].location==1)?"worn":
+               (nouns[i].location<0x34)?nouns[nouns[i].location].noun:
+               (nouns[i].location>223)?"nowhere":
+               messages[rooms[nouns[i].location].description]);
    }
          
    fclose(infile);
