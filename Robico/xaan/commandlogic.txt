@@ -22,6 +22,24 @@ def THROW(noun):
       return
    location[noun] = currentroom
    inventory.size -= 1
+
+def WISH(noun):
+   if noun == 0:
+      message("Nothing Happens")
+      return
+   if noun == 255:
+      message("I don't understand")
+      return
+   if noun < 40:
+      message("You can't do that")
+      return
+   if location[noun] == 0:
+      message("Nothing Happens")
+      return
+   message("You are not")
+   message("holding")
+   message("the %!")
+   return 
    
 def GO(noun):
    message("Just type a direction.")
