@@ -35,11 +35,11 @@ l0085       = &0085
 currentroom = &0088
 l0089       = &0089
 droploc     = &008a
-invsize     = &008b
-l008c       = &008c
+curinv     = &008b
+curwear       = &008c
 l008d       = &008d
 l008e       = &008e
-l0522       = &0522
+pobjcnt       = &0522
 l0523       = &0523
 lastobj     = &0525
 tempstore   = &0526
@@ -85,7 +85,7 @@ jprtempty=&121e
             ldx #&01
             lda #&01
             jsr prtobjs
-            cpy #&00
+            cpy #&00       ; y is number of objects printed
             bne someobjs
 .jprtempty  lda #&7f
             jmp prtempty
@@ -121,13 +121,13 @@ holdnoun=&1274
 .getcmd
 {
             bne havenoun
-.neednoun   ldx #&0a       ; message 10 "I can't guess what you want to verb"
+.neednoun   ldx #&0a          ; message 10 "I can't guess what you want to verb"
             jmp prtmsg
 .havenoun   cpx #&ff
             beq jbadnoun
             cpx #&28
-            bcc isobject   ; object < 40 
-.cantdo     ldx #&11       ; message 17 "You can't do that"
+            bcc isobject      ; object < 40 
+.cantdo     ldx #&11          ; message 17 "You can't do that"
             jmp prtmsg
 .jbadnoun   jmp badnoun
 .isobject   stx lastobj
@@ -138,7 +138,7 @@ holdnoun=&1274
             cmp #&01
             beq getobj
             cmp #&28
-            bcs nothere    ; object > 40
+            bcs nothere       ; object > 40
             tax
             lda inventory,x
             beq getobj
@@ -146,76 +146,76 @@ holdnoun=&1274
             beq getobj
             cmp currentroom
             beq getobj
-.nothere    ldx #&0e       ; message 14 "You can't see"
+.nothere    ldx #&0e          ; message 14 "You can't see"
 .thenoun    jsr findmsg
-            ldx #&12       ; message 18 "the noun"
+            ldx #&12          ; message 18 "the noun"
             jmp prtmsg
-.nothold    ldx #&0f       ; message 16 "You are not"
+.nothold    ldx #&0f          ; message 16 "You are not"
 .holdnoun   jsr findmsg
-            ldx #&1a       ; message 26 "holding"
-            jmp thenoun    ; "the noun"
-.getobj     lda invsize
-            cmp #&07       ; is space in inventory?
+            ldx #&1a          ; message 26 "holding"
+            jmp thenoun       ; "the noun"
+.getobj     lda curinv
+            cmp #&07          ; is space in inventory?
             bcs invfull
             ldx lastobj
-            cpx #&1a       ; object 26 "oil"
+            cpx #&1a          ; object 26 "oil"
             beq getoil
-            cpx #&26       ; object 38 "water"
+            cpx #&26          ; object 38 "water"
             bne notwater
-            jmp l12fe
+            jmp fillcont
 .notwater   lda objflags,x
             and #&0f
-            bne l12b3
-l1297:      jsr doverb
-l129a:      inc invsize
+            bne chkflags      ; no flags action succeeds
+.getit      jsr doverb
+.getnomsg   inc curinv
             ldx lastobj
             lda inventory,x
-            cmp #&01
-            bne l12a8
-            dec l008c
-l12a8:      lda #&00
-            sta inventory,x
+            cmp #&01          ; if wearing object
+            bne notwear
+            dec curwear       ; reduce worn
+.notwear    lda #&00
+            sta inventory,x   ; set location to 00 = inventory
             rts
-.invfull    ldx #&16       ; message 22 "Your hands are full!"
+.invfull    ldx #&16          ; message 22 "Your hands are full!"
             jmp prtmsg
-l12b3:      cmp #&04
-            beq l1297
-            cmp #&05
+.chkflags   cmp #&04          ; Is it wearable? 4 = wearable
+            beq getit
+            cmp #&05          ; Is it gettable? 5 = not gettable
             beq cantget
-            cmp #&06
-            beq l12db
-            cmp #&07
-            beq l12ef
-            tay
+            cmp #&06          ; has shovel been moved
+            beq spademove
+            cmp #&07          ; Is coin in well?
+            beq coinwell
+            tay               ; chain count - get three times, i.e. 3 - 0
             txa
             pha
             tya
             clc
-            adc #&12
-            tax
+            adc #&12          ; add value to 18
+            tax               ; print that message
             jsr prtmsg
             pla
             tax
             dec objflags,x
-            beq l129a
+            beq getnomsg
             rts
-.cantget    ldx #&1c       ; message 31 "the % is immovable"
+.cantget    ldx #&1c          ; message 31 "the % is immovable"
             jmp prtmsg
-l12db:      lda l7514
-            cmp #&01
-            bne l12ea
+.spademove  lda shoesloc
+            cmp #&01          ; Are shoes being warn?
+            bne cantreach
             lda #&00
             sta objflags,x
-            jmp l1297
-l12ea:      ldx #&68
+            jmp getit
+.cantreach  ldx #&68          ; message 104 "The % is out of reach!"
             jmp prtmsg
-l12ef:      lda waterloc
-            cmp #&27
-            bne l12ea
+.coinwell   lda waterloc
+            cmp #&27          ; object 39 "well"
+            bne cantreach     ; if water is in well "can't reach"
             lda #&00
             sta objflags,x
-            jmp l1297
-l12fe:      ldx #&71       ; message 113 "Fill a container."
+            jmp getit
+.fillcont   ldx #&71          ; message 113 "Fill a container."
             jmp prtmsg
            
 .tjbadnoun  jmp jbadnoun
@@ -231,7 +231,7 @@ l130d:      sty droploc
             cpx #&28          ; noun 40 - door
             bcc canthrow      ; < noun 40
             jmp cantdo
-.canthrow   lda invsize
+.canthrow   lda curinv
             bne stuffinv      ; if we have stuff in inv
             ldx #&10          ; message 16 "You are not"
             jsr findmsg
@@ -251,7 +251,7 @@ l130d:      sty droploc
 }            
 .thininv
 {
-            dec invsize
+            dec curinv
             lda droploc
             sta inventory,x
             jmp doverb
@@ -260,49 +260,53 @@ l130d:      sty droploc
 ; &1341
 .gocmd
 {
-            ldx #&19          ; message 25 "Just type a direction."
+            ldx #&19             ; message 25 "Just type a direction."
             jmp prtmsg
 }
 srchnoun:   jmp l142e
-l1349:      jmp badnoun
-            bne l1351
+
+.wearcmd
+{
+.jbadnoun   jmp badnoun
+            bne havenoun
             jmp neednoun
-l1351:      cpx #&ff
-            beq l1349
-            cpx #&28
-            bcc l135c
+.havenoun   cpx #&ff
+            beq jbadnoun
+            cpx #&28             ; < 40 - i.e. object
+            bcc isobject
             jmp cantdo
-l135c:      lda objflags,x
+.isobject   lda objflags,x
             and #&0f
-            cmp #&04
-            beq l1368
+            cmp #&04             ; flag 4 - wearable
+            beq iswear
             jmp cantdo
-l1368:      lda inventory,x
-            beq l1374
-            cpx #&01
-            beq l139b
+.iswear     lda inventory,x
+            beq ininv            ; in inventory
+            cpx #&01             ; this should be cmp
+            beq isworn
             jmp youarenothold
-l1374:      lda l008c
-            cmp #&07
-            bcs l1396
-            cpx #&13
-            bne l138a
-            lda waterloc
-            cmp #&13
-            bne l138a
-            ldx #&72
+.ininv      lda curwear
+            cmp #&07             ; can we wear anything else?
+            bcs wearmax
+            cpx #&13             ; is it the hat?
+            bne wearit
+            lda waterloc         ; is water in hat
+            cmp #&13             ; object 19 "hat"
+            bne wearit
+            ldx #&72             ; message 114 "The hat is full!"
             jmp prtmsg
-l138a:      lda #&01
-            sta inventory,x
-            inc l008c
-            dec invsize
+.wearit     lda #&01
+            sta inventory,x      ; wear it
+            inc curwear
+            dec curinv
             jmp doverb
-l1396:      ldx #&17
+.wearmax    ldx #&17             ; message 23 "A body can only take ... "
             jmp prtmsg
-l139b:      ldx #&0f
+.isworn     ldx #&0f             ; message 15 "You are already"
             jsr findmsg
-            ldx #&1b
+            ldx #&1b             ; message 27 "wearing"
             jmp thenoun
+}
             
 .searchcmd
 {            
@@ -411,7 +415,10 @@ l1476:      rts
             ldx #&20          ; message 20 "You don't possess it!"
             jmp prtmsg
 }   
-         
+
+; &147c
+.lampcmd
+{         
             bne jjwaitnoun
             lda lamploc
             bne donthave
@@ -475,7 +482,7 @@ l14c1:      jmp l14a2
             sta lampflag
             lda #&15             ; noun 21 - lamp
             sta oilloc
-            dec invsize
+            dec curinv
             jmp sitcmd
 .jjbadnoun  jmp jbadnoun
 }
@@ -519,7 +526,7 @@ l1551:      tya
             lsr a
             lsr a
             clc
-            adc #&4b
+            adc #&4b             ; object pronoun - "a" "an" "some" "a pair of"
             tax
             jsr findmsg
             jsr l0b28
@@ -553,12 +560,12 @@ prtempty=&15ab
             sta l0523
             stx droploc
             ldy #&00
-            sty l0522
+            sty pobjcnt         ; count of objects printed
             jsr l15c1
             dey
             beq l15b9
             sty l006a
-            inc l0522
+            inc pobjcnt
             jsr l15c1
 l15a6:      lda #&7f          ; backspace
             jsr oswrch
@@ -578,7 +585,7 @@ l15c5:      lda inventory,x
             bne l15eb
             lda l0523
             beq l160d
-            lda l0522
+            lda pobjcnt
             beq l15e6
             lda l0523
             cmp #&02
@@ -593,7 +600,7 @@ l15eb:      inx
             cpx #&28
             bne l15c5
             rts
-l15f1:      lda l0522
+l15f1:      lda pobjcnt
             beq l15eb
             stx lastobj
             tya
@@ -609,7 +616,7 @@ l15f1:      lda l0522
 l160d:      lda l7420
             beq l1628
             lda objflags,x
-            bmi l1630
+            bmi l1630            ; bit 8 set
             lda lamploc
             beq l1623
             cmp droploc
@@ -617,7 +624,7 @@ l160d:      lda l7420
 l1620:      jmp l15eb
 l1623:      lda l7427
             beq l1620
-l1628:      lda l0522
+l1628:      lda pobjcnt
             beq l15e6
             jmp l15e3
 l1630:      lda lamploc
@@ -640,7 +647,7 @@ l1657:      lda inventory,x
             beq l165f
             jmp youarenothold
 l165f:      stx lastobj
-            ldx #&53
+            ldx #&53             ; message 83 - "Where?"
             jsr prtmsg
             jsr l0b3d
             jsr osnewl
@@ -736,7 +743,7 @@ l173c:      lda umbrellaloc
             cmp currentroom
             beq l174a
             jmp l1705
-l1748:      dec invsize
+l1748:      dec curinv
 l174a:      lda #&ff
             sta umbrellaloc
             ldx #&4a
@@ -814,7 +821,7 @@ l17ba:      lda #&01
             sta guardalive ; set guard to be dead
             ldx #&5e       ; message 94 - kill guard
             jsr findmsg
-            dec invsize    ; reduce size of inventory
+            dec curinv    ; reduce size of inventory
             ldx #&ff
             stx chainloc   ; destroy chain
             ldx #&61       ; message 97 - chain dissolves
@@ -971,7 +978,7 @@ l17ba:      lda #&01
 .invitem    lda inventory,x   ; check inventory
             beq haveobj
             jmp youarenothold
-.haveobj    dec invsize
+.haveobj    dec curinv
             lda #&ff
             sta inventory,x   ; destroy object
             cpx #&0c          ; noun 12 - doll
@@ -1201,7 +1208,7 @@ l1a7d:      dex
             cmp currentroom
             beq inroom
             jmp nothere
-.ininv      dec invsize
+.ininv      dec curinv
 .inroom     lda #&ff
             sta foodloc
             jmp doverb
@@ -1271,8 +1278,8 @@ l1b53:      lda inventory,x
 l1b5c:      dex
             bpl l1b53
             lda #&00
-            sta invsize
-            sta l008c
+            sta curinv
+            sta curwear
             jmp l1c00
 l1b68:      lda #&bb
             sta inventory,x
@@ -1535,7 +1542,7 @@ l1d5d:      ldx #&87
             bne l1dd7
             cmp l750e
             bne l1ddf
-            cmp l7514
+            cmp shoesloc
             bne l1de7
             cmp l7517
             bne l1def
@@ -1846,7 +1853,7 @@ l2042:      sta l0060,x
             lda #&ff
             sta l008e
             lda #&01
-            sta l008c
+            sta curwear
             lda #&34       ; Room 52 "in a small, dimly lit prison cell"
             sta currentroom
             lda #&45
@@ -2031,7 +2038,7 @@ l21e0:      cmp l750c
 l21e6:      cmp l750e
             bne l21ec
             iny
-l21ec:      cmp l7514
+l21ec:      cmp shoesloc
             bne l21f2
             iny
 l21f2:      cmp l7517
@@ -4792,6 +4799,14 @@ l7435:      .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00,&00
             .byte &00,&00,&00,&00,&00,&00,&00
+; objflags
+; &AB            
+; A = last two bits pronoun
+;     enum { "a", "an", "some", "a pair of" }
+; B = enum {
+;              noflags, chainpull2, chainpull1, chainpull0,
+;              wearable, notgettable, shovelgot, coingot
+;          }
 .objflags   .byte &00,&00,&55,&45,&00,&04,&04,&03
             .byte &44,&07,&00,&00,&00,&45,&20,&34
             .byte &34,&00,&45,&04,&10,&00,&34,&04
@@ -4823,8 +4838,8 @@ l750f:      .byte &b6
 l7511:      .byte &70
 l7512:      .byte &9e
 l7513:      .byte &01
-l7514:      .byte &6e
-shovelloc:      .byte &24
+.shoesloc   .byte &6e
+.shovelloc  .byte &24
 l7516:      .byte &ae
 l7517:      .byte &69,&a1,&91,&83
 .umbrellaloc .byte &3d
