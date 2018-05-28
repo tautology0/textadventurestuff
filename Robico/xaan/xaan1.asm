@@ -213,6 +213,8 @@ prtblink:   lda #&01
             eor l006b
             sta l006b
             jmp storechar
+}
+
 ; &9cf
 ; findmsg - finds message in X (and passes it to print routine)
 .findmsg
