@@ -1,4 +1,25 @@
-Command logic
+Command logic in pseudo python
+
+def QUIT(noun):
+   message("Are you sure you want to quit?"
+   print("\n\n")
+   key=""
+   while (key != "y" and key != "n"):
+      key=readchar.readchar()
+   if key="n":
+      message("I though you were only kidding")
+      return
+   message("Bye!")
+   quitflag=9
+   
+def SIT(noun):
+   message("Okay")
+
+def WAIT(noun):
+   if noun == 0:
+      message("You pause for a while")
+   else:
+      message("I don't understand")
 
 def THROW(noun):
    if noun == 0:

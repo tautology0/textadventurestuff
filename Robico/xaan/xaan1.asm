@@ -133,7 +133,7 @@ org &0880
             rts
 }
 
-; &10921
+; &printmsg
 .printmsg
 {            
             lda #&86          ; this instruction can be altered
@@ -262,7 +262,7 @@ l0a17:      sec
             bcs l0a25
 l0a22:      ldy #&00
             rts
-l0a25:      jsr l0b22
+l0a25:      jsr printmsgnl
             jmp l0a22
 l0a2b:      sec
             sbc #&5b
@@ -332,7 +332,7 @@ l0aa3:      sta (wordbufptr),y
             ldy #&00
             cpx #&00
             bne l0ab1
-            jsr l0921
+            jsr printmsg
 l0ab1:      jsr setwordbufptr
 l0ab4:      jsr l09fa
             lda (wordbufptr),y
@@ -358,7 +358,7 @@ l0ad5:      txa
             dex
             bne l0ad5
             jmp l0acc
-l0ae4:      jsr l0b22
+l0ae4:      jsr printmsgnl
 l0ae7:      iny
             lda (wordbufptr),y
             cmp #&2b
@@ -384,10 +384,16 @@ l0b0b:      lda #&01
             beq l0b1c
             jsr oswrch
             jmp l0b0b
-l0b1c:      jsr l0b22
+l0b1c:      jsr printmsgnl
             jmp l0acc
-l0b22:      jsr osnewl
-            jmp l0921
+
+; b22
+; printmsgnl - print a message with a newline first
+.printmsgnl
+{            
+            jsr osnewl
+            jmp printmsg
+}
             
 ; gettcursor - returns the current text cursor in x and y
 .gettcursor
@@ -627,7 +633,7 @@ l0b22:      jsr osnewl
             ldx #&05          ; message 5 - "Okay"
             jmp prtmsg
 }
-; c9b
+
 ; code for quit
 .quitcmd
 {
@@ -654,31 +660,31 @@ ynyes:      ldx #&09          ; message 9 - "Bye!"
             jmp prtmsg
 }
 
-;&cce
-
+; prints the noun number x
 .printnoun
 {
-            jsr setbufnoun
+            jsr setbufnoun    ; set bufptr to noun
             ldy #&00
             stx msgnumber
             ldx #&00
-l0cd7:      lda (bufptr),y
-            cmp #&0d
-            beq l0ce7
-            cmp #&40
-            beq l0ce8
-l0ce1:      jsr incbufptr
-            jmp l0cd7
-l0ce7:      rts
-l0ce8:      cpx msgnumber
-            beq l0cf0
+nounloop:   lda (bufptr),y
+            cmp #&0d          ; &0d - end of noun list
+            beq return
+            cmp #&40          ; &40 - end of this noun
+            beq chknoun
+nextnoun:   jsr incbufptr
+            jmp nounloop
+return:     rts
+chknoun:    cpx msgnumber
+            beq foundnoun
             inx
-            jmp l0ce1
-l0cf0:      jsr incbufptr
-l0cf3:      lda (bufptr),y
-            cmp #&40
-            beq l0ce7
-            jsr oswrch
+            jmp nextnoun
+foundnoun:  jsr incbufptr
+nprtloop:   lda (bufptr),y
+            cmp #&40          ; &40 - end of noun
+            beq return
+            jsr oswrch        ; print noun
             iny
-            jmp l0cf3
+            jmp nprtloop
+}
 
