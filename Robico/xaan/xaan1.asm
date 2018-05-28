@@ -38,7 +38,7 @@ wordbufptr  = &0066
 wordbufptrh = &0067
 l0068       = &0068
 lwrormask   = &0069        ; == &20 - value to lower case ASCII
-l006b       = &006b
+blinkflag   = &006b
 bufptr      = &0070
 bufptrh     = &0071
 cmpbuf      = &0072
@@ -210,8 +210,8 @@ prtquery:   jsr incbufptr
             sta lwrormask
             jmp msgloop
 prtblink:   lda #&01
-            eor l006b
-            sta l006b
+            eor blinkflag
+            sta blinkflag
             jmp storechar
 }
 
