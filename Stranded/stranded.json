@@ -1,0 +1,712 @@
+{
+	"messages": {
+		"1": "You are standing on a barren plateau.",
+		"2": "You are on a rocky mountain path.",
+		"3": "You are on the top of a steep cliff. A space shuttle is visible below.",
+		"4": "You are on a ledge halfway down the cliff face.",
+		"5": "You are at the base of the cliff.",
+		"6": "You hit the ground with a thud.",
+		"7": "You are lost in the forest.",
+		"8": "You are at the top of a tree. Dense vegitation can be seen all around.",
+		"9": "You are on a flat plain. A spaceship is visible to the south. A fierce looking robot is guarding the spaceship.",
+		"10": "The robot won't let you.",
+		"11": "The explosion blows you to the south but you seem to be alright.",
+		"12": "You are lost in the desert.",
+		"13": "You are by a spaceship.",
+		"14": "You are standing in a airlock. The inner door is locked.",
+		"15": "Sorry! the door is locked.",
+		"16": "The door opens and you go in.",
+		"17": "You are in the main control room. There is a slot for a fuel capsule and a lever.",
+		"18": "Nothing happens. You notice that a fuel gauge shows zero.",
+		"19": "With a roar the ship takes off on automatic pilot. After a while you hear the engines cut out.",
+		"20": "You are in a long twisty corridor.",
+		"21": "You are in the ships engine room. You can see a warm glow from the south.",
+		"22": "You are lost in a maze of machinary which all looks alike.",
+		"23": "As you enter the room you are fried to a cinder by the radiation.",
+		"24": "You are standing near the main reactor. The radiation would kill an unprotected mortal.",
+		"25": "You are in a airlock. An outer door leads west.",
+		"26": "The outer door opens and you are blown into space.",
+		"27": "You are standing outside a familiar looking Time Machine. The entrance is locked.",
+		"28": "You are in the Time Machine.",
+		"29": "You are in a large empty room.",
+		"30": "You are in an empty boot room.",
+		"31": "You are in a suit locker.",
+		"32": "You are in a large control room. A large circlular control console is in the middle of the room. The console has three buttons (red blackand white).There is a slot here for a time crystal.",
+		"33": "You feel queasy as you instantly go into hyperspace.",
+		"34": "You are standing in a cave entrance. The door to the Time Machine is to the north.",
+		"35": "You are lost in a labyrinth of twisty tunnels.",
+		"36": "You are standing on the edge of a ravine. The walls glow with a greenish light.",
+		"37": "You are standing outside the Time Machine. You see a house to the south.",
+		"38": "You are standing on the front porch of your house. The door is locked.",
+		"39": "You try the lockpick but it does'nt work.",
+		"40": "CONGRATULATIONS. You have escaped from the planet and are safely home. I Hope you've enjoyed playing.",
+		"41": "You seem to be dead. Better luck next time.",
+		"42": "You are on a rough rocky mountain path.",
+		"43": "Nothing happens.",
+		"44": "You have no lockpick.",
+		"45": "You see nothing but grassy hills in all directions.",
+		"46": "You are standing in a large cave. You can see a strange glow from the south."
+	},
+	"characters": {
+		"224": [255, 255, 192, 221, 213, 213, 221, 192],
+		"225": [255, 192, 221, 213, 213, 221, 192, 255],
+		"226": [192, 221, 213, 213, 221, 192, 255, 255],
+		"227": [221, 213, 213, 221, 192, 255, 255, 0],
+		"228": [213, 213, 221, 192, 255, 255, 0, 219],
+		"229": [213, 221, 192, 255, 255, 0, 219, 219],
+		"230": [221, 192, 255, 255, 0, 219, 219, 192],
+		"231": [192, 255, 255, 0, 219, 219, 192, 219],
+		"232": [255, 255, 0, 219, 219, 192, 219, 27],
+		"233": [255, 0, 219, 219, 192, 219, 27, 255],
+		"234": [0, 219, 219, 192, 219, 27, 255, 255],
+		"235": [219, 219, 192, 219, 27, 255, 255, 3],
+		"236": [219, 192, 219, 27, 255, 255, 3, 123],
+		"237": [192, 219, 27, 255, 255, 3, 123, 123],
+		"238": [219, 27, 255, 255, 3, 123, 123, 3],
+		"239": [27, 255, 255, 3, 123, 123, 3, 123],
+		"240": [255, 255, 3, 123, 123, 3, 123, 123],
+		"241": [255, 3, 123, 123, 3, 123, 123, 192],
+		"242": [3, 123, 123, 3, 123, 123, 192, 223],
+		"243": [123, 123, 3, 123, 123, 192, 223, 208],
+		"244": [123, 3, 123, 123, 192, 223, 208, 208],
+		"245": [3, 123, 123, 192, 223, 208, 208, 223],
+		"246": [123, 123, 192, 223, 208, 208, 223, 192],
+		"247": [123, 192, 223, 208, 208, 223, 192, 255],
+		"248": [192, 223, 208, 208, 223, 192, 255, 255],
+		"249": [223, 208, 208, 223, 192, 255, 255, 0],
+		"250": [208, 208, 223, 192, 255, 255, 0, 255],
+		"251": [208, 223, 192, 255, 255, 0, 255, 0],
+		"252": [223, 192, 255, 255, 0, 255, 0, 0],
+		"253": [192, 255, 255, 0, 255, 0, 0, 255],
+		"254": [255, 255, 0, 255, 0, 0, 255, 0],
+		"255": [255, 0, 255, 0, 0, 255, 0, 255]
+	},
+	"pictures:": {
+		"2": {
+			"colours": {
+				"1": "yellow",
+				"2": "magenta"
+			},
+			"data": "COLOUR 0; MOVE 232, 0; DRAW 224, 232; DRAW 208, 232; DRAW 196, 508; MOVE 208, 232; DRAW 104, 172; DRAW 0, 136; MOVE 0, 108; DRAW 120, 160; DRAW 224, 232; MOVE 320, 508; DRAW 324, 324; DRAW 332, 324; DRAW 344, 180; DRAW 348, 0; MOVE 324, 324; DRAW 216, 260; MOVE 332, 324; DRAW 212, 248; MOVE 340, 220; DRAW 1016, 220; MOVE 336, 272; DRAW 424, 420; DRAW 496, 284; MOVE 472, 256; DRAW 552, 364; DRAW 584, 320; MOVE 568, 296; DRAW 696, 452; DRAW 800, 284; MOVE 764, 344; DRAW 824, 400; DRAW 872, 328; MOVE 832, 284; DRAW 1016, 500; COLOUR 0; MOVE 428, 468; FILL ; COLOUR 1; MOVE 464, 100; FILL ; COLOUR 3; MOVE 668, 408; COLOUR 0; DRAW 692, 404; DRAW 720, 408; MOVE 992, 464; DRAW 1016, 456; MOVE 408, 392; DRAW 420, 388; DRAW 436, 392; COLOUR 3; MOVE 408, 272; FILL ; MOVE 88, 156; FILL ; COLOUR 3; MOVE 500, 472; TEXT 236; COLOUR 3; MOVE 556, 332; FILL ; MOVE 684, 332; FILL ; MOVE 824, 348; FILL ; MOVE 996, 408; FILL ; COLOUR 0; MOVE 764, 376; FILL ; MOVE 872, 356; FILL ; MOVE 588, 372; FILL ; COLOUR 0; MOVE 496, 340; FILL ; MOVE 344, 336; FILL ; COLOUR 3; MOVE 12, 128; FILL ; MOVE 56, 144; FILL ; MOVE 124, 176; FILL ; MOVE 152, 192; FILL ; MOVE 208, 228; DRAW 164, 196; MOVE 140, 184; FILL ; MOVE 668, 404; FILL ; MOVE 200, 224; DRAW 160, 196; COLOUR 3; MOVE 716, 404; FILL ; COLOUR 3; MOVE 436, 388; FILL ; COLOUR 0; MOVE 340, 284; FILL ; "
+		},
+		"3": {
+			"colours": {
+				"3": "blue",
+				"1": "green"
+			},
+			"data": "COLOUR 0; MOVE 0, 192; DRAW 440, 208; DRAW 432, 188; DRAW 732, 192; DRAW 1016, 184; MOVE 440, 208; DRAW 440, 188; MOVE 0, 324; DRAW 112, 344; DRAW 244, 340; DRAW 352, 332; DRAW 452, 316; COLOUR 0; MOVE 384, 300; DRAW 476, 324; DRAW 552, 340; DRAW 624, 344; DRAW 740, 336; DRAW 824, 320; DRAW 912, 296; MOVE 864, 312; DRAW 908, 324; DRAW 964, 332; DRAW 1016, 328; MOVE 0, 284; DRAW 1016, 284; COLOUR 3; MOVE 588, 260; COLOUR 3; MOVE 664, 240; TEXT 232; MOVE 664, 272; TEXT 231; COLOUR 1; MOVE 252, 128; FILL ; COLOUR 3; MOVE 840, 444; FILL ; MOVE 108, 460; COLOUR 2; MOVE 140, 484; TEXT 236; COLOUR 1; MOVE 416, 204; FILL ; MOVE 672, 188; FILL ; COLOUR 3; MOVE 444, 332; FILL ; MOVE 0, 332; FILL ; MOVE 1008, 332; FILL ; COLOUR 3; MOVE 860, 316; FILL ; "
+		},
+		"4": {
+			"colours": {
+				"1": "blue"
+			},
+			"data": "COLOUR 0; MOVE 0, 120; DRAW 124, 116; DRAW 116, 364; DRAW 0, 368; MOVE 112, 364; DRAW 268, 368; DRAW 280, 244; DRAW 264, 120; DRAW 124, 116; MOVE 264, 120; DRAW 356, 116; DRAW 352, 236; DRAW 360, 372; DRAW 268, 364; MOVE 356, 116; DRAW 488, 132; DRAW 468, 240; DRAW 476, 372; DRAW 360, 372; MOVE 488, 132; DRAW 628, 112; DRAW 616, 260; DRAW 632, 360; DRAW 476, 368; MOVE 624, 112; DRAW 712, 120; DRAW 684, 208; DRAW 692, 288; DRAW 704, 352; DRAW 636, 360; MOVE 704, 352; DRAW 836, 364; DRAW 828, 240; DRAW 852, 124; DRAW 712, 120; MOVE 836, 364; DRAW 964, 356; DRAW 972, 232; DRAW 948, 124; DRAW 852, 124; MOVE 944, 124; DRAW 1016, 116; MOVE 1016, 360; DRAW 1016, 360; DRAW 960, 356; COLOUR 1; MOVE 128, 472; FILL ; COLOUR 3; MOVE 148, 480; TEXT 236; COLOUR 3; MOVE 220, 68; FILL ; COLOUR 3; MOVE 488, 124; FILL ; MOVE 848, 116; FILL ; MOVE 32, 116; FILL ; COLOUR 1; MOVE 704, 360; FILL ; MOVE 956, 360; FILL ; MOVE 284, 368; FILL ; "
+		},
+		"5": {
+			"colours": {
+				"3": "blue",
+				"1": "green"
+			},
+			"data": "COLOUR 0; MOVE 120, 120; DRAW 120, 392; DRAW 72, 508; MOVE 96, 508; DRAW 120, 480; DRAW 120, 508; MOVE 240, 508; DRAW 240, 120; MOVE 288, 216; DRAW 292, 508; MOVE 360, 508; DRAW 360, 416; DRAW 384, 432; MOVE 384, 404; DRAW 360, 376; DRAW 360, 216; MOVE 440, 160; DRAW 444, 508; MOVE 552, 508; DRAW 552, 404; DRAW 616, 460; DRAW 624, 508; DRAW 636, 508; DRAW 628, 468; DRAW 660, 504; MOVE 688, 508; DRAW 556, 356; DRAW 552, 168; MOVE 836, 232; DRAW 840, 508; MOVE 892, 508; DRAW 892, 232; MOVE 640, 120; DRAW 760, 120; DRAW 804, 148; MOVE 840, 148; DRAW 820, 120; DRAW 924, 116; DRAW 932, 100; DRAW 932, 80; DRAW 920, 60; DRAW 628, 64; DRAW 636, 80; DRAW 636, 100; DRAW 628, 120; DRAW 616, 96; DRAW 616, 80; DRAW 624, 64; MOVE 804, 148; DRAW 820, 144; DRAW 840, 144; DRAW 828, 152; DRAW 808, 148; MOVE 384, 404; DRAW 380, 416; DRAW 388, 432; DRAW 392, 420; DRAW 392, 408; MOVE 164, 404; MOVE 120, 120; DRAW 112, 104; DRAW 96, 100; MOVE 240, 116; DRAW 244, 108; DRAW 264, 100; MOVE 288, 216; DRAW 280, 208; MOVE 360, 216; DRAW 372, 212; MOVE 552, 168; DRAW 560, 156; DRAW 572, 144; MOVE 440, 160; DRAW 436, 148; DRAW 424, 140; MOVE 836, 232; DRAW 828, 224; MOVE 892, 232; DRAW 900, 224; MOVE 684, 264; DRAW 692, 268; DRAW 696, 416; DRAW 648, 464; DRAW 656, 468; DRAW 700, 432; DRAW 700, 508; MOVE 728, 508; DRAW 728, 500; DRAW 740, 508; DRAW 748, 508; DRAW 732, 492; DRAW 736, 268; DRAW 740, 260; MOVE 628, 120; DRAW 652, 120; MOVE 660, 504; DRAW 668, 508; MOVE 368, 420; DRAW 384, 428; MOVE 0, 296; DRAW 120, 300; MOVE 240, 300; DRAW 288, 296; MOVE 360, 296; DRAW 440, 296; MOVE 556, 296; DRAW 620, 300; DRAW 692, 296; MOVE 736, 296; DRAW 836, 300; MOVE 892, 300; DRAW 1016, 296; MOVE 388, 412; DRAW 388, 412; MOVE 108, 100; DRAW 172, 96; DRAW 248, 104; MOVE 428, 144; DRAW 496, 140; DRAW 572, 144; MOVE 284, 212; DRAW 324, 208; DRAW 368, 212; MOVE 688, 264; DRAW 712, 260; DRAW 740, 264; MOVE 832, 228; DRAW 864, 224; DRAW 900, 228; COLOUR 1; MOVE 764, 228; FILL ; COLOUR 0; MOVE 564, 152; DRAW 580, 140; COLOUR 3; MOVE 0, 332; FILL ; MOVE 252, 332; FILL ; MOVE 384, 332; FILL ; MOVE 568, 472; FILL ; MOVE 644, 500; FILL ; MOVE 688, 480; FILL ; MOVE 660, 420; FILL ; MOVE 776, 420; FILL ; MOVE 924, 420; FILL ; MOVE 112, 508; FILL ; COLOUR 2; MOVE 24, 452; TEXT 236; COLOUR 0; MOVE 860, 448; TEXT 238; COLOUR 3; MOVE 408, 476; FILL ; MOVE 368, 428; FILL ; COLOUR 3; MOVE 580, 300; FILL ; MOVE 988, 300; FILL ; COLOUR 1; MOVE 84, 288; FILL ; COLOUR 1; MOVE 256, 288; FILL ; MOVE 396, 220; FILL ; MOVE 600, 392; COLOUR 1; MOVE 916, 280; FILL ; MOVE 524, 112; FILL ; MOVE 604, 284; FILL ; MOVE 968, 112; FILL ; MOVE 244, 100; FILL ; MOVE 296, 208; FILL ; MOVE 444, 140; FILL ; MOVE 800, 296; FILL ; MOVE 736, 260; FILL ; MOVE 840, 224; FILL ; MOVE 896, 224; FILL ; COLOUR 3; MOVE 276, 300; FILL ; COLOUR 3; MOVE 652, 452; FILL ; COLOUR 3; MOVE 556, 412; FILL ; COLOUR 3; MOVE 636, 484; FILL ; MOVE 664, 508; FILL ; MOVE 732, 508; FILL ; MOVE 692, 508; FILL ; COLOUR 3; MOVE 696, 440; FILL ; "
+		},
+		"6": {
+			"colours": {
+				"1": "yellow",
+				"2": "cyan"
+			},
+			"data": "COLOUR 0; MOVE 240, 480; DRAW 220, 404; DRAW 260, 404; DRAW 240, 480; MOVE 220, 396; DRAW 260, 396; MOVE 260, 388; DRAW 220, 388; MOVE 220, 380; DRAW 260, 380; MOVE 260, 372; DRAW 220, 372; MOVE 220, 364; DRAW 260, 364; DRAW 260, 200; DRAW 300, 64; DRAW 180, 64; DRAW 220, 200; DRAW 220, 364; MOVE 260, 340; DRAW 280, 268; DRAW 260, 268; MOVE 220, 268; DRAW 200, 268; DRAW 220, 332; MOVE 240, 268; DRAW 240, 336; COLOUR 3; MOVE 240, 156; FILL ; MOVE 208, 284; FILL ; MOVE 268, 276; FILL ; COLOUR 1; MOVE 240, 420; FILL ; COLOUR 0; MOVE 240, 364; DRAW 240, 404; MOVE 244, 404; MOVE 232, 364; DRAW 232, 404; MOVE 244, 404; DRAW 244, 364; MOVE 248, 364; DRAW 248, 404; MOVE 200, 64; DRAW 196, 52; DRAW 224, 52; DRAW 220, 64; MOVE 272, 64; DRAW 284, 52; DRAW 256, 52; DRAW 268, 64; MOVE 208, 56; FILL ; MOVE 272, 56; FILL ; MOVE 288, 52; DRAW 276, 64; COLOUR 0; MOVE 240, 192; DRAW 240, 72; MOVE 0, 280; DRAW 160, 288; DRAW 204, 284; MOVE 276, 284; DRAW 424, 268; DRAW 560, 248; MOVE 452, 264; DRAW 580, 280; DRAW 716, 288; DRAW 884, 280; DRAW 1016, 264; COLOUR 1; MOVE 468, 180; FILL ; COLOUR 3; MOVE 344, 84; TEXT 252; COLOUR 3; MOVE 244, 344; FILL ; MOVE 232, 312; FILL ; MOVE 212, 296; FILL ; COLOUR 1; MOVE 136, 264; FILL ; MOVE 292, 264; FILL ; MOVE 704, 264; FILL ; MOVE 244, 56; FILL ; "
+		},
+		"7": {
+			"colours": {
+				"1": "green"
+			},
+			"data": "COLOUR 0; MOVE 0, 312; DRAW 104, 412; DRAW 184, 296; DRAW 160, 332; DRAW 288, 468; DRAW 384, 324; DRAW 360, 300; DRAW 448, 408; DRAW 504, 328; DRAW 612, 476; DRAW 740, 320; DRAW 720, 344; DRAW 800, 416; DRAW 888, 336; DRAW 880, 324; DRAW 976, 480; DRAW 1016, 424; MOVE 0, 268; DRAW 1016, 268; COLOUR 1; MOVE 128, 200; TEXT 239; MOVE 128, 168; TEXT 246; MOVE 128, 136; TEXT 246; MOVE 128, 104; TEXT 246; MOVE 96, 168; TEXT 254; MOVE 96, 136; TEXT 253; MOVE 160, 112; TEXT 245; MOVE 172, 144; TEXT 254; MOVE 128, 72; TEXT 246; MOVE 816, 264; TEXT 233; COLOUR 0; MOVE 260, 440; DRAW 280, 436; DRAW 304, 440; MOVE 592, 444; DRAW 608, 440; DRAW 640, 444; MOVE 788, 400; DRAW 804, 396; DRAW 820, 400; COLOUR 3; MOVE 284, 448; FILL ; MOVE 612, 456; FILL ; MOVE 800, 408; FILL ; COLOUR 0; MOVE 404, 420; FILL ; COLOUR 3; MOVE 124, 484; TEXT 236; COLOUR 0; MOVE 160, 396; FILL ; MOVE 0, 336; FILL ; MOVE 48, 464; FILL ; MOVE 384, 348; FILL ; MOVE 504, 348; FILL ; MOVE 720, 380; FILL ; MOVE 888, 356; FILL ; MOVE 1016, 448; FILL ; "
+		},
+		"8": {
+			"colours": {
+				"1": "blue",
+				"2": "cyan"
+			},
+			"data": "COLOUR 0; MOVE 0, 0; DRAW 160, 80; DRAW 160, 428; DRAW 0, 508; MOVE 160, 428; DRAW 856, 428; DRAW 1016, 508; MOVE 856, 428; DRAW 856, 80; DRAW 1016, 0; MOVE 856, 80; DRAW 160, 80; COLOUR 1; MOVE 384, 80; DRAW 348, 240; DRAW 348, 360; DRAW 384, 360; DRAW 384, 400; DRAW 624, 400; DRAW 624, 360; DRAW 664, 360; DRAW 664, 240; DRAW 624, 80; COLOUR 1; MOVE 408, 80; DRAW 368, 240; DRAW 368, 344; DRAW 408, 344; DRAW 408, 376; DRAW 600, 376; DRAW 600, 344; DRAW 640, 344; DRAW 640, 240; DRAW 600, 80; COLOUR 1; MOVE 388, 80; DRAW 624, 80; MOVE 360, 268; FILL ; MOVE 424, 312; DRAW 584, 312; DRAW 584, 272; DRAW 424, 272; DRAW 424, 312; COLOUR 3; MOVE 476, 204; FILL ; COLOUR 0; MOVE 476, 288; FILL ; COLOUR 1; MOVE 696, 320; TEXT 224; TEXT 225; TEXT 226; MOVE 696, 288; TEXT 227; TEXT 228; TEXT 229; COLOUR 1; MOVE 396, 368; FILL ; MOVE 616, 352; FILL ; MOVE 648, 212; FILL ; COLOUR 1; MOVE 392, 120; FILL ; MOVE 376, 188; FILL ; MOVE 616, 120; FILL ; MOVE 632, 180; FILL ; COLOUR 3; MOVE 592, 348; FILL ; MOVE 392, 300; FILL ; COLOUR 3; MOVE 704, 268; FILL ; MOVE 748, 300; FILL ; MOVE 780, 312; DRAW 780, 268; COLOUR 3; MOVE 720, 304; FILL ; MOVE 748, 312; DRAW 748, 288; MOVE 760, 288; DRAW 760, 312; COLOUR 3; MOVE 736, 288; DRAW 736, 312; "
+		},
+		"9": {
+			"colours": {
+				"1": "blue",
+				"2": "cyan"
+			},
+			"data": "COLOUR 0; MOVE 240, 80; DRAW 240, 240; DRAW 336, 184; DRAW 336, 168; DRAW 264, 168; DRAW 264, 80; DRAW 240, 80; MOVE 264, 80; DRAW 360, 160; DRAW 640, 160; DRAW 736, 80; DRAW 736, 168; DRAW 664, 168; DRAW 664, 184; DRAW 760, 240; DRAW 760, 80; DRAW 736, 80; MOVE 240, 240; DRAW 360, 320; DRAW 640, 320; DRAW 760, 240; MOVE 360, 320; DRAW 392, 232; DRAW 336, 184; DRAW 336, 168; DRAW 392, 216; DRAW 392, 232; DRAW 608, 232; DRAW 664, 184; DRAW 664, 168; DRAW 608, 216; DRAW 608, 232; DRAW 640, 320; MOVE 608, 216; DRAW 392, 216; MOVE 360, 160; DRAW 360, 188; MOVE 640, 188; DRAW 640, 160; MOVE 280, 340; COLOUR 3; DRAW 280, 480; DRAW 720, 480; DRAW 720, 340; DRAW 280, 340; COLOUR 0; MOVE 0, 200; DRAW 240, 200; MOVE 760, 200; DRAW 1016, 200; COLOUR 0; MOVE 472, 428; FILL ; COLOUR 3; MOVE 328, 240; FILL ; MOVE 452, 268; FILL ; MOVE 656, 228; FILL ; COLOUR 1; MOVE 416, 308; TEXT 240; TEXT 241; MOVE 416, 276; TEXT 243; TEXT 244; MOVE 500, 308; TEXT 242; TEXT 242; TEXT 242; MOVE 500, 272; TEXT 242; TEXT 242; COLOUR 0; MOVE 452, 284; FILL ; COLOUR 3; MOVE 292, 148; FILL ; MOVE 396, 172; FILL ; MOVE 648, 172; FILL ; MOVE 728, 92; FILL ; MOVE 272, 92; FILL ; MOVE 356, 308; FILL ; MOVE 644, 312; FILL ; COLOUR 1; MOVE 212, 28; FILL ; MOVE 420, 132; FILL ; MOVE 804, 132; FILL ; COLOUR 0; MOVE 436, 296; DRAW 456, 296; MOVE 436, 288; DRAW 444, 288; MOVE 436, 280; DRAW 440, 280; MOVE 452, 280; DRAW 460, 280; COLOUR 3; MOVE 352, 172; FILL ; "
+		},
+		"10": {
+			"colours": {
+				"1": "yellow",
+				"2": "white",
+				"3": "cyan"
+			},
+			"data": "MOVE 0, 0; COLOUR 0; MOVE 0, 0; DRAW 400, 200; DRAW 400, 308; DRAW 0, 508; MOVE 400, 228; DRAW 456, 228; DRAW 456, 280; DRAW 400, 280; MOVE 456, 280; DRAW 492, 264; DRAW 492, 244; DRAW 456, 228; MOVE 1016, 0; DRAW 896, 60; DRAW 896, 448; DRAW 1016, 508; MOVE 896, 144; DRAW 728, 144; DRAW 728, 360; DRAW 896, 360; MOVE 728, 360; DRAW 572, 284; DRAW 572, 224; DRAW 728, 144; MOVE 572, 272; DRAW 548, 272; DRAW 548, 232; DRAW 572, 232; MOVE 548, 232; DRAW 512, 252; DRAW 512, 256; DRAW 548, 272; MOVE 496, 248; DRAW 508, 252; DRAW 496, 260; MOVE 432, 468; DRAW 580, 468; DRAW 552, 384; DRAW 464, 384; DRAW 432, 468; MOVE 476, 344; DRAW 540, 344; DRAW 524, 304; DRAW 492, 304; DRAW 476, 344; MOVE 496, 288; DRAW 516, 288; DRAW 508, 272; DRAW 504, 272; DRAW 496, 288; COLOUR 1; MOVE 508, 220; FILL ; COLOUR 3; MOVE 508, 420; FILL ; MOVE 508, 324; FILL ; MOVE 508, 284; FILL ; "
+		},
+		"11": {
+			"colours": {
+				"0": "black"
+			},
+			"data": "COLOUR 0; MOVE 0, 0; DRAW 120, 60; DRAW 120, 448; DRAW 0, 508; MOVE 120, 140; DRAW 284, 140; DRAW 284, 368; DRAW 124, 368; MOVE 284, 140; DRAW 380, 188; DRAW 380, 320; DRAW 280, 368; MOVE 380, 208; DRAW 420, 208; DRAW 420, 300; DRAW 380, 300; MOVE 420, 300; DRAW 452, 284; DRAW 452, 224; DRAW 420, 208; MOVE 1016, 508; DRAW 900, 448; DRAW 900, 60; DRAW 1016, 0; MOVE 900, 140; DRAW 736, 140; DRAW 736, 368; DRAW 900, 368; MOVE 736, 140; DRAW 644, 188; DRAW 644, 320; DRAW 736, 368; MOVE 644, 208; DRAW 604, 208; DRAW 604, 300; DRAW 644, 300; MOVE 604, 300; DRAW 572, 284; DRAW 572, 224; DRAW 604, 208; MOVE 468, 276; DRAW 468, 232; DRAW 488, 244; DRAW 488, 264; DRAW 468, 276; DRAW 452, 276; DRAW 452, 232; DRAW 468, 232; MOVE 564, 268; MOVE 572, 236; DRAW 556, 236; DRAW 556, 276; DRAW 572, 276; MOVE 556, 276; DRAW 532, 264; DRAW 532, 244; DRAW 556, 236; MOVE 468, 264; TEXT 235; TEXT 234; COLOUR 1; MOVE 508, 224; FILL ; COLOUR 3; MOVE 508, 324; FILL ; "
+		},
+		"12": {
+			"colours": {
+				"1": "magenta",
+				"2": "red"
+			},
+			"data": "COLOUR 0; MOVE 80, 240; DRAW 80, 320; DRAW 160, 400; DRAW 240, 400; DRAW 320, 320; DRAW 320, 240; DRAW 240, 160; DRAW 160, 160; DRAW 80, 240; MOVE 4, 120; DRAW 640, 120; DRAW 640, 508; MOVE 640, 120; DRAW 848, 0; MOVE 152, 308; DRAW 244, 308; DRAW 244, 272; DRAW 152, 272; DRAW 152, 308; MOVE 80, 220; DRAW 80, 340; DRAW 68, 340; DRAW 68, 220; DRAW 80, 220; COLOUR 0; MOVE 352, 388; DRAW 556, 388; DRAW 556, 348; DRAW 352, 348; DRAW 352, 388; COLOUR 3; MOVE 380, 364; FILL ; COLOUR 1; MOVE 360, 380; TEXT 68; TEXT 65; TEXT 78; TEXT 71; TEXT 69; TEXT 82; COLOUR 3; MOVE 112, 308; FILL ; COLOUR 3; MOVE 76, 308; FILL ; COLOUR 0; MOVE 196, 296; FILL ; COLOUR 1; MOVE 360, 308; TEXT 224; TEXT 225; TEXT 226; MOVE 360, 276; TEXT 227; TEXT 228; TEXT 229; COLOUR 3; MOVE 192, 188; FILL ; MOVE 192, 368; FILL ; MOVE 288, 296; FILL ; COLOUR 3; MOVE 904, 368; COLOUR 3; MOVE 368, 256; FILL ; MOVE 440, 288; FILL ; MOVE 444, 256; DRAW 444, 300; MOVE 400, 280; DRAW 400, 300; COLOUR 3; MOVE 384, 280; DRAW 384, 300; MOVE 412, 300; DRAW 412, 276; MOVE 424, 276; DRAW 424, 300; "
+		},
+		"13": {
+			"colours": {
+				"2": "green",
+				"1": "blue"
+			},
+			"data": "COLOUR 0; MOVE 376, 56; DRAW 376, 440; DRAW 392, 440; DRAW 392, 456; DRAW 576, 456; DRAW 576, 440; DRAW 592, 440; DRAW 592, 56; DRAW 376, 56; COLOUR 1; MOVE 424, 124; FILL ; COLOUR 0; MOVE 388, 64; DRAW 388, 400; DRAW 580, 400; DRAW 580, 64; DRAW 388, 64; MOVE 404, 80; DRAW 404, 144; DRAW 464, 144; DRAW 464, 80; DRAW 404, 80; MOVE 404, 160; DRAW 404, 224; DRAW 464, 224; DRAW 464, 160; DRAW 404, 160; MOVE 404, 240; DRAW 404, 304; DRAW 464, 304; DRAW 464, 240; DRAW 404, 240; MOVE 404, 320; DRAW 404, 384; DRAW 464, 384; DRAW 464, 320; DRAW 404, 320; MOVE 564, 384; DRAW 504, 384; DRAW 504, 320; DRAW 564, 320; DRAW 564, 384; MOVE 484, 400; DRAW 484, 64; MOVE 504, 304; DRAW 564, 304; DRAW 564, 240; DRAW 504, 240; DRAW 504, 304; MOVE 504, 224; DRAW 504, 160; DRAW 564, 160; DRAW 564, 224; DRAW 504, 224; MOVE 504, 144; DRAW 504, 80; DRAW 564, 80; DRAW 564, 144; DRAW 504, 144; MOVE 404, 352; DRAW 464, 352; MOVE 504, 352; DRAW 564, 352; MOVE 424, 384; DRAW 424, 320; MOVE 444, 320; DRAW 444, 384; MOVE 524, 384; DRAW 524, 320; MOVE 544, 320; DRAW 544, 384; MOVE 392, 440; DRAW 576, 440; COLOUR 3; MOVE 432, 432; TEXT 248; TEXT 249; TEXT 250; TEXT 251; MOVE 464, 456; COLOUR 0; MOVE 596, 56; DRAW 616, 92; DRAW 616, 412; DRAW 596, 440; COLOUR 1; MOVE 604, 396; FILL ; COLOUR 0; MOVE 592, 400; DRAW 616, 376; MOVE 0, 140; DRAW 376, 140; MOVE 616, 140; DRAW 1016, 140; MOVE 576, 456; DRAW 600, 436; COLOUR 1; MOVE 584, 444; FILL ; COLOUR 3; MOVE 472, 488; TEXT 239; COLOUR 3; MOVE 160, 80; FILL ; COLOUR 0; MOVE 24, 188; TEXT 230; MOVE 52, 188; TEXT 230; COLOUR 3; MOVE 696, 100; FILL ; COLOUR 1; MOVE 596, 68; FILL ; MOVE 596, 428; FILL ; "
+		},
+		"14": {
+			"colours": {
+				"1": "green"
+			},
+			"data": "COLOUR 0; MOVE 0, 0; DRAW 244, 120; DRAW 244, 388; DRAW 0, 508; DRAW 244, 388; DRAW 776, 388; DRAW 1016, 508; DRAW 776, 388; DRAW 776, 120; DRAW 1016, 0; DRAW 776, 120; DRAW 244, 120; COLOUR 1; MOVE 424, 72; FILL ; COLOUR 3; MOVE 424, 432; FILL ; COLOUR 0; MOVE 260, 376; TEXT 230; MOVE 288, 376; TEXT 230; "
+		},
+		"15": {
+			"colours": {
+				"2": "cyan",
+				"1": "green"
+			},
+			"data": "COLOUR 0; MOVE 0, 0; DRAW 244, 120; DRAW 244, 388; DRAW 0, 508; DRAW 244, 388; DRAW 776, 388; DRAW 1016, 508; DRAW 776, 388; DRAW 776, 120; DRAW 1016, 0; DRAW 776, 120; DRAW 244, 120; COLOUR 0; MOVE 704, 48; DRAW 660, 48; DRAW 656, 56; DRAW 660, 64; DRAW 672, 68; DRAW 696, 64; DRAW 692, 104; DRAW 712, 100; DRAW 724, 104; DRAW 720, 48; DRAW 700, 48; MOVE 700, 108; DRAW 712, 108; DRAW 724, 104; MOVE 676, 84; DRAW 672, 108; DRAW 688, 104; MOVE 700, 108; DRAW 692, 112; DRAW 676, 112; MOVE 676, 80; MOVE 676, 80; DRAW 668, 80; DRAW 656, 84; DRAW 644, 80; DRAW 640, 72; DRAW 648, 64; DRAW 656, 64; COLOUR 3; MOVE 684, 56; FILL ; MOVE 672, 76; FILL ; MOVE 560, 476; FILL ; COLOUR 1; MOVE 400, 96; FILL ; COLOUR 0; MOVE 704, 376; TEXT 230; MOVE 732, 376; TEXT 230; COLOUR 1; MOVE 756, 92; FILL ; COLOUR 3; MOVE 708, 92; FILL ; MOVE 684, 100; FILL ; COLOUR 1; MOVE 668, 84; FILL ; COLOUR 3; MOVE 692, 108; FILL ; MOVE 712, 104; FILL ; COLOUR 3; MOVE 660, 80; FILL ; MOVE 656, 68; FILL ; MOVE 692, 68; FILL ; MOVE 676, 100; FILL ; MOVE 696, 100; FILL ; MOVE 676, 104; FILL ; "
+		},
+		"16": {
+			"colours": {
+				"2": "cyan",
+				"1": "blue"
+			},
+			"data": "COLOUR 0; MOVE 0, 100; DRAW 1016, 100; MOVE 728, 100; DRAW 728, 464; DRAW 1016, 464; DRAW 0, 464; MOVE 728, 464; DRAW 696, 444; DRAW 696, 120; DRAW 728, 100; MOVE 696, 120; DRAW 520, 120; MOVE 696, 444; DRAW 520, 444; DRAW 520, 464; DRAW 520, 100; COLOUR 3; MOVE 524, 408; DRAW 708, 408; DRAW 708, 396; DRAW 524, 396; DRAW 524, 408; MOVE 536, 400; FILL ; MOVE 284, 100; COLOUR 0; DRAW 284, 464; COLOUR 0; MOVE 460, 296; DRAW 488, 296; DRAW 488, 284; DRAW 460, 284; DRAW 460, 296; MOVE 472, 296; DRAW 476, 284; COLOUR 1; MOVE 608, 412; DRAW 616, 404; DRAW 612, 388; DRAW 592, 372; DRAW 568, 284; DRAW 588, 272; DRAW 604, 312; DRAW 600, 240; DRAW 588, 160; DRAW 612, 156; DRAW 632, 248; DRAW 640, 164; DRAW 656, 168; DRAW 648, 284; DRAW 648, 336; DRAW 660, 288; DRAW 672, 304; DRAW 648, 384; DRAW 632, 392; DRAW 616, 392; COLOUR 1; MOVE 624, 364; FILL ; COLOUR 3; MOVE 444, 180; FILL ; COLOUR 1; MOVE 168, 200; FILL ; MOVE 784, 232; FILL ; COLOUR 3; MOVE 500, 292; FILL ; MOVE 696, 408; DRAW 696, 396; MOVE 700, 400; FILL ; COLOUR 1; MOVE 584, 288; FILL ; MOVE 660, 308; FILL ; MOVE 644, 172; FILL ; MOVE 604, 164; FILL ; "
+		},
+		"17": {
+			"colours": {
+				"2": "yellow",
+				"1": "magenta"
+			},
+			"data": "COLOUR 0; MOVE 360, 200; DRAW 420, 176; DRAW 540, 176; DRAW 600, 200; DRAW 600, 184; DRAW 544, 160; DRAW 420, 160; DRAW 360, 184; DRAW 360, 200; DRAW 440, 240; DRAW 460, 232; DRAW 500, 232; DRAW 520, 240; DRAW 600, 200; MOVE 420, 160; DRAW 420, 176; DRAW 460, 232; MOVE 540, 160; DRAW 540, 176; DRAW 500, 232; MOVE 440, 160; DRAW 440, 120; DRAW 464, 112; DRAW 496, 112; DRAW 520, 120; DRAW 520, 160; MOVE 444, 240; DRAW 444, 300; MOVE 516, 240; DRAW 516, 300; MOVE 444, 300; DRAW 468, 296; DRAW 492, 296; DRAW 516, 300; DRAW 492, 304; DRAW 468, 304; DRAW 444, 300; MOVE 0, 200; DRAW 240, 252; DRAW 444, 252; MOVE 516, 252; DRAW 776, 252; DRAW 1016, 200; MOVE 780, 252; DRAW 780, 508; MOVE 240, 252; DRAW 240, 508; COLOUR 3; MOVE 360, 464; DRAW 360, 384; DRAW 660, 384; DRAW 660, 464; DRAW 360, 464; MOVE 348, 476; DRAW 672, 476; DRAW 672, 372; DRAW 348, 372; DRAW 348, 476; MOVE 364, 472; FILL ; MOVE 408, 196; FILL ; MOVE 472, 196; FILL ; MOVE 544, 208; FILL ; MOVE 476, 144; FILL ; COLOUR 1; MOVE 456, 200; TEXT 238; COLOUR 0; MOVE 484, 200; TEXT 238; COLOUR 2; MOVE 472, 224; TEXT 238; COLOUR 1; MOVE 468, 264; TEXT 237; MOVE 464, 264; TEXT 237; MOVE 464, 280; TEXT 237; MOVE 468, 280; TEXT 237; COLOUR 1; MOVE 364, 404; DRAW 424, 440; DRAW 460, 392; DRAW 524, 440; DRAW 552, 416; DRAW 656, 444; COLOUR 1; MOVE 300, 236; FILL ; MOVE 640, 224; FILL ; COLOUR 3; MOVE 436, 228; FILL ; MOVE 520, 228; FILL ; MOVE 664, 456; FILL ; MOVE 356, 456; FILL ; COLOUR 3; MOVE 440, 236; FILL ; "
+		},
+		"18": {
+			"colours": {
+				"0": "black"
+			},
+			"data": "COLOUR 0; MOVE 320, 80; DRAW 328, 160; DRAW 344, 240; DRAW 372, 292; DRAW 424, 328; DRAW 476, 340; DRAW 532, 324; DRAW 568, 292; DRAW 596, 236; DRAW 612, 176; DRAW 620, 120; DRAW 624, 80; MOVE 0, 72; DRAW 156, 80; DRAW 320, 76; MOVE 624, 80; DRAW 844, 88; DRAW 1016, 76; COLOUR 0; MOVE 320, 80; DRAW 480, 120; DRAW 620, 80; MOVE 476, 332; FILL ; MOVE 328, 96; FILL ; MOVE 616, 96; FILL ; MOVE 464, 124; COLOUR 2; DRAW 480, 124; DRAW 472, 136; DRAW 468, 124; MOVE 432, 116; DRAW 440, 144; DRAW 468, 164; DRAW 500, 152; DRAW 516, 120; MOVE 380, 104; DRAW 392, 164; DRAW 432, 208; DRAW 488, 216; DRAW 532, 184; DRAW 552, 140; DRAW 560, 104; MOVE 348, 92; DRAW 364, 176; DRAW 396, 232; DRAW 456, 268; DRAW 508, 256; DRAW 564, 216; DRAW 580, 168; DRAW 600, 92; MOVE 320, 76; DRAW 348, 88; DRAW 380, 104; DRAW 428, 112; DRAW 464, 124; MOVE 480, 124; DRAW 516, 116; DRAW 560, 100; DRAW 600, 88; DRAW 624, 80; MOVE 528, 96; FILL ; MOVE 328, 76; DRAW 620, 80; COLOUR 3; MOVE 720, 244; COLOUR 0; MOVE 720, 240; DRAW 736, 188; DRAW 752, 240; DRAW 720, 240; MOVE 200, 240; DRAW 216, 188; DRAW 232, 240; DRAW 204, 240; COLOUR 3; MOVE 212, 228; FILL ; MOVE 740, 228; FILL ; COLOUR 1; MOVE 204, 268; TEXT 247; MOVE 724, 268; TEXT 247; COLOUR 2; MOVE 336, 80; DRAW 404, 108; MOVE 364, 88; DRAW 456, 120; MOVE 372, 92; DRAW 416, 108; MOVE 612, 80; DRAW 488, 120; MOVE 396, 96; DRAW 468, 120; COLOUR 0; MOVE 480, 112; DRAW 480, 112; MOVE 424, 108; DRAW 424, 108; "
+		},
+		"19": {
+			"colours": {
+				"0": "black"
+			},
+			"data": "COLOUR 0; MOVE 360, 0; DRAW 360, 480; DRAW 680, 480; DRAW 680, 0; FILL ; COLOUR 1; MOVE 384, 100; FILL ; COLOUR 0; MOVE 400, 440; DRAW 496, 440; DRAW 496, 264; DRAW 400, 264; DRAW 400, 440; MOVE 544, 440; DRAW 640, 440; DRAW 640, 264; DRAW 544, 264; DRAW 544, 440; MOVE 640, 40; DRAW 544, 40; DRAW 544, 216; DRAW 640, 216; DRAW 640, 40; MOVE 400, 40; DRAW 400, 216; DRAW 496, 216; DRAW 496, 40; DRAW 400, 40; MOVE 0, 448; DRAW 160, 448; DRAW 160, 208; DRAW 0, 208; COLOUR 3; MOVE 488, 472; TEXT 49; TEXT 51; MOVE 640, 252; TEXT 236; COLOUR 0; MOVE 0, 224; DRAW 140, 224; DRAW 140, 432; DRAW 0, 432; COLOUR 3; MOVE 44, 440; FILL ; COLOUR 0; MOVE 48, 432; DRAW 56, 344; DRAW 60, 224; MOVE 12, 372; FILL ; COLOUR 1; MOVE 84, 372; FILL ; COLOUR 3; MOVE 148, 216; FILL ; "
+		},
+		"20": {
+			"colours": {
+				"1": "green",
+				"3": "cyan"
+			},
+			"data": "COLOUR 0; MOVE 0, 248; DRAW 72, 260; DRAW 188, 272; DRAW 312, 256; DRAW 424, 232; DRAW 496, 212; MOVE 528, 212; DRAW 640, 236; DRAW 768, 248; DRAW 904, 244; DRAW 1016, 236; MOVE 356, 244; DRAW 440, 256; DRAW 552, 264; DRAW 656, 252; DRAW 744, 244; COLOUR 3; MOVE 508, 208; COLOUR 1; MOVE 148, 452; FILL ; COLOUR 3; MOVE 92, 444; TEXT 236; COLOUR 1; MOVE 0, 252; FILL ; MOVE 364, 256; FILL ; MOVE 732, 256; FILL ; MOVE 1016, 244; FILL ; "
+		},
+		"21": {
+			"colours": {
+				"1": "blue",
+				"2": "green"
+			},
+			"data": "COLOUR 0; MOVE 0, 256; DRAW 116, 272; DRAW 252, 280; DRAW 392, 264; DRAW 532, 240; DRAW 636, 212; MOVE 496, 248; DRAW 604, 260; DRAW 744, 272; DRAW 868, 268; DRAW 1016, 256; MOVE 80, 100; COLOUR 0; MOVE 96, 104; DRAW 132, 104; DRAW 132, 152; DRAW 96, 152; DRAW 96, 104; MOVE 96, 152; DRAW 116, 172; DRAW 132, 152; DRAW 160, 176; DRAW 144, 196; DRAW 116, 172; MOVE 160, 176; DRAW 160, 128; DRAW 132, 104; COLOUR 2; MOVE 144, 196; DRAW 144, 196; COLOUR 0; MOVE 144, 188; COLOUR 0; MOVE 144, 188; DRAW 144, 188; COLOUR 1; MOVE 136, 172; COLOUR 1; MOVE 116, 164; FILL ; COLOUR 3; MOVE 116, 140; FILL ; MOVE 156, 156; FILL ; MOVE 136, 120; FILL ; COLOUR 3; MOVE 136, 200; COLOUR 1; MOVE 140, 184; FILL ; MOVE 132, 160; FILL ; COLOUR 2; MOVE 136, 196; COLOUR 2; MOVE 144, 196; DRAW 168, 176; MOVE 140, 192; DRAW 140, 192; COLOUR 1; MOVE 484, 260; FILL ; MOVE 0, 268; FILL ; MOVE 1016, 268; FILL ; COLOUR 3; MOVE 128, 440; TEXT 236; "
+		},
+		"22": {
+			"colours": {
+				"1": "blue",
+				"2": "green"
+			},
+			"data": "COLOUR 0; MOVE 240, 120; DRAW 776, 120; DRAW 776, 388; DRAW 244, 388; DRAW 244, 120; DRAW 0, 0; MOVE 244, 388; DRAW 0, 508; MOVE 776, 388; DRAW 1016, 508; MOVE 776, 120; DRAW 1016, 0; MOVE 280, 120; DRAW 280, 360; DRAW 440, 360; DRAW 440, 120; MOVE 52, 0; DRAW 248, 108; DRAW 764, 108; DRAW 960, 0; MOVE 496, 480; DRAW 500, 484; DRAW 516, 484; DRAW 520, 480; DRAW 512, 476; DRAW 500, 476; MOVE 508, 480; DRAW 508, 460; MOVE 488, 456; DRAW 532, 456; DRAW 532, 420; DRAW 508, 424; DRAW 484, 420; DRAW 484, 456; MOVE 488, 420; DRAW 508, 416; DRAW 524, 420; COLOUR 1; MOVE 504, 432; FILL ; COLOUR 0; MOVE 508, 420; FILL ; COLOUR 0; MOVE 408, 244; DRAW 420, 244; DRAW 420, 236; DRAW 408, 236; DRAW 408, 244; COLOUR 1; MOVE 368, 168; FILL ; COLOUR 3; MOVE 656, 412; FILL ; MOVE 360, 452; FILL ; MOVE 432, 80; FILL ; COLOUR 1; MOVE 432, 240; FILL ; MOVE 492, 424; FILL ; MOVE 528, 424; FILL ; "
+		},
+		"23": {
+			"colours": {
+				"1": "blue",
+				"2": "green"
+			},
+			"data": "COLOUR 0; MOVE 560, 160; DRAW 640, 160; DRAW 640, 216; DRAW 628, 228; DRAW 572, 228; DRAW 560, 216; DRAW 560, 160; COLOUR 0; MOVE 536, 156; DRAW 564, 160; DRAW 620, 156; DRAW 656, 156; MOVE 524, 144; DRAW 556, 148; DRAW 616, 144; DRAW 648, 140; MOVE 632, 128; DRAW 604, 136; DRAW 552, 136; DRAW 512, 132; MOVE 496, 120; DRAW 540, 124; DRAW 600, 116; DRAW 620, 116; MOVE 608, 104; DRAW 580, 108; DRAW 516, 108; DRAW 484, 104; MOVE 468, 92; DRAW 520, 100; DRAW 564, 96; DRAW 592, 88; MOVE 472, 80; DRAW 504, 88; DRAW 532, 88; DRAW 560, 76; MOVE 500, 72; DRAW 516, 76; DRAW 528, 68; MOVE 640, 164; DRAW 640, 156; COLOUR 3; MOVE 608, 184; FILL ; COLOUR 2; MOVE 528, 72; DRAW 528, 72; COLOUR 0; MOVE 572, 208; DRAW 572, 188; MOVE 572, 208; DRAW 584, 208; DRAW 584, 200; DRAW 572, 200; DRAW 584, 188; MOVE 600, 208; DRAW 600, 188; MOVE 616, 208; DRAW 616, 188; MOVE 616, 208; DRAW 628, 208; DRAW 628, 200; DRAW 616, 200; MOVE 640, 216; DRAW 648, 224; MOVE 624, 228; DRAW 632, 236; MOVE 576, 228; DRAW 580, 236; DRAW 632, 236; DRAW 648, 220; DRAW 648, 168; COLOUR 2; MOVE 648, 224; DRAW 648, 224; MOVE 652, 220; DRAW 652, 220; COLOUR 0; MOVE 648, 164; DRAW 648, 164; COLOUR 3; MOVE 596, 232; FILL ; COLOUR 3; MOVE 636, 228; DRAW 640, 220; COLOUR 0; MOVE 0, 332; DRAW 132, 356; DRAW 248, 368; DRAW 404, 360; DRAW 580, 332; DRAW 732, 300; MOVE 580, 332; DRAW 736, 344; DRAW 964, 332; DRAW 1016, 324; COLOUR 1; MOVE 176, 396; FILL ; COLOUR 3; MOVE 80, 468; TEXT 236; COLOUR 1; MOVE 0, 340; FILL ; MOVE 588, 340; FILL ; MOVE 1016, 340; FILL ; "
+		}
+	},
+	"roomcommands": [{
+			"location": 1,
+			"message": "1 (You are standing on a barren plateau.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 2", "IF VERB=SOUTH GOTO 3", "IF VERB=WEST GOTO 61"]
+		},
+		{
+			"location": 2,
+			"message": "2 (You are on a rocky mountain path.)",
+			"image": 1,
+			"flags": 3,
+			"actions": ["IF VERB=UP GOTO 1", "IF VERB=DOWN GOTO 6"]
+		},
+		{
+			"location": 3,
+			"message": "3 (You are on the top of a steep cliff. A space shuttle is visible below.)",
+			"image": 2,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 1", "IF VERB=JUMP AND INROOM(PARA) GOTO 4", "IF VERB=JUMP AND NOTINV(PARA) GOTO 7"]
+		},
+		{
+			"location": 4,
+			"message": "4 (You are on a ledge halfway down the cliff face.)",
+			"image": 3,
+			"flags": 3,
+			"actions": ["IF VERB=JUMP AND INROOM(PARA) GOTO 5", "IF VERB=JUMP AND NOTINV(PARA) GOTO 7"]
+		},
+		{
+			"location": 5,
+			"message": "5 (You are at the base of the cliff.)",
+			"image": 3,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 8", "IF VERB=SOUTH GOTO 11", "IF VERB=EAST GOTO 6"]
+		},
+		{
+			"location": 6,
+			"message": "2 (You are on a rocky mountain path.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=UP GOTO 2", "IF VERB=DOWN GOTO 5"]
+		},
+		{
+			"location": 7,
+			"message": "6 (You hit the ground with a thud.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 60"]
+		},
+		{
+			"location": 8,
+			"message": "7 (You are lost in the forest.)",
+			"image": 4,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 5", "IF VERB=WEST GOTO 8", "IF VERB=EAST GOTO 8", "IF VERB=NORTH GOTO 9"]
+		},
+		{
+			"location": 9,
+			"message": "7 (You are lost in the forest.)",
+			"image": 4,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 8", "IF VERB=EAST GOTO 1", "IF VERB=WEST GOTO 9", "IF VERB=NORTH GOTO 9", "IF VERB=CLIM TREE GOTO 10"]
+		},
+		{
+			"location": 10,
+			"message": "8 (You are at the top of a tree. Dense vegitation can be seen all around.)",
+			"image": 4,
+			"flags": 3,
+			"actions": ["IF VERB=DOWN GOTO 9"]
+		},
+		{
+			"location": 11,
+			"message": "9 (You are on a flat plain. A spaceship is visible to the south. A fierce looking robot is guarding the spaceship.)",
+			"image": 5,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 5", "IF VERB=EAST GOTO 14", "IF VERB=SOUTH GOTO 12", "IF VERB=SHOO ROBO AND INROOM(LASE) GOTO 13"]
+		},
+		{
+			"location": 12,
+			"message": "10 (The robot won't let you.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 11"]
+		},
+		{
+			"location": 13,
+			"message": "11 (The explosion blows you to the south but you seem to be alright.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 17"]
+		},
+		{
+			"location": 14,
+			"message": "12 (You are lost in the desert.)",
+			"image": 6,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 15", "IF VERB=SOUTH GOTO 15", "IF VERB=EAST GOTO 15", "IF VERB=WEST GOTO 14"]
+		},
+		{
+			"location": 15,
+			"message": "12 (You are lost in the desert.)",
+			"image": 6,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 15", "IF VERB=SOUTH GOTO 15", "IF VERB=EAST GOTO 15", "IF VERB=NORTH GOTO 16"]
+		},
+		{
+			"location": 16,
+			"message": "12 (You are lost in the desert.)",
+			"image": 6,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 16", "IF VERB=SOUTH GOTO 15", "IF VERB=EAST GOTO 16", "IF VERB=WEST GOTO 6"]
+		},
+		{
+			"location": 17,
+			"message": "13 (You are by a spaceship.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 14", "IF VERB=JUMP GOTO 18", "IF VERB=GO AIRL GOTO 18"]
+		},
+		{
+			"location": 18,
+			"message": "14 (You are standing in a airlock. The inner door is locked.)",
+			"image": 7,
+			"flags": 3,
+			"actions": ["IF VERB=DOWN GOTO 17", "IF VERB=SOUTH GOTO 19", "IF VERB=PICK LOCK AND INROOM(LOCK) GOTO 20"]
+		},
+		{
+			"location": 19,
+			"message": "15 (Sorry! the door is locked.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 18"]
+		},
+		{
+			"location": 20,
+			"message": "16 (The door opens and you go in.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 21"]
+		},
+		{
+			"location": 21,
+			"message": "17 (You are in the main control room. There is a slot for a fuel capsule and a lever.)",
+			"image": 8,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 18", "IF VERB=PULL LEVE AND INROOM(FUEL) GOTO 23", "IF VERB=PULL LEVE AND INROOM(FUEL) GOTO 22"]
+		},
+		{
+			"location": 22,
+			"message": "18 (Nothing happens. You notice that a fuel gauge shows zero.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 21"]
+		},
+		{
+			"location": 23,
+			"message": "19 (With a roar the ship takes off on automatic pilot. After a while you hear the engines cut out.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 24"]
+		},
+		{
+			"location": 24,
+			"message": "17 (You are in the main control room. There is a slot for a fuel capsule and a lever.)",
+			"image": 8,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 25"]
+		},
+		{
+			"location": 25,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 26", "IF VERB=WEST GOTO 33", "IF VERB=SOUTH GOTO 24"]
+		},
+		{
+			"location": 26,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 27", "IF VERB=WEST GOTO 25"]
+		},
+		{
+			"location": 27,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 28", "IF VERB=WEST GOTO 26"]
+		},
+		{
+			"location": 28,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 29", "IF VERB=SOUTH GOTO 27"]
+		},
+		{
+			"location": 29,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 28", "IF VERB=WEST GOTO 30"]
+		},
+		{
+			"location": 30,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 29", "IF VERB=WEST GOTO 31", "IF VERB=SOUTH GOTO 34"]
+		},
+		{
+			"location": 31,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 30", "IF VERB=WEST GOTO 32"]
+		},
+		{
+			"location": 32,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 31", "IF VERB=SOUTH GOTO 33", "IF VERB=WEST GOTO 39"]
+		},
+		{
+			"location": 33,
+			"message": "20 (You are in a long twisty corridor.)",
+			"image": 9,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 32", "IF VERB=EAST GOTO 25"]
+		},
+		{
+			"location": 34,
+			"message": "21 (You are in the ships engine room. You can see a warm glow from the south.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 30", "IF VERB=EAST GOTO 35", "IF VERB=SOUTH AND INROOM(SUIT) GOTO 38", "IF VERB=SOUTH AND NOTINV(SUIT) GOTO 37"]
+		},
+		{
+			"location": 35,
+			"message": "22 (You are lost in a maze of machinary which all looks alike.)",
+			"image": 10,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 34", "IF VERB=WEST GOTO 35", "IF VERB=EAST GOTO 35", "IF VERB=SOUTH GOTO 36"]
+		},
+		{
+			"location": 36,
+			"message": "22 (You are lost in a maze of machinary which all looks alike.)",
+			"image": 10,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 35", "IF VERB=NORTH GOTO 36", "IF VERB=EAST GOTO 36", "IF VERB=SOUTH GOTO 36"]
+		},
+		{
+			"location": 37,
+			"message": "23 (As you enter the room you are fried to a cinder by the radiation.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 60"]
+		},
+		{
+			"location": 38,
+			"message": "24 (You are standing near the main reactor. The radiation would kill an unprotected mortal.)",
+			"image": 11,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 34"]
+		},
+		{
+			"location": 39,
+			"message": "25 (You are in a airlock. An outer door leads west.)",
+			"image": 20,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 40", "IF VERB=NORTH GOTO 41", "IF VERB=EAST GOTO 32"]
+		},
+		{
+			"location": 40,
+			"message": "26 (The outer door opens and you are blown into space.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 60"]
+		},
+		{
+			"location": 41,
+			"message": "27 (You are standing outside a familiar looking Time Machine. The entrance is locked.)",
+			"image": 12,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 39", "IF VERB=PICK LOCK AND INROOM(LOCK) GOTO 42", "IF VERB=PICK LOCK AND NOTINV(LOCK) GOTO 65"]
+		},
+		{
+			"location": 42,
+			"message": "28 (You are in the Time Machine.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 45", "IF VERB=SOUTH GOTO 41", "IF VERB=EAST GOTO 43"]
+		},
+		{
+			"location": 43,
+			"message": "30 (You are in an empty boot room.)",
+			"image": 14,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 44", "IF VERB=WEST GOTO 42", "IF VERB=NORTH GOTO 45", "IF VERB=SOUTH GOTO 69"]
+		},
+		{
+			"location": 44,
+			"message": "31 (You are in a suit locker.)",
+			"image": 15,
+			"flags": 3,
+			"actions": ["IF VERB=WEST GOTO 43"]
+		},
+		{
+			"location": 45,
+			"message": "32 (You are in a large control room. A large circlular control console is in the middle of the room. The console has three buttons (red blackand white).There is a slot here for a time crystal.)",
+			"image": 16,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 42", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 46", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 47", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 62", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 62", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 62", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 62"]
+		},
+		{
+			"location": 46,
+			"message": "33 (You feel queasy as you instantly go into hyperspace.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 49"]
+		},
+		{
+			"location": 47,
+			"message": "33 (You feel queasy as you instantly go into hyperspace.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 55"]
+		},
+		{
+			"location": 48,
+			"message": "33 (You feel queasy as you instantly go into hyperspace.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 45"]
+		},
+		{
+			"location": 49,
+			"message": "32 (You are in a large control room. A large circlular control console is in the middle of the room. The console has three buttons (red blackand white).There is a slot here for a time crystal.)",
+			"image": 16,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 50", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 47", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 48", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 63", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 63", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 63", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 63"]
+		},
+		{
+			"location": 50,
+			"message": "34 (You are standing in a cave entrance. The door to the Time Machine is to the north.)",
+			"image": 17,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 49", "IF VERB=SOUTH GOTO 51", "IF VERB=WEST GOTO 50", "IF VERB=EAST GOTO 52"]
+		},
+		{
+			"location": 51,
+			"message": "35 (You are lost in a labyrinth of twisty tunnels.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 52", "IF VERB=EAST GOTO 50", "IF VERB=WEST GOTO 53", "IF VERB=SOUTH GOTO 51"]
+		},
+		{
+			"location": 52,
+			"message": "35 (You are lost in a labyrinth of twisty tunnels.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 50", "IF VERB=EAST GOTO 51", "IF VERB=WEST GOTO 52", "IF VERB=SOUTH GOTO 53"]
+		},
+		{
+			"location": 53,
+			"message": "46 (You are standing in a large cave. You can see a strange glow from the south.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 51", "IF VERB=EAST GOTO 52", "IF VERB=WEST GOTO 50", "IF VERB=SOUTH GOTO 54"]
+		},
+		{
+			"location": 54,
+			"message": "36 (You are standing on the edge of a ravine. The walls glow with a greenish light.)",
+			"image": 0,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 53"]
+		},
+		{
+			"location": 55,
+			"message": "32 (You are in a large control room. A large circlular control console is in the middle of the room. The console has three buttons (red blackand white).There is a slot here for a time crystal.)",
+			"image": 16,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 56", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 47", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 46", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 64", "IF VERB=PUSH WHIT AND INROOM(CRYS) GOTO 64", "IF VERB=PUSH RED AND INROOM(CRYS) GOTO 64", "IF VERB=PUSH BLAC AND INROOM(CRYS) GOTO 64"]
+		},
+		{
+			"location": 56,
+			"message": "37 (You are standing outside the Time Machine. You see a house to the south.)",
+			"image": 22,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 55", "IF VERB=SOUTH GOTO 57", "IF VERB=EAST GOTO 66", "IF VERB=WEST GOTO 66"]
+		},
+		{
+			"location": 57,
+			"message": "38 (You are standing on the front porch of your house. The door is locked.)",
+			"image": 18,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 56", "IF VERB=PICK LOCK AND INROOM(LOCK) GOTO 58", "IF VERB=UNLO DOOR AND INROOM(KEY) GOTO 59"]
+		},
+		{
+			"location": 58,
+			"message": "39 (You try the lockpick but it does'nt work.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 57"]
+		},
+		{
+			"location": 59,
+			"message": "40 (CONGRATULATIONS. You have escaped from the planet and are safely home. I Hope you've enjoyed playing.)",
+			"image": 23,
+			"flags": 3,
+			"actions": ["GOTO 0"]
+		},
+		{
+			"location": 60,
+			"message": "41 (You seem to be dead. Better luck next time.)",
+			"image": 24,
+			"flags": 3,
+			"actions": ["GOTO 0"]
+		},
+		{
+			"location": 61,
+			"message": "42 (You are on a rough rocky mountain path.)",
+			"image": 19,
+			"flags": 3,
+			"actions": ["IF VERB=EAST GOTO 1", "IF VERB=NORTH GOTO 6"]
+		},
+		{
+			"location": 62,
+			"message": "43 (Nothing happens.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 45"]
+		},
+		{
+			"location": 63,
+			"message": "43 (Nothing happens.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 49"]
+		},
+		{
+			"location": 64,
+			"message": "43 (Nothing happens.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 55"]
+		},
+		{
+			"location": 65,
+			"message": "44 (You have no lockpick.)",
+			"image": 0,
+			"flags": 0,
+			"actions": ["GOTO 41"]
+		},
+		{
+			"location": 66,
+			"message": "45 (You see nothing but grassy hills in all directions.)",
+			"image": 21,
+			"flags": 3,
+			"actions": ["IF VERB=NORTH GOTO 66", "IF VERB=SOUTH GOTO 66", "IF VERB=EAST GOTO 67", "IF VERB=WEST GOTO 66"]
+		},
+		{
+			"location": 67,
+			"message": "45 (You see nothing but grassy hills in all directions.)",
+			"image": 21,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 66", "IF VERB=WEST GOTO 68", "IF VERB=EAST GOTO 67"]
+		},
+		{
+			"location": 68,
+			"message": "45 (You see nothing but grassy hills in all directions.)",
+			"image": 21,
+			"flags": 3,
+			"actions": ["IF VERB=SOUTH GOTO 67", "IF VERB=WEST GOTO 66", "IF VERB=EAST GOTO 66", "IF VERB=NORTH GOTO 56"]
+		}
+	]
+}
